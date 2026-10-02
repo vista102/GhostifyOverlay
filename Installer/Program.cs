@@ -53,22 +53,43 @@ namespace GhostifySetup {
         private readonly PrivateFontCollection _fonts = new PrivateFontCollection();
         private readonly System.Collections.Generic.List<IntPtr> _memory = new System.Collections.Generic.List<IntPtr>();
         private readonly System.Collections.Generic.List<IntPtr> _handles = new System.Collections.Generic.List<IntPtr>();
+        private readonly System.Collections.Generic.List<Font> _ownedFonts = new System.Collections.Generic.List<Font>();
+        private FontFamily[] _families = new FontFamily[0];
+        private bool _disposed;
         [DllImport("gdi32.dll")] private static extern IntPtr AddFontMemResourceEx(IntPtr font, uint size, IntPtr reserved, ref uint count);
         [DllImport("gdi32.dll")] private static extern bool RemoveFontMemResourceEx(IntPtr handle);
         internal BrandFonts(InstallerEngine engine) {
+            try {
             foreach (string path in new[] { "Assets/GoogleSans-Regular.ttf", "Assets/NotoSansKR-Regular.ttf" }) {
                 byte[] data = engine.PayloadFile(path); IntPtr memory = Marshal.AllocHGlobal(data.Length); _memory.Add(memory);
                 Marshal.Copy(data, 0, memory, data.Length); _fonts.AddMemoryFont(memory, data.Length);
                 uint count = 0; IntPtr handle = AddFontMemResourceEx(memory, (uint)data.Length, IntPtr.Zero, ref count);
                 if (handle != IntPtr.Zero) _handles.Add(handle);
             }
+                _families = _fonts.Families;
+            } catch { Dispose(); throw; }
         }
         internal Font Font(float size, bool english = false, bool bold = false) {
+            if (_disposed) throw new ObjectDisposedException(nameof(BrandFonts));
             string wanted = english ? "Google Sans" : "Noto Sans KR";
-            foreach (FontFamily family in _fonts.Families) if (family.Name.StartsWith(wanted, StringComparison.OrdinalIgnoreCase)) return new Font(family, size, bold ? FontStyle.Bold : FontStyle.Regular, GraphicsUnit.Point);
-            return new Font("맑은 고딕", size, bold ? FontStyle.Bold : FontStyle.Regular);
+            Font font = null;
+            foreach (FontFamily family in _families) if (family.Name.StartsWith(wanted, StringComparison.OrdinalIgnoreCase)) {
+                font = new Font(family, size, bold ? FontStyle.Bold : FontStyle.Regular, GraphicsUnit.Point); break;
+            }
+            if (font == null) font = new Font("맑은 고딕", size, bold ? FontStyle.Bold : FontStyle.Regular);
+            _ownedFonts.Add(font); return font;
         }
-        public void Dispose() { _fonts.Dispose(); foreach (IntPtr handle in _handles) RemoveFontMemResourceEx(handle); foreach (IntPtr memory in _memory) Marshal.FreeHGlobal(memory); }
+        public void Dispose() {
+            if (_disposed) return;
+            _disposed = true;
+            // Controls must release their handles before the fonts and their backing memory.
+            foreach (Font font in _ownedFonts) font.Dispose();
+            foreach (FontFamily family in _families) family.Dispose();
+            _fonts.Dispose();
+            foreach (IntPtr handle in _handles) RemoveFontMemResourceEx(handle);
+            foreach (IntPtr memory in _memory) Marshal.FreeHGlobal(memory);
+            _ownedFonts.Clear(); _handles.Clear(); _memory.Clear(); _families = new FontFamily[0];
+        }
     }
     internal class RoundedPanel : Panel {
         internal Color Fill = Color.White, Stroke = Color.FromArgb(230, 230, 230);
@@ -87,21 +108,34 @@ namespace GhostifySetup {
     internal sealed class BrandButton : Button {
         internal Color Fill = Color.FromArgb(255, 202, 58), Ink = Color.FromArgb(41, 41, 41);
         internal bool IsClose;
-        private bool _hover;
-        internal BrandButton() { FlatStyle = FlatStyle.Flat; FlatAppearance.BorderSize = 0; Cursor = Cursors.Hand; SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true); }
+        private bool _hover, _pressed;
+        internal BrandButton() { FlatStyle = FlatStyle.Flat; FlatAppearance.BorderSize = 0; UseVisualStyleBackColor = false; Cursor = Cursors.Hand; SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true); }
         protected override void OnMouseEnter(EventArgs e) { _hover = true; Invalidate(); base.OnMouseEnter(e); }
-        protected override void OnMouseLeave(EventArgs e) { _hover = false; Invalidate(); base.OnMouseLeave(e); }
+        protected override void OnMouseLeave(EventArgs e) { _hover = _pressed = false; Invalidate(); base.OnMouseLeave(e); }
+        protected override void OnMouseDown(MouseEventArgs e) { if (e.Button == MouseButtons.Left) _pressed = true; Invalidate(); base.OnMouseDown(e); }
+        protected override void OnMouseUp(MouseEventArgs e) { _pressed = false; Invalidate(); base.OnMouseUp(e); }
+        protected override void OnKeyDown(KeyEventArgs e) { if (e.KeyCode == Keys.Space) { _pressed = true; Invalidate(); } base.OnKeyDown(e); }
+        protected override void OnKeyUp(KeyEventArgs e) { _pressed = false; Invalidate(); base.OnKeyUp(e); }
+        protected override void OnGotFocus(EventArgs e) { Invalidate(); base.OnGotFocus(e); }
+        protected override void OnLostFocus(EventArgs e) { _pressed = false; Invalidate(); base.OnLostFocus(e); }
+        protected override void OnChangeUICues(UICuesEventArgs e) { Invalidate(); base.OnChangeUICues(e); }
+        protected override void OnPaintBackground(PaintEventArgs e) {
+            // The native Button background can be black with owner painting, including at rounded corners.
+            e.Graphics.Clear(Parent == null ? BackColor : Parent.BackColor);
+        }
         protected override void OnPaint(PaintEventArgs e) {
+            // Button's native paint path may skip OnPaintBackground; clear the buffer here too.
+            e.Graphics.Clear(Parent == null ? BackColor : Parent.BackColor);
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
             if (IsClose) {
                 using (var pen = new Pen(_hover ? Color.FromArgb(41, 41, 41) : Color.FromArgb(100, 100, 100), 2.5f) { StartCap = LineCap.Round, EndCap = LineCap.Round }) {
                     float cx = Width / 2f, cy = Height / 2f; e.Graphics.DrawLine(pen, cx - 7, cy - 7, cx + 7, cy + 7); e.Graphics.DrawLine(pen, cx + 7, cy - 7, cx - 7, cy + 7);
                 }
             } else {
-                Color color = !Enabled ? Color.FromArgb(235, 235, 235) : _hover ? ControlPaint.Light(Fill, .16f) : Fill;
+                Color color = !Enabled ? Color.FromArgb(235, 235, 235) : _pressed ? ControlPaint.Dark(Fill, .08f) : _hover ? ControlPaint.Light(Fill, .16f) : Fill;
                 using (var shape = RoundedPanel.Shape(new RectangleF(0, 0, Width - 1, Height - 1), 12)) using (var fill = new SolidBrush(color)) e.Graphics.FillPath(fill, shape);
                 TextRenderer.DrawText(e.Graphics, Text, Font, ClientRectangle, Enabled ? Ink : Color.FromArgb(135, 135, 135), TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine);
-                if (Focused) ControlPaint.DrawFocusRectangle(e.Graphics, Rectangle.Inflate(ClientRectangle, -5, -5), Ink, color);
+                if (Focused && ShowFocusCues) using (var focus = RoundedPanel.Shape(new RectangleF(3, 3, Width - 7, Height - 7), 9)) using (var pen = new Pen(Ink, 1.5f)) e.Graphics.DrawPath(pen, focus);
             }
         }
     }
@@ -112,18 +146,22 @@ namespace GhostifySetup {
         private readonly Label _gameStatus, _ummStatus, _backupStatus, _heading, _subtitle, _note;
         private readonly BrandButton _install, _browse, _close;
         private readonly PictureBox _mascot;
-        private bool _busy, _complete;
+        private readonly Icon _brandIcon;
+        private bool _busy, _complete, _resourcesDisposed;
         private string _backup;
         private Point? _drag;
         internal SetupWindow(InstallerEngine engine) {
-            _engine = engine; _fonts = new BrandFonts(engine);
+            _engine = engine;
+            try {
+            _fonts = new BrandFonts(engine);
             Text = "Ghostify Overlay 설치"; FormBorderStyle = FormBorderStyle.None; StartPosition = FormStartPosition.CenterScreen;
             ClientSize = new Size(1000, 660); AutoScaleDimensions = new SizeF(96, 96); AutoScaleMode = AutoScaleMode.Dpi;
             BackColor = Color.FromArgb(250, 250, 250); Font = _fonts.Font(12); DoubleBuffered = true;
-            using (var stream = new MemoryStream(InstallerEngine.Resource("Brand.ico"))) using (var icon = new Icon(stream)) Icon = (Icon)icon.Clone();
+            using (var stream = new MemoryStream(InstallerEngine.Resource("Brand.ico"))) using (var icon = new Icon(stream)) _brandIcon = (Icon)icon.Clone();
+            Icon = _brandIcon;
             Label logo = Label("Ghostify Overlay", 26, new Rectangle(28, 8, 550, 76), true);
             Label version = Label("v" + engine.Version, 11, new Rectangle(590, 38, 150, 28), true); version.ForeColor = Color.FromArgb(115, 115, 115);
-            _close = new BrandButton { IsClose = true, Bounds = new Rectangle(941, 22, 40, 40), BackColor = BackColor, TabStop = false }; _close.Click += (s, e) => Close(); Controls.Add(_close);
+            _close = new BrandButton { IsClose = true, AccessibleName = "닫기", Bounds = new Rectangle(941, 22, 40, 40), BackColor = BackColor, TabStop = false }; _close.Click += (s, e) => Close(); Controls.Add(_close);
             var hero = new RoundedPanel { Bounds = new Rectangle(24, 90, 346, 542), BackColor = BackColor, Stroke = Color.FromArgb(239, 239, 239) }; Controls.Add(hero);
             using (var stream = new MemoryStream(InstallerEngine.Resource("Mascot.png"))) using (var image = new Bitmap(stream)) _mascot = new PictureBox { Image = new Bitmap(image), SizeMode = PictureBoxSizeMode.Zoom, BackColor = Color.White, Bounds = new Rectangle(17, 44, 312, 338) };
             hero.Controls.Add(_mascot);
@@ -136,7 +174,7 @@ namespace GhostifySetup {
             _path = new TextBox { BorderStyle = BorderStyle.None, Bounds = new Rectangle(14, 21, 434, 30), Font = _fonts.Font(10), BackColor = Color.White, ForeColor = Color.FromArgb(65, 65, 65) }; input.Controls.Add(_path);
             _path.Leave += (s, e) => ValidateSelection(); _path.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) { ValidateSelection(); e.SuppressKeyPress = true; } };
             _browse = new BrandButton { Text = "찾기", Fill = Color.FromArgb(238, 238, 238), Bounds = new Rectangle(894, 263, 78, 62), Font = _fonts.Font(12) }; Controls.Add(_browse);
-            _browse.Click += (s, e) => { using (var picker = new FolderBrowserDialog { Description = "A Dance of Fire and Ice.exe가 있는 게임 폴더를 선택하세요.", SelectedPath = _path.Text, ShowNewFolderButton = false }) if (picker.ShowDialog(this) == DialogResult.OK) SetPath(picker.SelectedPath); };
+            _browse.Click += (s, e) => Browse();
             var status = new RoundedPanel { Bounds = new Rectangle(416, 347, 556, 142), Fill = Color.White, BackColor = BackColor, Radius = 12 }; Controls.Add(status);
             _gameStatus = Label("게임 폴더 선택 대기", 11, new Rectangle(18, 18, 520, 31), false, status);
             _ummStatus = Label("Unity Mod Manager 확인 대기", 11, new Rectangle(18, 56, 520, 31), false, status);
@@ -149,6 +187,7 @@ namespace GhostifySetup {
             MouseUp += (s, e) => _drag = null; logo.MouseUp += (s, e) => _drag = null; version.MouseUp += (s, e) => _drag = null;
             FormClosing += (s, e) => { if (_busy) e.Cancel = true; };
             Shown += (s, e) => { try { SetPath(InstallerEngine.FindGame()); } catch { SetPath(string.Empty); } };
+            } catch { Dispose(); throw; }
         }
         private Label Label(string text, float size, Rectangle bounds, bool english = false, Control parent = null) {
             var label = new Label { Text = text, Bounds = bounds, Font = _fonts.Font(size, english), BackColor = Color.Transparent, ForeColor = Color.FromArgb(41, 41, 41), AutoEllipsis = true };
@@ -157,6 +196,16 @@ namespace GhostifySetup {
         private void DragStart(object sender, MouseEventArgs e) { if (e.Button == MouseButtons.Left && !_busy) _drag = new Point(Cursor.Position.X - Left, Cursor.Position.Y - Top); }
         private void DragMove(object sender, MouseEventArgs e) { if (_drag.HasValue && e.Button == MouseButtons.Left) Location = new Point(Cursor.Position.X - _drag.Value.X, Cursor.Position.Y - _drag.Value.Y); }
         internal void SetPath(string value) { _path.Text = value; ValidateSelection(); }
+        private void Browse() {
+            try {
+                using (var picker = new FolderBrowserDialog {
+                    Description = "A Dance of Fire and Ice.exe가 있는 게임 폴더를 선택하세요.",
+                    RootFolder = Environment.SpecialFolder.MyComputer,
+                    SelectedPath = Directory.Exists(_path.Text) ? _path.Text : string.Empty,
+                    ShowNewFolderButton = false
+                }) if (picker.ShowDialog(this) == DialogResult.OK) SetPath(picker.SelectedPath);
+            } catch (Exception ex) { MessageBox.Show(this, "폴더 선택 창을 열 수 없습니다. 경로를 직접 입력해 주세요.\n" + ex.Message, "Ghostify Overlay", MessageBoxButtons.OK, MessageBoxIcon.Information); }
+        }
         private void ValidateSelection() {
             if (_busy || _complete) return;
             try {
@@ -167,6 +216,8 @@ namespace GhostifySetup {
                 _heading.Text = "설치 준비"; _install.Text = state.IsUpdate ? "업데이트 / 다시 설치" : "설치하기"; _install.Enabled = true;
             } catch (Exception ex) {
                 _gameStatus.Text = ex.Message; _ummStatus.Text = "게임과 Unity Mod Manager를 확인해 주세요."; _install.Enabled = false;
+                _backupStatus.Text = "기존 설정 유지 · 설치 전 자동 백업";
+                _subtitle.Text = "얼불춤 폴더를 확인하고 설치를 시작하세요.";
             }
         }
         private static string Quote(string value) { return "\"" + value.TrimEnd('\\') + "\""; }
@@ -193,14 +244,28 @@ namespace GhostifySetup {
                 _heading.Text = "설치 완료"; _subtitle.Text = "게임에서 Alt+D로 설정을 열어 보세요.";
                 _gameStatus.Text = "✓  Ghostify Overlay " + _engine.Version + " 설치 완료"; _ummStatus.Text = "✓  모드 활성화 완료";
                 _backupStatus.Text = "✓  기존 설정 보존 · 백업 폴더 열기"; _backupStatus.Cursor = Cursors.Hand;
-                _backupStatus.Click += (s, e) => Process.Start(new ProcessStartInfo(_backup) { UseShellExecute = true });
+                _backupStatus.Click += (s, e) => {
+                    try { Process.Start(new ProcessStartInfo(_backup) { UseShellExecute = true }); }
+                    catch (Exception ex) { MessageBox.Show(this, "백업 폴더를 열 수 없습니다.\n" + ex.Message, "Ghostify Overlay", MessageBoxButtons.OK, MessageBoxIcon.Information); }
+                };
                 _note.Text = "저장한 키 색상과 오버레이 배치는 그대로 유지됩니다."; _install.Text = "완료";
             } catch (System.ComponentModel.Win32Exception ex) when (ex.NativeErrorCode == 1223) { _heading.Text = "설치 취소"; _subtitle.Text = "설치를 시작하려면 다시 눌러 주세요."; }
             catch (Exception ex) { _heading.Text = "설치 확인 필요"; _subtitle.Text = "아래 내용을 확인한 뒤 다시 시도해 주세요."; MessageBox.Show(this, ex.Message, "Ghostify Overlay", MessageBoxButtons.OK, MessageBoxIcon.Information); }
             finally { _busy = false; _install.Enabled = _browse.Enabled = _close.Enabled = true; _path.ReadOnly = false; if (!_complete) ValidateSelection(); }
         }
         protected override void Dispose(bool disposing) {
-            if (disposing) { _mascot.Image.Dispose(); Icon.Dispose(); base.Dispose(true); _fonts.Dispose(); } else base.Dispose(false);
+            if (!disposing || _resourcesDisposed) { base.Dispose(disposing); return; }
+            _resourcesDisposed = true;
+            Image image = _mascot == null ? null : _mascot.Image;
+            Icon icon = _brandIcon;
+            if (_mascot != null) _mascot.Image = null;
+            Icon = null;
+            try { base.Dispose(true); }
+            finally {
+                if (image != null) image.Dispose();
+                if (icon != null) icon.Dispose();
+                if (_fonts != null) _fonts.Dispose();
+            }
         }
     }
 }

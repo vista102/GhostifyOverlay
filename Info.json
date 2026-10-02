@@ -2,7 +2,7 @@
   "Id": "DonQuixoteOverlay",
   "DisplayName": "Ghostify Overlay",
   "Author": "qkddn",
-  "Version": "0.2.9",
+  "Version": "0.2.10",
   "ManagerVersion": "0.33.0",
   "AssemblyName": "GhostifyOverlay.dll",
   "EntryMethod": "DonQuixoteOverlay.Main.Load"

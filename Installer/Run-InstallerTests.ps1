@@ -35,4 +35,25 @@ $process=Start-Process -FilePath $exe -ArgumentList $arguments -WindowStyle Hidd
 $result=Get-Content -LiteralPath $report -Raw -Encoding UTF8 | ConvertFrom-Json
 if($process.ExitCode -ne 0 -or !$result.Success){throw ('Shipping EXE install failed: '+$result.Message)}
 'PASS shipping EXE installs its embedded payload into a Unicode game fixture'
+$data=Join-Path $game 'Mods\DonQuixoteOverlay\UserData'
+New-Item -ItemType Directory -Path $data | Out-Null
+foreach($name in @('settings.json','layout.json','keyviewer.json','keyviewer-counts.json')){
+    [IO.File]::WriteAllText((Join-Path $data $name),('saved user settings '+$name))
+    [IO.File]::WriteAllText((Join-Path $data ($name+'.bak')),('saved user backup '+$name))
+}
+$before=@(Get-ChildItem -LiteralPath $data -File | ForEach-Object {@{Name=$_.Name;Hash=(Get-FileHash -LiteralPath $_.FullName).Hash}})
+$updateReport=Join-Path $root 'EXE-update-result.json'
+$process=Start-Process -FilePath $exe -ArgumentList ('--install "'+$game+'" "'+$updateReport+'" "'+$backup+'"') -WindowStyle Hidden -PassThru -Wait
+$result=Get-Content -LiteralPath $updateReport -Raw -Encoding UTF8 | ConvertFrom-Json
+if($process.ExitCode -ne 0 -or !$result.Success){throw ('Shipping EXE update failed: '+$result.Message)}
+foreach($file in $before){
+    if((Get-FileHash -LiteralPath (Join-Path $data $file.Name)).Hash -ne $file.Hash){throw 'Shipping EXE changed user settings'}
+    if((Get-FileHash -LiteralPath (Join-Path $result.Backup ('previous-mod\UserData\'+$file.Name))).Hash -ne $file.Hash){throw 'Shipping EXE backup is incomplete'}
+}
+'PASS shipping EXE updates and backs up all eight user files without changing them'
+$failureReport=Join-Path $root 'EXE-invalid-result.json'
+$process=Start-Process -FilePath $exe -ArgumentList ('--install "'+$root+'" "'+$failureReport+'" "'+$backup+'"') -WindowStyle Hidden -PassThru -Wait
+$result=Get-Content -LiteralPath $failureReport -Raw -Encoding UTF8 | ConvertFrom-Json
+if($process.ExitCode -ne 1 -or $result.Success -or [string]::IsNullOrWhiteSpace($result.Message)){throw 'Shipping EXE invalid-path handling failed'}
+'PASS shipping EXE reports invalid paths without opening an error window'
 'Fixture: '+$root

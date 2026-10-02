@@ -1,10 +1,12 @@
-# Ghostify Overlay 0.2.9
+# Ghostify Overlay 0.2.10
 
 ## 설치
 
-[비공개 GitHub 릴리스](https://github.com/vista102/GhostifyOverlay/releases/latest)에서 **GhostifyOverlay-Setup-0.2.9.exe**를 받습니다. Windows 10/11, .NET Framework 4.8, Unity Mod Manager 0.33.0 이상이 설치된 얼불춤을 사용합니다.
+[비공개 GitHub 릴리스](https://github.com/vista102/GhostifyOverlay/releases/latest)에서 **GhostifyOverlay-Setup-0.2.10.exe**를 받습니다. Windows 10/11, .NET Framework 4.8, Unity Mod Manager 0.33.0 이상이 설치된 얼불춤을 사용합니다.
 
 게임을 완전히 종료하고 EXE를 실행한 뒤 자동으로 찾은 게임 폴더를 확인하고 **설치하기 / 업데이트**를 누릅니다. 직접 폴더를 선택할 수도 있습니다. 기존 키 색상·배치·설정·누적 기록은 유지하고 이전 모드·UMM 설정을 자동으로 백업합니다. 설치 실패 시 변경한 파일을 복원합니다. 첨부 캐릭터를 설치 화면과 EXE 아이콘에 사용했습니다. 자세한 제작·복원 안내는 [설치 프로그램 문서](Installer/README.md)에 있습니다.
+
+0.2.10은 설치 창을 닫을 때 글꼴 메모리를 중복 해제하던 오류(HRESULT 0x800703E6)를 수정했습니다. 찾기·설치·닫기 버튼의 검은 모서리를 없애고 키보드 포커스를 둥근 테두리로 표시합니다. 폴더 선택을 취소하면 현재 경로를 유지합니다.
 
 ## 모드 사용
 
@@ -58,7 +60,7 @@ SkyHook 이벤트를 별도 큐로 관찰하고 Unity 객체는 메인 스레드
 
 키뷰어 기준 커밋은 JipperResourcePack ac6d6410571ee7d585aedce7f5085de34f615af2입니다. 클래스 관계·기본 크기와 배치·슬롯 집계·레인 계산을 유지하고 독립 모드 연결, uGUI 설정, 안전한 저장과 자원 정리를 조정했습니다. JALib·IMGUI·DOTween 추가 의존성은 없습니다. BSD 고지와 Google Sans OFL은 배포물에 포함합니다. 자세한 출처는 THIRD-PARTY-NOTICES.md를 참고하세요.
 
-0.2.1의 폰트 초기화 오류 수정을 유지합니다. 0.2.9 Release 빌드 오류·경고 0, 이번 테두리·정렬·닫기 버튼 수정과 관련된 로직 139·이펙트/UI 69로 208개 검사를 통과했습니다. 실제 바탕·테두리·X·토글 픽셀 생성 코드로 만든 미리보기에서 같은 모서리 곡선과 테두리 없는 X 아이콘을 확인했습니다. 변경되지 않은 기능은 0.2.7의 전체 379개 검사 결과를 유지합니다. Noto Sans KR의 family·Regular face·원본/변환 해시·OFL 배포와 한글 음절 11,172개 포함을 확인했습니다. API 대체 검사와 미리보기는 게임 화면을 실행하는 검사가 아닙니다. 인게임 화면·입력·판정 미터·이펙트, 해상도별 표시, 성능과 타 모드 호환성은 사용자 실행 검증 대기입니다.
+0.2.10 Release 빌드 오류·경고 0. 설치 엔진 31개와 설치 UI 36개 검사를 통과했습니다. 실제 배포 EXE에서 폴더 선택·취소, 키보드 포커스, X·Esc·Alt+F4 종료를 확인했고 종료 오류가 재현되지 않았습니다. 기존 모드의 로직·키뷰어·폰트·판정·UI·이펙트·Enter 등록 검사와 패치 연결 검사도 재실행했습니다. Unity 밖에서 호출할 수 없는 패치 3개는 게임 내 실행 검증이 필요합니다. Noto Sans KR의 family·Regular face·원본/변환 해시·OFL 배포와 한글 음절 11,172개 포함을 확인했습니다. 인게임 화면·입력·판정 미터·이펙트, 해상도별 표시, 성능과 타 모드 호환성은 사용자 실행 검증 대기입니다.
 
 프로젝트 폴더·프로젝트 파일·빌드 이름은 GhostifyOverlay, 모드 매니저와 설정창 표시명은 Ghostify Overlay입니다. 기존 설치의 설정·배치·기록이 그대로 이어지도록 내부 UMM ID와 저장 경로는 호환을 유지합니다.
 

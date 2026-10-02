@@ -21,6 +21,11 @@ Visual Studio 2022 Build Tools의 C# compiler와 Windows .NET Framework 4.8을 �
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File Installer\Build-Setup.ps1 -GameDir '게임 폴더'
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File Installer\Run-InstallerTests.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File Installer\Run-InstallerUiTests.ps1
 ```
 
 `dist/GhostifyOverlay-Setup-<버전>.exe`, 모드 ZIP, `SHA256SUMS.txt`를 생성합니다. 검사에서는 실제 InstallerEngine을 컴파일해 새 설치·업데이트·사용자 파일 8개 보존·UMM 보존·두 단계 복원·손상/누락/중복/경로 탈출 ZIP·실행 중 게임 차단 등을 31개 항목으로 확인하고, 배포 EXE 자체의 설치도 별도 임시 게임 폴더에서 실행합니다. 실제 게임 실행과 UAC 사용자 클릭은 이 자동 검사에 포함하지 않습니다.
+
+UI 검사 36개는 실제 SetupWindow와 Windows Forms 메시지 루프를 사용합니다. 정상 종료·X·Esc 및 반복 Dispose, 글꼴 초기화 실패, 설치 중 종료 방지, 버튼 상태별 네 모서리, GDI/창 핸들과 글꼴 메모리 해제를 검사합니다. 0.2.10 배포 EXE의 실제 화면에서도 찾기·폴더 선택·취소·키보드 포커스·X·Esc·Alt+F4 종료를 확인했습니다.
+
+글꼴·글꼴 패밀리·이미지·아이콘은 설치 창이 소유하고 한 번만 해제합니다. 컨트롤을 먼저 해제하고 글꼴과 글꼴 컬렉션, GDI 등록, 원본 메모리 순서로 정리합니다. 사용자 컴퓨터의 글꼴 설치 목록은 변경하지 않습니다.
