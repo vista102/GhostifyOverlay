@@ -1,0 +1,40 @@
+# Generated builds, installers and local recovery data
+/bin/
+/obj/
+/dist/
+/Backups/
+/UserData/
+**/UserData/
+/Installer/obj/
+/Installer/test-fixture-*/
+/Tests/*fixture*/
+/Tests/effect-storage-*/
+*.dll
+*.pdb
+*.exe
+*.zip
+*.log
+*.bak
+*.tmp
+*.user
+*.suo
+.vs/
+.env
+.env.*
+
+# Local original-mod comparisons and historical machine-specific reports
+/SOURCE_BASELINE.json
+/IMPLEMENTATION_PLAN.md
+/VALIDATION.md
+/KEYVIEWER_RESEARCH_PLAN.md
+/Migrate-InstalledAppearance.ps1
+/Tools/ApplyTheme.py
+/Tools/ImportJipper.py
+/Tests/*.reference.txt
+/Tests/*results.txt
+
+# Previous, unused fonts are not part of the shipped project
+/Assets/BMDOHYEON_ttf.ttf
+/Assets/Galmuri11-Bold.ttf
+/Assets/Montserrat-Regular.ttf
+/Assets/Montserrat-OFL.txt

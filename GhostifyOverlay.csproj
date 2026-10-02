@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B21D79B7-5CD1-4DCD-B015-E0D6A12F774A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>DonQuixoteOverlay</RootNamespace>
+    <AssemblyName>GhostifyOverlay</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <LangVersion>latest</LangVersion>
+    <GameDir Condition=" '$(GameDir)' == '' ">C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice</GameDir>
+    <ManagedDir>$(GameDir)\A Dance of Fire and Ice_Data\Managed</ManagedDir>
+    <OutputPath>bin\$(Configuration)\GhostifyOverlay\</OutputPath>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>$(ManagedDir)\UnityModManager\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(ManagedDir)\Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>$(ManagedDir)\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(ManagedDir)\Newtonsoft.Json.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="RDTools">
+      <HintPath>$(ManagedDir)\RDTools.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="SkyHook.Unity">
+      <HintPath>$(ManagedDir)\SkyHook.Unity.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>$(ManagedDir)\Unity.TextMeshPro.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(ManagedDir)\UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>$(ManagedDir)\UnityEngine.AudioModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(ManagedDir)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>$(ManagedDir)\UnityEngine.InputLegacyModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.InputModule">
+      <HintPath>$(ManagedDir)\UnityEngine.InputModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(ManagedDir)\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.TextCoreFontEngineModule">
+      <HintPath>$(ManagedDir)\UnityEngine.TextCoreFontEngineModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(ManagedDir)\UnityEngine.UI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>$(ManagedDir)\UnityEngine.UIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityModManager">
+      <HintPath>$(ManagedDir)\UnityModManager\UnityModManager.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="netstandard">
+      <HintPath>$(ManagedDir)\netstandard.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="GameplayPatches.cs" />
+    <Compile Include="EffectRestoration.cs" />
+    <Compile Include="EffectLifetime.cs" />
+    <Compile Include="InputController.cs" />
+    <Compile Include="KeyCaptureUiLease.cs" />
+    <Compile Include="LayoutEditorController.cs" />
+    <Compile Include="KeyViewerContents\AsyncInputHook.cs" />
+    <Compile Include="KeyViewerContents\FootKeyviewerStyle.cs" />
+    <Compile Include="KeyViewerContents\Key.cs" />
+    <Compile Include="KeyViewerContents\KeyViewer.cs" />
+    <Compile Include="KeyViewerContents\KeyViewer.Input.cs" />
+    <Compile Include="KeyViewerContents\KeyViewer.Layout.cs" />
+    <Compile Include="KeyViewerContents\KeyViewerSetting.cs" />
+    <Compile Include="KeyViewerContents\KeyViewerStore.cs" />
+    <Compile Include="KeyViewerContents\KeyviewerStyle.cs" />
+    <Compile Include="KeyViewerContents\Rain.cs" />
+    <Compile Include="KeyViewerContents\RainManager.cs" />
+    <Compile Include="KeyViewerContents\RainPool.cs" />
+    <Compile Include="KeyViewerContents\RawRain.cs" />
+    <Compile Include="KeyViewerContents\KeyViewerMetrics.cs" />
+    <Compile Include="Main.cs" />
+    <Compile Include="OverlayController.cs" />
+    <Compile Include="OverlayPresentation.cs" />
+    <Compile Include="OverlayTextShadow.cs" />
+    <Compile Include="OwnedStateRegistry.cs" />
+    <Compile Include="PatchRegistry.cs" />
+    <Compile Include="RuntimeStatus.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="SettingsWindow.cs" />
+    <Compile Include="SettingsWindow.Effects.cs" />
+    <Compile Include="UiComponents.cs" />
+    <Compile Include="UiTheme.cs" />
+    <Compile Include="XPerfectModule.cs" />
+    <Content Include="THIRD-PARTY-NOTICES.md"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
+    <Content Include="Licenses\JipperResourcePack-BSD-3-Clause.txt"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
+    <Content Include="Licenses\JipperResourcePack-source.json"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
+    <Content Include="Info.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="README.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\NotoSansKR-Regular.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\NotoSansKR-OFL.txt"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
+    <Content Include="Assets\NotoSansKR-source.json"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
+    <Content Include="Assets\GoogleSans-Regular.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\GoogleSans-OFL.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>

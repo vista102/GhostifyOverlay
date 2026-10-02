@@ -1,0 +1,11 @@
+{
+  "Background": "#000000FF",
+  "BackgroundClicked": "#FFCA3AFF",
+  "Outline": "#FFCA3AFF",
+  "OutlineClicked": "#FFCA3AFF",
+  "Text": "#FFFFFFFF",
+  "TextClicked": "#292929FF",
+  "RainColor": "#FFCA3AFF",
+  "RainColor2": "#FFFFFFFF",
+  "RainColor3": "#FFCA3AFF"
+}

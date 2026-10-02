@@ -1,0 +1,15 @@
+{
+  "Repository": "https://github.com/google/fonts",
+  "Commit": "4efc2774c63917927efe769ca845def6bd6debae",
+  "FontUrl": "https://raw.githubusercontent.com/google/fonts/4efc2774c63917927efe769ca845def6bd6debae/ofl/notosanskr/NotoSansKR%5Bwght%5D.ttf",
+  "FontSha256": "194018E6B2B293A7964F037B25C0249CE1418BC9AB3C971060A03AA57861E252",
+  "LicenseSha256": "1C05C68C34F9708415AADA51F17E1B0092D2CEA709BF4A94CD38114F9E73D7D9",
+  "Output": "NotoSansKR-Regular.ttf",
+  "OutputSha256": "4609A7B62A6DA24CAE3A8B73ECDE7003581B8F60662D60CC8F55A3793DE07763",
+  "Family": "Noto Sans KR",
+  "Style": "Regular",
+  "Weight": 400,
+  "FontToolsVersion": "4.61.1",
+  "Conversion": "instantiateVariableFont(wght=400, updateFontNames=True); no glyph subsetting",
+  "HangulSyllables": 11172
+}

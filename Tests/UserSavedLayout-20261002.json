@@ -1,0 +1,21 @@
+{
+  "SchemaVersion": 3,
+  "TopLeftX": 0.0,
+  "TopLeftY": 0.0,
+  "TopRightX": 0.0,
+  "TopRightY": 0.0,
+  "AttemptsX": -150.0,
+  "AttemptsY": 15.0,
+  "JudgmentsX": 0.0,
+  "JudgmentsY": -5.0,
+  "ComboX": 0.0,
+  "ComboY": -85.0,
+  "DetailedPerfectX": 0.0,
+  "DetailedPerfectY": -15.0,
+  "TopLeftScale": 0.849999964,
+  "TopRightScale": 0.849999964,
+  "AttemptsScale": 0.799999952,
+  "JudgmentsScale": 0.799999952,
+  "ComboScale": 1.0,
+  "DetailedPerfectScale": 0.799999952
+}

@@ -1,0 +1,18 @@
+{
+  "repository": "https://github.com/Jongye0l/JipperResourcePack",
+  "commit": "ac6d6410571ee7d585aedce7f5085de34f615af2",
+  "files": {
+    "KeyViewer.cs": "57741f77d0fcf01d8b907c5579e155678c0ccc1214836d3705f15aa3f2910fec",
+    "KeyViewer.Update.cs": "359d6b592f0b4a7be3923bc704581f912a86af6b09ca46c41fee3d28b3093449",
+    "KeyViewerSetting.cs": "eeb4f72124436d01d636228d98ef88764cf0cfa099ad5376850e61bb78ba0652",
+    "Key.cs": "caea022e720f10c8f2bf269e7ddfc9346b0fd0183d77fb940bd2a65e44c55789",
+    "KeyCountData.cs": "cfb8a4dd8fc7b9c3774d2c25d0e4e2a94bae0a6d47191f88e190fe3f3d9aa175",
+    "Rain.cs": "f5554a28d59e303b595913397a1ef515c083b99019ff4252c9a7428aaf997dfe",
+    "RainManager.cs": "39bddf58dd91c6363ff4492ae50c41ed50a5b03655cf4291b99244cb1586ec8c",
+    "RainPool.cs": "96b4f2e5c2658c8227814e82b400a92228efa7f24a6a0c3b37d2eb4b6629bade",
+    "RawRain.cs": "5b006d6f3c721bced9360826a5df67f4a38bdb2b7b2d0bb9a7b990ac120e4435",
+    "KeyviewerStyle.cs": "d1e1f99ea5be4a6583a89267e555cf5ecde4f1eed664064fafb297afe49942a6",
+    "FootKeyviewerStyle.cs": "cbd7c2a62973033118862bfe20f8b034a903767c9366d5f49b8079b4921a3e6f",
+    "AsyncInputHook.cs": "5faa392bcfba2b55fdd524945df58f99a8562da35fca04e922309d64b15ab26a"
+  }
+}

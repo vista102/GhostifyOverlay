@@ -1,0 +1,3 @@
+$managed='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice\A Dance of Fire and Ice_Data\Managed'
+foreach($file in Get-ChildItem -LiteralPath $managed -Filter '*.dll') {try {[Reflection.Assembly]::LoadFrom($file.FullName)|Out-Null}catch {}}
+[TMPro.TMP_FontAsset].GetMethods([Reflection.BindingFlags]'Public,Static')|Where-Object {$_.Name -eq 'CreateFontAsset'}|ForEach-Object { $_.ToString(); $_.GetParameters()|Select-Object Name,ParameterType | Format-Table -AutoSize }
