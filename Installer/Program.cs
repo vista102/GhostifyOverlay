@@ -60,7 +60,7 @@ namespace GhostifySetup {
         [DllImport("gdi32.dll")] private static extern bool RemoveFontMemResourceEx(IntPtr handle);
         internal BrandFonts(InstallerEngine engine) {
             try {
-            foreach (string path in new[] { "Assets/GoogleSans-Regular.ttf", "Assets/NotoSansKR-Regular.ttf" }) {
+            foreach (string path in new[] { "Assets/GmarketSansTTFMedium.ttf", "Assets/NotoSansKR-Regular.ttf" }) {
                 byte[] data = engine.PayloadFile(path); IntPtr memory = Marshal.AllocHGlobal(data.Length); _memory.Add(memory);
                 Marshal.Copy(data, 0, memory, data.Length); _fonts.AddMemoryFont(memory, data.Length);
                 uint count = 0; IntPtr handle = AddFontMemResourceEx(memory, (uint)data.Length, IntPtr.Zero, ref count);
@@ -71,9 +71,9 @@ namespace GhostifySetup {
         }
         internal Font Font(float size, bool english = false, bool bold = false) {
             if (_disposed) throw new ObjectDisposedException(nameof(BrandFonts));
-            string wanted = english ? "Google Sans" : "Noto Sans KR";
+            string wanted = "Gmarket Sans";
             Font font = null;
-            foreach (FontFamily family in _families) if (family.Name.StartsWith(wanted, StringComparison.OrdinalIgnoreCase)) {
+            foreach (FontFamily family in _families) if (family.GetName(1033).StartsWith(wanted, StringComparison.OrdinalIgnoreCase)) {
                 font = new Font(family, size, bold ? FontStyle.Bold : FontStyle.Regular, GraphicsUnit.Point); break;
             }
             if (font == null) font = new Font("맑은 고딕", size, bold ? FontStyle.Bold : FontStyle.Regular);
@@ -106,7 +106,7 @@ namespace GhostifySetup {
         }
     }
     internal sealed class BrandButton : Button {
-        internal Color Fill = Color.FromArgb(255, 202, 58), Ink = Color.FromArgb(41, 41, 41);
+        internal Color Fill = Color.FromArgb(255, 201, 57), Ink = Color.FromArgb(41, 41, 41);
         internal bool IsClose;
         private bool _hover, _pressed;
         internal BrandButton() { FlatStyle = FlatStyle.Flat; FlatAppearance.BorderSize = 0; UseVisualStyleBackColor = false; Cursor = Cursors.Hand; SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true); }
@@ -159,7 +159,7 @@ namespace GhostifySetup {
             BackColor = Color.FromArgb(250, 250, 250); Font = _fonts.Font(12); DoubleBuffered = true;
             using (var stream = new MemoryStream(InstallerEngine.Resource("Brand.ico"))) using (var icon = new Icon(stream)) _brandIcon = (Icon)icon.Clone();
             Icon = _brandIcon;
-            Label logo = Label("Ghostify Overlay", 26, new Rectangle(28, 8, 550, 76), true);
+            Label logo = Label("Ghostify Overlay", 26, new Rectangle(28, 16, 550, 68), true);
             Label version = Label("v" + engine.Version, 11, new Rectangle(590, 38, 150, 28), true); version.ForeColor = Color.FromArgb(115, 115, 115);
             _close = new BrandButton { IsClose = true, AccessibleName = "닫기", Bounds = new Rectangle(941, 22, 40, 40), BackColor = BackColor, TabStop = false }; _close.Click += (s, e) => Close(); Controls.Add(_close);
             var hero = new RoundedPanel { Bounds = new Rectangle(24, 90, 346, 542), BackColor = BackColor, Stroke = Color.FromArgb(239, 239, 239) }; Controls.Add(hero);
@@ -179,7 +179,7 @@ namespace GhostifySetup {
             _gameStatus = Label("게임 폴더 선택 대기", 11, new Rectangle(18, 18, 520, 31), false, status);
             _ummStatus = Label("Unity Mod Manager 확인 대기", 11, new Rectangle(18, 56, 520, 31), false, status);
             _backupStatus = Label("기존 설정 유지 · 설치 전 자동 백업", 11, new Rectangle(18, 94, 520, 31), false, status); _backupStatus.ForeColor = Color.FromArgb(100, 100, 100);
-            _note = Label("원본 DonQuixote가 있다면 중복 실행을 막기 위해 끕니다.", 10, new Rectangle(418, 507, 550, 42)); _note.ForeColor = Color.FromArgb(110, 110, 110);
+            _note = Label(string.Empty, 10, new Rectangle(418, 507, 550, 42)); _note.ForeColor = Color.FromArgb(110, 110, 110);
             _install = new BrandButton { Text = "설치하기", Bounds = new Rectangle(416, 562, 556, 58), Font = _fonts.Font(14), Enabled = false }; Controls.Add(_install); _install.Click += async (s, e) => await Install();
             AcceptButton = _install; CancelButton = _close;
             MouseDown += DragStart; logo.MouseDown += DragStart; version.MouseDown += DragStart;
@@ -210,7 +210,7 @@ namespace GhostifySetup {
             if (_busy || _complete) return;
             try {
                 GameState state = _engine.Inspect(_path.Text);
-                _gameStatus.Text = "✓  게임 폴더 확인 완료"; _ummStatus.Text = "✓  Unity Mod Manager " + state.UmmVersion;
+                _gameStatus.Text = (state.VerifiedGameBuild ? "✓  " : "!  ") + state.Compatibility; _ummStatus.Text = "✓  Unity Mod Manager " + state.UmmVersion;
                 _backupStatus.Text = state.IsUpdate ? "✓  기존 " + state.ExistingVersion + " · 설정과 배치를 유지합니다" : "✓  새 설치 · 설정은 첫 실행에 생성됩니다";
                 _subtitle.Text = state.IsUpdate ? "기존 Ghostify Overlay를 업데이트합니다." : "Ghostify Overlay를 얼불춤에 설치합니다.";
                 _heading.Text = "설치 준비"; _install.Text = state.IsUpdate ? "업데이트 / 다시 설치" : "설치하기"; _install.Enabled = true;

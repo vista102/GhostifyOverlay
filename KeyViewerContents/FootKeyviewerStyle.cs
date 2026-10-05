@@ -2,10 +2,10 @@
 namespace DonQuixoteOverlay.KeyViewerContents;
 
 public enum FootKeyviewerStyle {
-    None,
-    Key2,
-    Key4,
-    Key6,
-    Key8,
-    Key16
+    None = 0,
+    Key2 = 1,
+    Key4 = 2,
+    // Value 3 belonged to the removed 6-key mode.
+    Key8 = 4,
+    Key16 = 5
 }

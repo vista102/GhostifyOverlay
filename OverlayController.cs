@@ -10,8 +10,8 @@ using UnityEngine.SceneManagement;
 namespace DonQuixoteOverlay {
     internal static class FontAssetProvider {
         private static TMP_FontAsset _notoSansKr;
-        private static TMP_FontAsset _googleSans;
-        private static bool _googleSansLoaded;
+        private static TMP_FontAsset _gmarketSans;
+        private static bool _gmarketSansLoaded;
         private static bool _notoSansKrLoaded;
 
         private static TMP_FontAsset KoreanFallback {
@@ -23,23 +23,23 @@ namespace DonQuixoteOverlay {
                 return _notoSansKr;
             }
         }
-        public static TMP_FontAsset GoogleSans {
+        public static TMP_FontAsset GmarketSans {
             get {
-                if (!_googleSansLoaded) {
-                    _googleSansLoaded = true;
-                    _googleSans = LoadDirect("GoogleSans-Regular.ttf", "GoogleSans");
+                if (!_gmarketSansLoaded) {
+                    _gmarketSansLoaded = true;
+                    _gmarketSans = LoadDirect("GmarketSansTTFMedium.ttf", "GmarketSans");
                     TMP_FontAsset fallback = KoreanFallback;
-                    if (_googleSans != null && fallback != null) {
-                        if (_googleSans.fallbackFontAssetTable == null)
-                            _googleSans.fallbackFontAssetTable = new System.Collections.Generic.List<TMP_FontAsset>();
-                        if (!_googleSans.fallbackFontAssetTable.Contains(fallback))
-                            _googleSans.fallbackFontAssetTable.Add(fallback);
+                    if (_gmarketSans != null && fallback != null) {
+                        if (_gmarketSans.fallbackFontAssetTable == null)
+                            _gmarketSans.fallbackFontAssetTable = new System.Collections.Generic.List<TMP_FontAsset>();
+                        if (!_gmarketSans.fallbackFontAssetTable.Contains(fallback))
+                            _gmarketSans.fallbackFontAssetTable.Add(fallback);
                     }
                 }
-                return _googleSans ?? KoreanFallback;
+                return _gmarketSans ?? KoreanFallback;
             }
         }
-        public static TMP_FontAsset OverlayFont { get { return GoogleSans; } }
+        public static TMP_FontAsset OverlayFont { get { return GmarketSans; } }
         private static TMP_FontAsset LoadDirect(string assetName, string displayName) {
             try { return Create(Path.Combine(Main.Entry.Path, "Assets", assetName), displayName); }
             catch (Exception ex) { RuntimeStatus.Failure("font." + displayName, displayName + " 폰트 로딩", ex); return null; }
@@ -55,13 +55,13 @@ namespace DonQuixoteOverlay {
             return asset;
         }
         internal static void Dispose() {
-            foreach (TMP_FontAsset asset in new[] { _googleSans, _notoSansKr }) {
+            foreach (TMP_FontAsset asset in new[] { _gmarketSans, _notoSansKr }) {
                 if (asset == null) continue;
                 if (asset.atlasTextures != null) foreach (Texture2D texture in asset.atlasTextures) if (texture != null) UnityEngine.Object.Destroy(texture);
                 if (asset.material != null) UnityEngine.Object.Destroy(asset.material);
                 UnityEngine.Object.Destroy(asset);
             }
-            _googleSans = _notoSansKr = null; _googleSansLoaded = _notoSansKrLoaded = false;
+            _gmarketSans = _notoSansKr = null; _gmarketSansLoaded = _notoSansKrLoaded = false;
         }
     }
 
@@ -96,9 +96,9 @@ namespace DonQuixoteOverlay {
         }
 
         public static void BeginRun(scrController controller, int startFloor) {
-            if (controller == null || Main.Settings == null) return;
+            if (controller == null || !controller.gameworld || Main.Settings == null) return;
             string key = CurrentLevelKey(controller);
-            _levelKey = key;
+            ObserveLevel(key);
             _countedCurrentRun = false;
             _fullCurrentRun = false;
             _progressCurrentRun = false;
@@ -140,7 +140,10 @@ namespace DonQuixoteOverlay {
             if (controller == null) return false;
             bool auto = false;
             try { auto = RDC.auto; } catch { }
-            return !auto && !controller.noFail && !controller.noFailInfiniteMargin && !controller.freeroamInvulnerability;
+            return CountsAttempts(controller.gameworld, auto, controller.noFail, controller.noFailInfiniteMargin, controller.freeroamInvulnerability);
+        }
+        internal static bool CountsAttempts(bool gameworld, bool auto, bool noFail, bool infiniteMargin, bool invulnerable) {
+            return gameworld && !auto && !noFail && !infiniteMargin && !invulnerable;
         }
 
         public static bool IsProgressStart(int startFloor, bool startedFromCheckpoint) {
@@ -150,6 +153,20 @@ namespace DonQuixoteOverlay {
         public static int GetSessionAttempts(string filePath, bool progress) {
             string key = PathKey(filePath);
             return GetByKey(progress ? SessionProgressAttempts : SessionAttempts, key);
+        }
+        internal static void ObserveLevel(string key) {
+            if (string.Equals(_levelKey, key, StringComparison.OrdinalIgnoreCase)) return;
+            EndSession(); _levelKey = key ?? string.Empty;
+        }
+        internal static void EndSession() {
+            SessionAttempts.Clear(); SessionProgressAttempts.Clear(); _levelKey = string.Empty;
+            _countedCurrentRun = _fullCurrentRun = _progressCurrentRun = _invalidatedCurrentRun = _startedMidMap = false;
+            _startProgress = 0f;
+        }
+        internal static void ObserveContext(scrController controller) {
+            if (controller == null) return; // Native restart can briefly have no controller.
+            if (controller.gameworld) ObserveLevel(CurrentLevelKey(controller));
+            else if (!ADOBase.isLevelEditor) EndSession();
         }
 
         public static int GetStoredAttempts(string filePath, bool progress) {
@@ -211,39 +228,42 @@ namespace DonQuixoteOverlay {
         private readonly OverlayJudgmentLayout _judgmentLayout = new OverlayJudgmentLayout();
         private readonly OverlayStatusTextCache _statusText = new OverlayStatusTextCache();
         private readonly OverlayTextShadow _textShadow = new OverlayTextShadow();
+        private readonly OverlayFpsCounter _fps = new OverlayFpsCounter();
         private bool _judgmentPresentationDirty = true;
         private TextMeshProUGUI _xPerfectAboveMeter;
         private readonly System.Collections.Generic.List<TMP_Text> _overlayTexts = new System.Collections.Generic.List<TMP_Text>();
         private TextMeshProUGUI _attempts;
-        private readonly System.Collections.Generic.Dictionary<RectTransform, Vector2> _autoTextPositions = new System.Collections.Generic.Dictionary<RectTransform, Vector2>();
+        private TextMeshProUGUI _songInfo;
+        private TextMeshProUGUI _timingRanges;
+        private float _metadataNextUpdate;
+        private string _songMeasuredText;
+        private float _songMeasuredWidth = -1f;
         private readonly int[] _lastJudgmentCounts = new int[9];
         private readonly string[] _judgmentColors = new string[9];
         private readonly Vector3[] _meterCorners = new Vector3[4];
-        private readonly OverlayAutoScanSchedule _autoScan = new OverlayAutoScanSchedule();
-        private readonly System.Collections.Generic.List<RectTransform> _deadAutoTexts = new System.Collections.Generic.List<RectTransform>();
-        private scrController _autoUiController;
         private bool _overlayActive;
         private bool _textsVisible = true;
         private bool _judgmentColorsReady;
-        private bool _autoWasActive;
         private int _lastCombo = int.MinValue;
         private int _lastMinus = int.MinValue, _lastX = int.MinValue, _lastPlus = int.MinValue;
         private int _lastAttempt = int.MinValue, _lastProgressAttempt = int.MinValue, _lastFullAttempt = int.MinValue, _lastFullProgressAttempt = int.MinValue;
         private int _lastBpmFlags = -1, _lastTbpmKey = int.MinValue, _lastCbpmKey = int.MinValue, _lastKpsKey = int.MinValue, _lastPitchKey = int.MinValue;
+        private int _lastFps = int.MinValue;
 
         private void Awake() { Instance = this; }
         internal void Initialize() { Build(); }
         private void OnEnable() { SceneManager.activeSceneChanged += OnSceneChanged; if (_canvas != null) ApplySettings(); }
-        private void OnDisable() { SceneManager.activeSceneChanged -= OnSceneChanged; RestoreAutoPlayText(); _textShadow.Dispose(); }
+        private void OnDisable() { SceneManager.activeSceneChanged -= OnSceneChanged; _textShadow.Dispose(); }
         private void OnSceneChanged(Scene previous, Scene current) {
-            RestoreAutoPlayText();
+            _metadataNextUpdate = 0f;
+            if (_songInfo != null) _songInfo.text = string.Empty;
+            if (_timingRanges != null) _timingRanges.text = string.Empty;
         }
-        private void OnDestroy() { RestoreAutoPlayText(); _textShadow.Dispose(); if (Instance == this) Instance = null; }
+        private void OnDestroy() { _textShadow.Dispose(); if (Instance == this) Instance = null; }
 
-        public static void NotifyHit(HitMargin margin, DetailedJudge detail) {
-            if (margin == HitMargin.Perfect || margin == HitMargin.Auto) _combo++; else _combo = 0;
-        }
-        public static void ResetRun() { _combo = 0; if (!ReferenceEquals(Instance, null)) Instance._autoScan.Reset(); }
+        public static void NotifyHit(HitMargin margin, int count) { _combo = NativeJudgments.AdvanceCombo(_combo, margin, count); }
+        internal static void RestoreCombo(System.Collections.Generic.IList<HitMargin> history) { _combo = NativeJudgments.ComboFromHistory(history); }
+        public static void ResetRun() { _combo = 0; }
 
         private void Build() {
             GameObject root = new GameObject("DonQuixoteOverlay.Overlay", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler));
@@ -265,10 +285,18 @@ namespace DonQuixoteOverlay {
 
             _status = Text("Status", content.transform, new Vector2(16, -18), new Vector2(470, 126), TextAlignmentOptions.TopLeft, 22);
             _comboText = Text("Combo", content.transform, new Vector2(0, -82), new Vector2(400, 145), TextAlignmentOptions.Top, 42, Anchor.TopCenter);
-            _bpm = Text("BPM", content.transform, new Vector2(-16, -18), new Vector2(330, 130), TextAlignmentOptions.TopRight, 22, Anchor.TopRight);
+            _bpm = Text("BPM", content.transform, new Vector2(-16, -18), new Vector2(330, 175), TextAlignmentOptions.TopRight, 22, Anchor.TopRight);
             BuildJudgmentGrid(content.transform);
             _xPerfectAboveMeter = Text("DetailedPerfectAboveMeter", content.transform, new Vector2(0f, 126f), new Vector2(280f, 38f), TextAlignmentOptions.Center, 27, Anchor.BottomCenter);
             _attempts = Text("Attempts", content.transform, new Vector2(390, 28), new Vector2(360, 116), TextAlignmentOptions.BottomLeft, 23, Anchor.BottomCenter);
+            _songInfo = Text("SongInfo", content.transform, new Vector2(0, -36), new Vector2(1200, 60), TextAlignmentOptions.Top, 20, Anchor.TopCenter);
+            _songInfo.richText = false;
+            _songInfo.fontStyle = FontStyles.Normal;
+            _songInfo.textWrappingMode = TextWrappingModes.Normal;
+            _songInfo.overflowMode = TextOverflowModes.Overflow;
+            _timingRanges = Text("TimingScale", content.transform, new Vector2(0, 172), new Vector2(320, 28), TextAlignmentOptions.Center, 18, Anchor.BottomCenter);
+            _timingRanges.fontStyle = FontStyles.Normal;
+            _timingRanges.overflowMode = TextOverflowModes.Overflow;
 
             GameObject bar = new GameObject("ProgressBar", typeof(RectTransform), typeof(Image));
             bar.transform.SetParent(content.transform, false);
@@ -293,7 +321,7 @@ namespace DonQuixoteOverlay {
             _judgmentRoot.anchorMin = _judgmentRoot.anchorMax = new Vector2(.5f, 0f);
             _judgmentRoot.pivot = new Vector2(.5f, 0f);
             _judgmentRoot.anchoredPosition = new Vector2(0f, 13f);
-            _judgmentRoot.sizeDelta = new Vector2(480f, 48f);
+            _judgmentRoot.sizeDelta = new Vector2(288f, 64f);
             for (int i = 0; i < _judgmentValues.Length; ++i) {
                 TextMeshProUGUI value = Text("Value" + i, root.transform, Vector2.zero, Vector2.zero, TextAlignmentOptions.Center, 27);
                 value.enableAutoSizing = false;
@@ -301,7 +329,9 @@ namespace DonQuixoteOverlay {
                 rt.anchorMin = rt.anchorMax = new Vector2(0f, .5f);
                 rt.pivot = new Vector2(0f, .5f);
                 rt.anchoredPosition = Vector2.zero;
-                rt.sizeDelta = new Vector2(0f, 48f);
+                rt.sizeDelta = new Vector2(0f, 64f);
+                value.overflowMode = TextOverflowModes.Overflow;
+                value.margin = Vector4.zero;
                 _judgmentValues[i] = value;
             }
         }
@@ -319,16 +349,15 @@ namespace DonQuixoteOverlay {
             rt.anchoredPosition = pos; rt.sizeDelta = size;
             TextMeshProUGUI tmp = go.GetComponent<TextMeshProUGUI>();
             ApplyFont(tmp, FontAssetProvider.OverlayFont);
-            tmp.fontSize = fontSize; tmp.fontStyle = FontStyles.Bold; tmp.color = Color.white; tmp.alignment = alignment;
+            tmp.fontSize = fontSize; tmp.fontStyle = FontStyles.Normal; tmp.color = Color.white; tmp.alignment = alignment;
             tmp.raycastTarget = false; tmp.textWrappingMode = TextWrappingModes.NoWrap;
             _overlayTexts.Add(tmp);
             return tmp;
         }
 
         private void Update() {
+            _fps.Tick(Time.unscaledTimeAsDouble);
             scrController c = scrController.instance;
-            if (c != null && c.gameworld) AdjustAutoPlayText(c);
-            else if (_autoWasActive) RestoreAutoPlayText();
             if (_canvas == null) return;
             bool editing = false;
             try { editing = ADOBase.isLevelEditor && scnEditor.instance != null && !scnEditor.instance.playMode; } catch { }
@@ -346,34 +375,37 @@ namespace DonQuixoteOverlay {
             if (s.ShowProgressBar) SetAnchorMaxIfChanged(_progressFill, new Vector2(progress, 1f));
 
             scrMistakesManager mistakes = scrPlayerManager.instance == null ? null : scrPlayerManager.instance.mistakesManager;
-            float acc = mistakes == null ? 100f : mistakes.percentAcc * 100f;
-            float xacc = mistakes == null ? 100f : mistakes.percentXAcc * 100f;
+            scrMarginTracker displayedTracker = NativeJudgments.DisplayedTracker;
+            float acc = displayedTracker == null ? 100f : displayedTracker.percentAcc * 100f;
+            float xacc = displayedTracker == null ? 100f : displayedTracker.percentXAcc * 100f;
             RefreshStatusText(s, c, progress, acc, xacc);
             SetActiveIfChanged(_status.gameObject, s.ShowProgress || s.ShowAccuracy || s.ShowXAccuracy || s.ShowMusicTime || s.ShowMapTime);
-            SetActiveIfChanged(_comboText.gameObject, s.ShowCombo);
-            if (s.ShowCombo && _lastCombo != _combo) {
+            bool showCombo = s.ShowCombo && PatchRegistry.IsAvailable("statistics");
+            SetActiveIfChanged(_comboText.gameObject, showCombo);
+            if (showCombo && _lastCombo != _combo) {
                 _lastCombo = _combo;
-                _comboText.text = "Perfect\n<size=78><color=#" + DQColors.AccentHex + ">" + _combo + "</color></size>";
+                _comboText.text = "<size=78><color=" + Hex(s.ValueColor) + ">" + _combo + "</color></size>\n<size=30>Combo</size>";
             }
-            bool showBpmBlock = s.ShowBpm || s.ShowTheoreticalKps;
+            bool showBpmBlock = s.ShowBpm || s.ShowTheoreticalKps || s.ShowFps;
             SetActiveIfChanged(_bpm.gameObject, showBpmBlock);
             if (showBpmBlock) RefreshBpmText(s, c);
             SetActiveIfChanged(_judgmentRoot.gameObject, s.ShowJudgmentCounts);
             if (s.ShowJudgmentCounts && UpdateJudgments(mistakes)) LayoutJudgmentValues();
-            bool showDetailed = s.ShowJudgmentCounts && Main.Settings.Judgments.EnableXPerfect;
+            bool showDetailed = NativeJudgments.DetailedTextVisible(s.ShowJudgmentCounts);
             SetActiveIfChanged(_xPerfectAboveMeter.gameObject, showDetailed);
             if (showDetailed) RefreshDetailedPerfectText();
-            SetActiveIfChanged(_attempts.gameObject, s.ShowAttempts);
-            if (s.ShowAttempts) RefreshAttemptText();
+            bool showAttempts = s.ShowAttempts && PatchRegistry.IsAvailable("statistics");
+            SetActiveIfChanged(_attempts.gameObject, showAttempts);
+            if (showAttempts) RefreshAttemptText();
+            RefreshMetadata(s, c);
             SetScaleIfChanged(_contentRoot, Vector3.one);
             LayoutData layout = LayoutStore.Current;
             SetPositionIfChanged(_status.rectTransform, new Vector2(16f + layout.TopLeftX, -18f + layout.TopLeftY));
             SetPositionIfChanged(_bpm.rectTransform, new Vector2(-16f + layout.TopRightX, -18f + layout.TopRightY));
             SetPositionIfChanged(_attempts.rectTransform, new Vector2(500f + layout.AttemptsX, 28f + layout.AttemptsY));
             SetPositionIfChanged(_judgmentRoot, new Vector2(layout.JudgmentsX, 13f + layout.JudgmentsY));
-            if (showDetailed) {
-                PositionDetailedPerfectAboveMeter(c, new Vector2(layout.DetailedPerfectX, layout.DetailedPerfectY));
-            }
+            Vector2 meterAnchor = ErrorMeterAnchor(c);
+            SetPositionIfChanged(_xPerfectAboveMeter.rectTransform, OverlayPlacement.Detailed(meterAnchor, layout));
             SetPositionIfChanged(_comboText.rectTransform, new Vector2(layout.ComboX, -82f + layout.ComboY));
             SetScaleIfChanged(_status.rectTransform, Vector3.one * SafeSectionScale(layout.TopLeftScale));
             SetScaleIfChanged(_bpm.rectTransform, Vector3.one * SafeSectionScale(layout.TopRightScale));
@@ -381,6 +413,40 @@ namespace DonQuixoteOverlay {
             SetScaleIfChanged(_judgmentRoot, Vector3.one * SafeSectionScale(layout.JudgmentsScale));
             SetScaleIfChanged(_xPerfectAboveMeter.rectTransform, Vector3.one * SafeSectionScale(layout.DetailedPerfectScale));
             SetScaleIfChanged(_comboText.rectTransform, Vector3.one * SafeSectionScale(layout.ComboScale));
+            SetPositionIfChanged(_songInfo.rectTransform, new Vector2(layout.SongInfoX, -36f + layout.SongInfoY));
+            float canvasScale = _canvas == null || _canvas.scaleFactor <= .01f ? 1f : _canvas.scaleFactor;
+            float songWidth = Math.Max(200f, Screen.width / canvasScale - 32f) / SafeSectionScale(layout.SongInfoScale);
+            if (_songMeasuredText != _songInfo.text || _songMeasuredWidth != songWidth) {
+                _songMeasuredText = _songInfo.text; _songMeasuredWidth = songWidth;
+                SetSizeIfChanged(_songInfo.rectTransform, new Vector2(songWidth, Math.Max(28f, _songInfo.GetPreferredValues(_songInfo.text, songWidth, float.PositiveInfinity).y)));
+            }
+            SetPositionIfChanged(_timingRanges.rectTransform, OverlayPlacement.Timing(meterAnchor, layout));
+            SetScaleIfChanged(_songInfo.rectTransform, Vector3.one * SafeSectionScale(layout.SongInfoScale));
+            SetScaleIfChanged(_timingRanges.rectTransform, Vector3.one * SafeSectionScale(layout.TimingRangesScale));
+        }
+
+        private void RefreshMetadata(OverlaySettings settings, scrController controller) {
+            SetActiveIfChanged(_songInfo.gameObject, settings.ShowSongInfo && !string.IsNullOrEmpty(_songInfo.text));
+            SetActiveIfChanged(_timingRanges.gameObject, settings.ShowTimingRanges);
+            if (Time.unscaledTime < _metadataNextUpdate) return;
+            _metadataNextUpdate = Time.unscaledTime + .1f;
+            try {
+                string song = settings.ShowSongInfo ? OverlayMetadata.CurrentSong(controller) : string.Empty;
+                if (_songInfo.text != song) _songInfo.text = song;
+                RuntimeStatus.Clear("overlay.song-info");
+            } catch (Exception ex) {
+                _songInfo.text = string.Empty;
+                RuntimeStatus.Failure("overlay.song-info", "곡 정보", ex);
+            }
+            SetActiveIfChanged(_songInfo.gameObject, settings.ShowSongInfo && !string.IsNullOrEmpty(_songInfo.text));
+            try {
+                string ranges = settings.ShowTimingRanges ? OverlayMetadata.CurrentTiming(controller) : string.Empty;
+                if (_timingRanges.text != ranges) _timingRanges.text = ranges;
+                RuntimeStatus.Clear("overlay.timing-ranges");
+            } catch (Exception ex) {
+                _timingRanges.text = string.Empty;
+                RuntimeStatus.Failure("overlay.timing-ranges", "판정 범위", ex);
+            }
         }
 
         private void RefreshStatusText(OverlaySettings settings, scrController controller, float progress, float accuracy, float xAccuracy) {
@@ -404,24 +470,29 @@ namespace DonQuixoteOverlay {
                 scrFloor floor = controller.currFloor;
                 cbpm = floor != null && floor.nextfloor != null ? (float)(60d / (floor.nextfloor.entryTime - floor.entryTime) * pitch) : tbpm;
             } catch { }
-            int flags = (settings.ShowBpm ? 1 : 0) | (settings.ShowTheoreticalKps ? 2 : 0);
+            int flags = (settings.ShowBpm ? 1 : 0) | (settings.ShowTheoreticalKps ? 2 : 0) | (settings.ShowFps ? 4 : 0);
             int tbpmKey = settings.ShowBpm ? Mathf.RoundToInt(tbpm * 100f) : 0;
             int cbpmKey = settings.ShowBpm ? Mathf.RoundToInt(cbpm * 100f) : 0;
             int kpsKey = settings.ShowTheoreticalKps ? Mathf.RoundToInt(cbpm / 60f * 100f) : 0;
             int pitchKey = Mathf.RoundToInt(pitch * 100f);
-            if (_lastBpmFlags == flags && _lastTbpmKey == tbpmKey && _lastCbpmKey == cbpmKey && _lastKpsKey == kpsKey && _lastPitchKey == pitchKey) return;
+            int fpsKey = _fps.HasSample ? _fps.Value : -1;
+            if (_lastBpmFlags == flags && _lastTbpmKey == tbpmKey && _lastCbpmKey == cbpmKey && _lastKpsKey == kpsKey && _lastPitchKey == pitchKey && _lastFps == fpsKey) return;
             _lastBpmFlags = flags; _lastTbpmKey = tbpmKey; _lastCbpmKey = cbpmKey; _lastKpsKey = kpsKey; _lastPitchKey = pitchKey;
-            string accent = "<color=#" + DQColors.AccentHex + ">";
+            _lastFps = fpsKey;
+            string accent = "<color=" + Hex(settings.ValueColor) + ">";
             _bpm.text = (settings.ShowBpm ? "TBPM | " + accent + (tbpmKey / 100f).ToString("0.##") + "</color>\nCBPM | " + accent + (cbpmKey / 100f).ToString("0.##") + "</color>\n" : "")
                 + (settings.ShowTheoreticalKps ? "KPS | " + accent + (kpsKey / 100f).ToString("0.00") + "</color>\n" : "")
-                + "Pitch | " + accent + (pitchKey / 100f).ToString("0.00") + "x</color>";
+                + "Pitch | " + accent + (pitchKey / 100f).ToString("0.00") + "x</color>"
+                + (settings.ShowFps ? "\nFPS | " + accent + (fpsKey < 0 ? "—" : fpsKey.ToString()) + "</color>" : "");
         }
 
         private void RefreshDetailedPerfectText() {
-            int minus = XPerfectModule.MinusCount, exact = XPerfectModule.XCount, plus = XPerfectModule.PlusCount;
+            var tracker = NativeJudgments.DisplayedTracker;
+            int[] counts = tracker == null ? null : tracker.hitMarginsCount;
+            int minus = NativeJudgments.Count(counts, HitMargin.PerfectMinus), exact = NativeJudgments.ExactCount(counts), plus = NativeJudgments.Count(counts, HitMargin.PerfectPlus);
             if (_lastMinus == minus && _lastX == exact && _lastPlus == plus) return;
             _lastMinus = minus; _lastX = exact; _lastPlus = plus;
-            _xPerfectAboveMeter.text = XPerfectModule.FormatCounts("  ");
+            _xPerfectAboveMeter.text = NativeJudgments.FormatDetailedCounts(counts, "  ");
         }
 
         private void RefreshAttemptText() {
@@ -452,7 +523,7 @@ namespace DonQuixoteOverlay {
 
         private bool UpdateJudgments(scrMistakesManager mistakes) {
             try {
-                scrMarginTracker tracker = mistakes == null || scrMistakesManager.marginTrackers == null || scrMistakesManager.marginTrackers.Length == 0 ? null : scrMistakesManager.marginTrackers[0];
+                scrMarginTracker tracker = NativeJudgments.DisplayedTracker;
                 int[] h = tracker == null ? null : tracker.hitMarginsCount;
                 EnsureJudgmentColors();
                 for (int i = 0; i < _judgmentValues.Length; ++i) {
@@ -475,24 +546,11 @@ namespace DonQuixoteOverlay {
             return _judgmentLayout.Rebuild();
         }
         private static int JudgmentCount(int[] values, int displayIndex) {
-            if (displayIndex == 4) return CountAt(values, (int)HitMargin.Perfect) + CountAt(values, (int)HitMargin.Auto);
-            if (displayIndex == 8) return CountAt(values, 7) + CountAt(values, 9) + CountAt(values, 11);
-            int sourceIndex = displayIndex == 0 ? 8 : displayIndex - 1;
-            return CountAt(values, sourceIndex);
+            return NativeJudgments.JudgmentCount(values, displayIndex);
         }
-        private static int CountAt(int[] values, int index) { return values != null && index >= 0 && index < values.Length ? values[index] : 0; }
         private void EnsureJudgmentColors() {
             if (_judgmentColorsReady) return;
-            ColourSchemeHitMargin vanilla = RDConstants.data.hitMarginColoursUI;
-            _judgmentColors[0] = Hex(vanilla.colourFail);
-            _judgmentColors[1] = Hex(vanilla.colourTooEarly);
-            _judgmentColors[2] = Hex(vanilla.colourVeryEarly);
-            _judgmentColors[3] = Hex(vanilla.colourLittleEarly);
-            _judgmentColors[4] = Hex(vanilla.colourPerfect);
-            _judgmentColors[5] = Hex(vanilla.colourLittleLate);
-            _judgmentColors[6] = Hex(vanilla.colourVeryLate);
-            _judgmentColors[7] = Hex(vanilla.colourTooLate);
-            _judgmentColors[8] = Hex(vanilla.colourMultipress);
+            for(int i=0;i<9;i++)_judgmentColors[i]=Hex(OverlayPalette.JudgmentColor(i));
             _judgmentColorsReady = true;
         }
         private static string Hex(Color color) { return KeyViewerContents.KeyViewerColorConverter.Format(color); }
@@ -504,55 +562,38 @@ namespace DonQuixoteOverlay {
                 SetSizeIfChanged(rect, new Vector2(_judgmentLayout.WidthAt(i), 48f));
             }
         }
-        private void PositionDetailedPerfectAboveMeter(scrController controller, Vector2 layoutOffset) {
+        private Vector2 ErrorMeterAnchor(scrController controller) {
             try {
                 RectTransform meter = controller == null || controller.errorMeter == null ? null : controller.errorMeter.wrapperRectTransform;
                 if (meter != null) {
                     meter.GetWorldCorners(_meterCorners);
                     Vector2 topCenter = (RectTransformUtility.WorldToScreenPoint(null, _meterCorners[1]) + RectTransformUtility.WorldToScreenPoint(null, _meterCorners[2])) * .5f;
                     float scale = _canvas == null || _canvas.scaleFactor <= .01f ? 1f : _canvas.scaleFactor;
-                    SetPositionIfChanged(_xPerfectAboveMeter.rectTransform,
-                        new Vector2((topCenter.x - Screen.width * .5f) / scale, topCenter.y / scale + 6f) + layoutOffset);
+                    return new Vector2((topCenter.x - Screen.width * .5f) / scale, topCenter.y / scale + 6f);
                 }
             } catch { }
+            return new Vector2(0, 126);
         }
         private static float SafeSectionScale(float value) { return value <= .01f ? 1f : Mathf.Clamp(value, .45f, 2f); }
 
-        public static float CalculateTimeProgress(double currentTime, double startTime, double endTime) {
-            if (endTime <= startTime) return 0f;
-            return Mathf.Clamp01((float)((currentTime - startTime) / (endTime - startTime)));
-        }
         internal static float FloorProgress(int floorIndex) {
-            try {
-                int last = ADOBase.lm.listFloors.Count - 1;
-                int index = Mathf.Clamp(floorIndex, 1, last);
-                return CalculateTimeProgress(ADOBase.lm.listFloors[index].entryTime, ADOBase.lm.listFloors[1].entryTime, ADOBase.lm.listFloors[last].entryTime);
-            } catch { return 0f; }
+            try { return TileProgress.Fraction(floorIndex, ADOBase.lm.listFloors.Count); } catch { return 0f; }
         }
         public static string FormatProgress(float absoluteProgress, bool startedMidMap, float startProgress) {
             if (!startedMidMap) return absoluteProgress.ToString("0.00%");
             return startProgress.ToString("0.00%") + "~" + absoluteProgress.ToString("0.00%");
         }
         private static float MapProgress(scrController controller) {
-            try {
-                int last = ADOBase.lm.listFloors.Count - 1;
-                double start = ADOBase.lm.listFloors[1].entryTime;
-                double end = ADOBase.lm.listFloors[last].entryTime;
-                double current = scrConductor.instance.songposition_minusi;
-                float value = CalculateTimeProgress(current, start, end);
-                if (current < start - 5d || current > end + 30d) {
-                    current = controller.currFloor == null ? start : controller.currFloor.entryTime;
-                    value = CalculateTimeProgress(current, start, end);
-                }
-                return value;
-            } catch { return 0f; }
+            return controller.currFloor == null ? 0f : FloorProgress(controller.currFloor.seqID);
         }
         private void SetTexts(bool value) {
             if (_textsVisible == value) return;
             _textsVisible = value;
             SetActiveIfChanged(_status.gameObject, value); SetActiveIfChanged(_comboText.gameObject, value); SetActiveIfChanged(_bpm.gameObject, value);
-            SetActiveIfChanged(_judgmentRoot.gameObject, value); SetActiveIfChanged(_xPerfectAboveMeter.gameObject, value);
+            SetActiveIfChanged(_judgmentRoot.gameObject, value);
+            SetActiveIfChanged(_xPerfectAboveMeter.gameObject, value && Main.Settings != null && NativeJudgments.DetailedTextVisible(Main.Settings.Overlay.ShowJudgmentCounts));
             SetActiveIfChanged(_attempts.gameObject, value); SetActiveIfChanged(_progressFill.parent.gameObject, value);
+            SetActiveIfChanged(_songInfo.gameObject, value); SetActiveIfChanged(_timingRanges.gameObject, value);
         }
         private static void SetActiveIfChanged(GameObject value, bool active) { if (value != null && value.activeSelf != active) value.SetActive(active); }
         private static void SetPositionIfChanged(RectTransform target, Vector2 value) { if (target != null && (target.anchoredPosition - value).sqrMagnitude > .0001f) target.anchoredPosition = value; }
@@ -561,7 +602,16 @@ namespace DonQuixoteOverlay {
         private static void SetAnchorMaxIfChanged(RectTransform target, Vector2 value) { if (target != null && (target.anchorMax - value).sqrMagnitude > .0000001f) target.anchorMax = value; }
 
         public void ApplySettings() {
-            if (_progressFill != null) _progressFill.GetComponent<Image>().color = ThemeAccent();
+            var settings=Main.Settings.Overlay;
+            if (_progressFill != null) _progressFill.GetComponent<Image>().color = settings.ProgressBarColor;
+            if(_status!=null)_status.color=settings.TextColor;
+            if(_comboText!=null)_comboText.color=settings.TextColor;
+            if(_bpm!=null)_bpm.color=settings.TextColor;
+            if(_attempts!=null)_attempts.color=settings.AttemptsColor;
+            if(_songInfo!=null)_songInfo.color=settings.TextColor;
+            if(_timingRanges!=null)_timingRanges.color=settings.TextColor;
+            _statusText.ValueHex=Hex(settings.ValueColor).TrimStart('#');_statusText.Invalidate();
+            _lastCombo=_lastMinus=_lastX=_lastPlus=int.MinValue;_lastBpmFlags=-1;
             _judgmentColorsReady = false;
             _judgmentPresentationDirty = true;
             TMP_FontAsset font = FontAssetProvider.OverlayFont;
@@ -573,51 +623,6 @@ namespace DonQuixoteOverlay {
             Material shadow = _textShadow.ForFont(font);
             text.fontSharedMaterial = shadow ?? font.material;
             text.UpdateMeshPadding();
-        }
-        private void AdjustAutoPlayText(scrController controller) {
-            bool auto = false;
-            try { auto = RDC.auto; } catch { }
-            if (!auto) {
-                if (_autoWasActive) RestoreAutoPlayText();
-                return;
-            }
-            if (!_autoWasActive || _autoUiController != controller) {
-                RestoreAutoPlayText();
-                _autoWasActive = true; _autoUiController = controller;
-            }
-            if (PruneAutoTexts()) _autoScan.Reset();
-            if (!_autoScan.TryScan(Time.unscaledTime)) return;
-            try {
-                TMP_Text[] tmpTexts = UnityEngine.Object.FindObjectsByType<TMP_Text>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-                for (int i = 0; i < tmpTexts.Length; ++i) AdjustAutoText(tmpTexts[i] == null ? null : tmpTexts[i].rectTransform, tmpTexts[i] == null ? null : tmpTexts[i].text);
-                Text[] legacyTexts = UnityEngine.Object.FindObjectsByType<Text>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-                for (int i = 0; i < legacyTexts.Length; ++i) AdjustAutoText(legacyTexts[i] == null ? null : legacyTexts[i].rectTransform, legacyTexts[i] == null ? null : legacyTexts[i].text);
-                RuntimeStatus.Clear("overlay.auto-text");
-            } catch (Exception ex) { RuntimeStatus.Failure("overlay.auto-text", "자동플레이 문구 위치", ex); }
-        }
-        private bool PruneAutoTexts() {
-            _deadAutoTexts.Clear();
-            foreach (System.Collections.Generic.KeyValuePair<RectTransform, Vector2> pair in _autoTextPositions)
-                if (pair.Key == null) _deadAutoTexts.Add(pair.Key);
-            for (int i = 0; i < _deadAutoTexts.Count; i++) _autoTextPositions.Remove(_deadAutoTexts[i]);
-            bool removed = _deadAutoTexts.Count > 0;
-            _deadAutoTexts.Clear();
-            return removed;
-        }
-        private void AdjustAutoText(RectTransform rect, string text) {
-            if (rect == null || rect.IsChildOf(transform) || !OverlayAutoScanSchedule.IsAutoPlayText(text)) return;
-            if (!_autoTextPositions.ContainsKey(rect)) _autoTextPositions[rect] = rect.anchoredPosition;
-            Canvas canvas = rect.GetComponentInParent<Canvas>();
-            if (canvas != null && canvas.renderMode != RenderMode.WorldSpace)
-                SetPositionIfChanged(rect, _autoTextPositions[rect] + new Vector2(0f, -145f));
-            else
-                SetPositionIfChanged(rect, _autoTextPositions[rect] + new Vector2(0f, -36f));
-        }
-        internal void RestoreAutoPlayText() {
-            foreach (System.Collections.Generic.KeyValuePair<RectTransform, Vector2> pair in _autoTextPositions)
-                if (pair.Key != null) pair.Key.anchoredPosition = pair.Value;
-            _autoTextPositions.Clear();
-            _deadAutoTexts.Clear(); _autoScan.Reset(); _autoWasActive = false; _autoUiController = null;
         }
     }
 }

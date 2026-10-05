@@ -1,6 +1,6 @@
 # Ghostify Overlay 설치 프로그램
 
-Windows 10/11용 단일 EXE입니다. .NET Framework 4.8과 **Unity Mod Manager 0.33.0 이상이 설치된 얼불춤**을 사용합니다. 별도 설치 프로그램 패키지나 추가 실행 DLL이 필요하지 않습니다.
+Windows 10/11용 단일 EXE입니다. .NET Framework 4.8과 **Unity Mod Manager 0.33.0 이상이 설치된 얼불춤**을 사용합니다. 개발 대상은 **3.4.0 alpha build 25590222**입니다. 설치 창은 게임 DLL의 SHA256과 검증 SDK 지문을 비교해 일치/미검증 상태를 표시합니다. 별도 설치 프로그램 패키지나 추가 실행 DLL이 필요하지 않습니다.
 
 ![설치 화면](Assets/InstallerPreview.png)
 
@@ -8,7 +8,7 @@ Windows 10/11용 단일 EXE입니다. .NET Framework 4.8과 **Unity Mod Manager 
 
 기존 Ghostify 설정·키 색상·배치·누적 기록은 그대로 유지합니다. 변경 전 모드 전체와 Unity Mod Manager 설정은 `%LocalAppData%\GhostifyOverlay\Backups`에 보관합니다. 성공 화면의 **백업 폴더 열기**로 확인할 수 있습니다. 실패하면 이번 설치가 바꾼 파일과 모드 매니저 설정을 복원합니다. 원본 DonQuixote는 삭제하지 않고 중복 실행을 막기 위해 UMM에서 비활성화합니다. 다른 모드 설정은 유지합니다.
 
-UMM ID/기존 설치 폴더 `DonQuixoteOverlay`는 호환을 위해 유지합니다. 게임 파일이나 Unity Mod Manager DLL은 EXE에 포함하지 않습니다. 배포 모드 12개 파일만 묶고 파일마다 SHA256을 확인합니다. 무결성 해시는 다운로드한 `SHA256SUMS.txt`와 비교할 수 있습니다. EXE에는 코드 서명 인증서가 적용되어 있지 않습니다.
+UMM ID/기존 설치 폴더 `DonQuixoteOverlay`는 호환을 위해 유지합니다. 게임 파일이나 Unity Mod Manager DLL은 EXE에 포함하지 않습니다. 배포 모드 14개 파일만 묶고 파일마다 SHA256을 확인합니다. 무결성 해시는 다운로드한 `SHA256SUMS.txt`와 비교할 수 있습니다. EXE에는 코드 서명 인증서가 적용되어 있지 않습니다.
 
 ## 이미지와 아이콘
 
@@ -24,8 +24,10 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File Installer\Run-InstallerT
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File Installer\Run-InstallerUiTests.ps1
 ```
 
-`dist/GhostifyOverlay-Setup-<버전>.exe`, 모드 ZIP, `SHA256SUMS.txt`를 생성합니다. 검사에서는 실제 InstallerEngine을 컴파일해 새 설치·업데이트·사용자 파일 8개 보존·UMM 보존·두 단계 복원·손상/누락/중복/경로 탈출 ZIP·실행 중 게임 차단 등을 31개 항목으로 확인하고, 배포 EXE 자체의 설치도 별도 임시 게임 폴더에서 실행합니다. 실제 게임 실행과 UAC 사용자 클릭은 이 자동 검사에 포함하지 않습니다.
+`dist/GhostifyOverlay-Setup-<버전>.exe`, 모드 ZIP, `SHA256SUMS.txt`를 생성합니다. 검사에서는 실제 InstallerEngine을 컴파일해 새 설치·업데이트·사용자 파일 8개 보존·UMM 보존·두 단계 복원·손상/누락/중복/경로 탈출 ZIP·실행 중 게임 차단 등을 35개 항목으로 확인하고, 배포 EXE 자체의 설치도 별도 임시 게임 폴더에서 실행합니다. 실제 게임 실행과 UAC 사용자 클릭은 이 자동 검사에 포함하지 않습니다.
 
-UI 검사 36개는 실제 SetupWindow와 Windows Forms 메시지 루프를 사용합니다. 정상 종료·X·Esc 및 반복 Dispose, 글꼴 초기화 실패, 설치 중 종료 방지, 버튼 상태별 네 모서리, GDI/창 핸들과 글꼴 메모리 해제를 검사합니다. 0.2.10 배포 EXE의 실제 화면에서도 찾기·폴더 선택·취소·키보드 포커스·X·Esc·Alt+F4 종료를 확인했습니다.
+UI 검사 38개는 실제 SetupWindow와 Windows Forms 메시지 루프를 사용합니다. 정상 종료·X·Esc 및 반복 Dispose, 글꼴 초기화 실패, 설치 중 종료 방지, 버튼 상태별 네 모서리, GDI/창 핸들과 글꼴 메모리 해제를 검사합니다. 0.2.10 배포 EXE의 실제 화면에서도 찾기·폴더 선택·취소·키보드 포커스·X·Esc·Alt+F4 종료를 확인했습니다.
 
 글꼴·글꼴 패밀리·이미지·아이콘은 설치 창이 소유하고 한 번만 해제합니다. 컨트롤을 먼저 해제하고 글꼴과 글꼴 컬렉션, GDI 등록, 원본 메모리 순서로 정리합니다. 사용자 컴퓨터의 글꼴 설치 목록은 변경하지 않습니다.
+
+게임을 유지하며 검사하려면 Run-InstallerTests.ps1 -SkipShippingInstall을 사용합니다. 생성된 가짜 게임 폴더에서 프로세스 감지만 대체하며 실행 중 차단과 설치 중 실행 전환은 별도로 검증합니다. 배포 EXE는 실제 프로세스 감지를 사용합니다.

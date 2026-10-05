@@ -61,12 +61,12 @@ namespace DonQuixoteOverlay.KeyViewerContents {
         public float X,Y,Width,Height;
         public object RainPool = new object();
     }
-    public class KeyViewerSetting { public float YLocation=200; public bool ShowTotalKpsKey16=true; }
+    public class KeyViewerSetting { public float YLocation=200; public bool ShowTotalKpsKey16=true; public KeyviewerStyle KeyViewerStyle=KeyviewerStyle.Key16; }
     public sealed class KeyViewerUpdater { public bool enabled; }
     public partial class KeyViewer {
         public const int HandOutIndex=20;
         public static KeyViewerSetting Settings = new KeyViewerSetting();
-        public static readonly byte[] BackSequence12={9,8,10,11}, BackSequence16={12,13,9,8,10,11,14,15}, BackSequence20={12,13,9,8,10,11,14,15,17,16,18,19};
+        public static readonly byte[] BackSequence12={9,8,10,11}, BackSequence16={12,13,9,8,10,11,14,15};
         public Key[] Keys = new Key[36];
         public Key Kps,Total;
         public KeyViewerUpdater Updater = new KeyViewerUpdater();
@@ -75,10 +75,10 @@ namespace DonQuixoteOverlay.KeyViewerContents {
             return new Key { X=x,Y=y,Width=width,Height=slim?30:50 };
         }
         public void Build(int style,float y=200,bool footer=true) {
+            Settings.KeyViewerStyle=style==16?KeyviewerStyle.Key16:style==12?KeyviewerStyle.Key12:KeyviewerStyle.Key10;
             Settings.YLocation=y;Settings.ShowTotalKpsKey16=footer;
             if(style==16)Initialize1KeyViewer();
             else if(style==12)Initialize0KeyViewer();
-            else if(style==20)Initialize2KeyViewer();
             else Initialize3KeyViewer();
         }
         public void Feet(int size) { InitializeFootKeyViewer(size); }
@@ -104,14 +104,14 @@ namespace DonQuixoteOverlay {
             var hidden=new KeyViewerContents.KeyViewer();hidden.Build(16,200,false);
             Check(hidden.Kps==null && hidden.Total==null && hidden.Keys[0].Y==285 && hidden.Keys[12].Y==231 && hidden.Keys.Take(16).All(k=>k.Width==50),"hiding the footer preserves original row offsets and fixed sizes");
             var twelve=new KeyViewerContents.KeyViewer();twelve.Build(12);
-            Check(twelve.Keys[8].Width==77 && twelve.Keys[9].Width==50 && twelve.Kps.Width==77,"twelve-key wide input and footer cells retain their source sizes");
+            Check(twelve.Keys.Take(12).All(k=>k.Width==50 && k.Height==50) && twelve.Kps.Width==104 && twelve.Total.Width==104 && twelve.Total.X==324,"twelve-key inputs are square with two-column KPS / Total cells");
+            Check(KeyViewerContents.KeyViewer.BackSequence12.Select((index,i)=>twelve.Keys[index].X==108+54*i && twelve.Keys[index].Y==225 && ReferenceEquals(twelve.Keys[index].RainPool,twelve.Keys[i+2].RainPool)).All(x=>x),"twelve-key lower row matches the reference and shares the matching upper lane");
             var ten=new KeyViewerContents.KeyViewer();ten.Build(10);
-            Check(ten.Keys[8].Width==131 && ten.Keys[9].Width==131 && ten.Keys.Take(8).All(k=>k.Width==50),"ten-key wide input cells retain their source sizes");
-            var twenty=new KeyViewerContents.KeyViewer();twenty.Build(20);
-            Check(twenty.Keys.Take(16).All(k=>k.Width==50 && k.Height==50) && twenty.Keys[16].Width==77,"twenty-key layout retains its original square rows and wide bottom input");
+            Check(ten.Keys.Take(10).All(k=>k.Width==50 && k.Height==50) && ten.Kps.Width==158 && ten.Total.Width==158 && ten.Total.X==270,"ten-key inputs are square with three-column KPS / Total cells");
+            Check(ten.Keys[8].X==162 && ten.Keys[9].X==216 && ten.Keys[8].Y==225 && ten.Keys[9].Y==225 && ReferenceEquals(ten.Keys[8].RainPool,ten.Keys[3].RainPool) && ReferenceEquals(ten.Keys[9].RainPool,ten.Keys[4].RainPool),"ten-key lower row matches the reference and shares the matching upper lane");
             viewer.Feet(16);
             Check(viewer.Keys.Skip(20).All(k=>k.Width==30 && k.Height==30) && viewer.Keys.Skip(20).GroupBy(k=>k.Y).All(g=>g.Select(k=>k.X).OrderBy(x=>x).SequenceEqual(Enumerable.Range(0,8).Select(i=>432f+34*i))),"sixteen foot cells retain the source 30x30 frames and spacing");
-            Check(KeyViewerContents.KeyViewerMetrics.RainWidth(1)==50 && KeyViewerContents.KeyViewerMetrics.RainWidth(2)==40 && KeyViewerContents.KeyViewerMetrics.RainWidth(3)==30,"all three rain widths retain the source slot semantics");
+            Check(KeyViewerContents.KeyViewerMetrics.RainWidth(1)==50 && KeyViewerContents.KeyViewerMetrics.RainWidth(2)==40,"the two retained rain widths keep the source slot semantics");
         }
         private static void Shadow() {
             var font=new TMPro.TMP_FontAsset();font.material.Keywords.Add("UNDERLAY_INNER");

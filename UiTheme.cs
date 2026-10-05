@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace DonQuixoteOverlay {
     internal static class DQColors {
-        public const string AccentHex = "FFCA3A";
+        public const string AccentHex = "FFC939";
         public const string KeyAccentHex = AccentHex;
         public static readonly Color KeyAccent = Hex(KeyAccentHex);
-        public const string XPerfectHex = "4DCCFF";
+        public const string XPerfectHex = "FFFFFF";
         public const string PlusMinusPerfectHex = "60FF4E";
         public static readonly Color XPerfect = Hex(XPerfectHex);
         public static readonly Color PlusMinusPerfect = Hex(PlusMinusPerfectHex);
@@ -137,7 +137,7 @@ namespace DonQuixoteOverlay {
         public const int PillRadius = DQRadii.Badge;
 
         public static TMP_FontAsset FontFor(string value) {
-            return FontAssetProvider.GoogleSans;
+            return FontAssetProvider.GmarketSans;
         }
 
     }

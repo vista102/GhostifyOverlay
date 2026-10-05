@@ -12,12 +12,12 @@ namespace DonQuixoteOverlay {
         internal float TotalWidth { get; private set; }
 
         internal OverlayJudgmentLayout() {
-            for (int i = 0; i < CellCount; i++) _preferredWidths[i] = 34f;
+            for (int i = 0; i < CellCount; i++) _preferredWidths[i] = 32f;
         }
 
         internal void SetPreferredWidth(int index, float preferred) {
             if (float.IsNaN(preferred) || float.IsInfinity(preferred)) preferred = 0f;
-            float width = Math.Max(34f, preferred + 10f);
+            float width = Math.Max(32f, preferred + 8f);
             if (_preferredWidths[index] == width) return;
             _preferredWidths[index] = width;
             _dirty = true;
@@ -27,12 +27,11 @@ namespace DonQuixoteOverlay {
             if (!_dirty) return false;
             float sum = 0f;
             for (int i = 0; i < CellCount; i++) sum += _preferredWidths[i];
-            TotalWidth = Math.Max(480f, sum);
-            float extra = sum < 480f ? (480f - sum) / CellCount : 0f;
+            TotalWidth = sum;
             float x = 0f;
             for (int i = 0; i < CellCount; i++) {
                 _offsets[i] = x;
-                _cellWidths[i] = _preferredWidths[i] + extra;
+                _cellWidths[i] = _preferredWidths[i];
                 x += _cellWidths[i];
             }
             _dirty = false;
@@ -54,6 +53,8 @@ namespace DonQuixoteOverlay {
     }
 
     internal sealed class OverlayStatusTextCache {
+        internal string ValueHex=DQColors.AccentHex;
+        internal void Invalidate() { _flags=-1; _culture=null; }
         private int _flags = -1;
         private int _progress, _accuracy, _xAccuracy, _musicCurrent, _musicTotal, _mapCurrent, _mapTotal;
         private bool _midMap;
@@ -79,16 +80,16 @@ namespace DonQuixoteOverlay {
                 && _midMap == midMap && _startProgress == startProgress) return false;
 
             if (cultureChanged || ((_flags ^ flags) & 1) != 0 || _progress != progress || _midMap != midMap || _startProgress != startProgress)
-                _progressLine = (flags & 1) == 0 ? string.Empty : "Progress | <color=#" + DQColors.AccentHex + ">"
+                _progressLine = (flags & 1) == 0 ? string.Empty : "Progress | <color=#" + ValueHex + ">"
                     + OverlayController.FormatProgress(progress / 10000f, midMap, startProgress) + "</color>\n";
             if (cultureChanged || ((_flags ^ flags) & 2) != 0 || _accuracy != accuracy)
-                _accuracyLine = (flags & 2) == 0 ? string.Empty : "Accuracy | <color=#" + DQColors.AccentHex + ">" + (accuracy / 100f).ToString("0.00") + "%</color>\n";
+                _accuracyLine = (flags & 2) == 0 ? string.Empty : "Accuracy | <color=#" + ValueHex + ">" + (accuracy / 100f).ToString("0.00") + "%</color>\n";
             if (cultureChanged || ((_flags ^ flags) & 4) != 0 || _xAccuracy != xAccuracy)
-                _xAccuracyLine = (flags & 4) == 0 ? string.Empty : "XAccuracy | <color=#" + DQColors.AccentHex + ">" + (xAccuracy / 100f).ToString("0.00") + "%</color>\n";
+                _xAccuracyLine = (flags & 4) == 0 ? string.Empty : "XAccuracy | <color=#" + ValueHex + ">" + (xAccuracy / 100f).ToString("0.00") + "%</color>\n";
             if (cultureChanged || ((_flags ^ flags) & 8) != 0 || _musicCurrent != musicCurrent || _musicTotal != musicTotal)
-                _musicLine = (flags & 8) == 0 ? string.Empty : "Music Time | " + FormatTime(musicCurrent) + "-" + FormatTime(musicTotal);
+                _musicLine = (flags & 8) == 0 ? string.Empty : "Music Time | <color=#" + ValueHex + ">" + FormatTime(musicCurrent) + "-" + FormatTime(musicTotal) + "</color>";
             if (cultureChanged || ((_flags ^ flags) & 16) != 0 || _mapCurrent != mapCurrent || _mapTotal != mapTotal)
-                _mapLine = (flags & 16) == 0 ? string.Empty : "Map Time | " + FormatTime(mapCurrent) + "-" + FormatTime(mapTotal);
+                _mapLine = (flags & 16) == 0 ? string.Empty : "Map Time | <color=#" + ValueHex + ">" + FormatTime(mapCurrent) + "-" + FormatTime(mapTotal) + "</color>";
 
             _flags = flags; _culture = culture; _progress = progress; _accuracy = accuracy; _xAccuracy = xAccuracy;
             _musicCurrent = musicCurrent; _musicTotal = musicTotal; _mapCurrent = mapCurrent; _mapTotal = mapTotal;
@@ -103,35 +104,4 @@ namespace DonQuixoteOverlay {
         }
     }
 
-    // A short discovery window catches late-created HUD/tile labels. Loss of a
-    // tracked object, a new run or a scene change opens a new bounded window.
-    internal sealed class OverlayAutoScanSchedule {
-        private int _attempts;
-        private double _next;
-        internal void Reset() { _attempts = 0; _next = 0d; }
-        internal bool TryScan(double now) {
-            if (_attempts >= 6 || now < _next) return false;
-            _attempts++; _next = now + .5d;
-            return true;
-        }
-
-        internal static bool IsAutoPlayText(string text) {
-            return ContainsIgnoringSpaces(text, "자동플레이") || ContainsIgnoringSpaces(text, "autoplay");
-        }
-
-        private static bool ContainsIgnoringSpaces(string value, string term) {
-            if (string.IsNullOrEmpty(value)) return false;
-            for (int start = 0; start < value.Length; start++) {
-                if (char.ToUpperInvariant(value[start]) != char.ToUpperInvariant(term[0])) continue;
-                int matched = 0;
-                for (int i = start; i < value.Length && matched < term.Length; i++) {
-                    if (value[i] == ' ') continue;
-                    if (char.ToUpperInvariant(value[i]) != char.ToUpperInvariant(term[matched])) break;
-                    matched++;
-                }
-                if (matched == term.Length) return true;
-            }
-            return false;
-        }
-    }
 }

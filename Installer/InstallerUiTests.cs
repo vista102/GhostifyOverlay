@@ -63,8 +63,8 @@ namespace GhostifySetup {
                     }
                 }
                 using (var fonts = new BrandFonts(engine)) {
-                    Check(fonts.Font(12).FontFamily.Name.StartsWith("Noto Sans KR"), "embedded Korean font loads");
-                    Check(fonts.Font(12, true).FontFamily.Name.StartsWith("Google Sans"), "embedded English font loads");
+                    Check(fonts.Font(12).FontFamily.GetName(1033).StartsWith("Gmarket Sans"), "embedded Gmarket Korean font loads regardless of localized family name");
+                    Check(fonts.Font(12, true).FontFamily.GetName(1033).StartsWith("Gmarket Sans"), "embedded Gmarket English font loads");
                     fonts.Dispose(); fonts.Dispose();
                     bool rejected = false;
                     try { fonts.Font(12); } catch (ObjectDisposedException) { rejected = true; }
@@ -73,6 +73,10 @@ namespace GhostifySetup {
                 using (var form = new SetupWindow(engine)) {
                     form.StartPosition = FormStartPosition.Manual; form.Location = new Point(-20000, -20000); form.ShowInTaskbar = false;
                     form.Show(); Application.DoEvents();
+                    Label title=null;foreach(Control control in form.Controls)if(control is Label label && label.Text=="Ghostify Overlay")title=label;
+                    Check(title!=null && title.Top>=16 && title.Bottom<100,"title is lowered with clear space above and below");
+                    Check(Field<Label>(form,"_note").Text==string.Empty,"original-mod disable notice is removed from the installer UI");
+                    using(var preview=new Bitmap(form.Width,form.Height)){form.DrawToBitmap(preview,form.ClientRectangle);preview.Save(Path.Combine(args[0],"Installer-0.4.0.png"));}
                     BrandButton browse = Field<BrandButton>(form, "_browse"), install = Field<BrandButton>(form, "_install"), close = Field<BrandButton>(form, "_close");
                     CheckCorners(browse, "browse normal corners match the window");
                     Handler(browse, "OnMouseEnter", EventArgs.Empty); CheckCorners(browse, "browse hover corners match the window");

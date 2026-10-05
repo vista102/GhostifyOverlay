@@ -26,7 +26,7 @@ namespace DonQuixoteOverlay {
                 if (!value) { Disable(); return true; }
                 if (Enabled) return true;
                 Disable();
-                InputController.Reset();
+                MenuInputBlock.Reset();
                 _harmony = new Harmony(HarmonyId);
                 PatchRegistry.Apply(_harmony, Assembly.GetExecutingAssembly());
                 Root = new GameObject("DonQuixoteOverlay.Root");
@@ -52,10 +52,11 @@ namespace DonQuixoteOverlay {
             Action[] actions = {
                 () => KeyViewerContents.AsyncInputHook.Reset(),
                 () => EffectRestoration.RestoreFilters(), () => EffectRestoration.RestoreCameras(),
-                () => XPerfectModule.RestoreTextStyles(), () => XPerfectMeterZoneController.RemoveAll(),
+                () => NativeJudgmentColors.RestoreAll(),
                 () => { if (Root != null) { Root.SetActive(false); UnityEngine.Object.Destroy(Root); Root = null; } },
-                () => KeyViewerContents.KeyViewerAssets.Dispose(), () => DarkNeonUi.DisposeAssets(), () => FontAssetProvider.Dispose(),
-                () => XPerfectModule.Reset(), () => { if (Settings != null) Save(); },
+                () => DarkNeonUi.DisposeAssets(), () => FontAssetProvider.Dispose(),
+                () => OverlayController.ResetRun(), () => { if (Settings != null) Save(); },
+                () => AttemptTracker.EndSession(),
                 () => { if (_harmony != null) { PatchRegistry.RemoveAll(_harmony); _harmony = null; } }
             };
             foreach (Action action in actions) try { action(); } catch (Exception ex) { Log(ex.ToString()); failure = ex; }
@@ -63,6 +64,7 @@ namespace DonQuixoteOverlay {
         }
         private static void Update(UnityModManager.ModEntry entry, float delta) {
             if (!Enabled) return;
+            NativeInputSync.Tick();
             if (_dirty && Time.unscaledTime >= _saveAt) SaveFromUi();
             bool alt = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt) || Input.GetKey(KeyCode.AltGr);
             if (alt && Input.GetKeyDown(KeyCode.D) && SettingsWindow.Instance != null) SettingsWindow.Instance.Toggle();
@@ -79,12 +81,13 @@ namespace DonQuixoteOverlay {
         private void Update() {
             if (!Main.Enabled) return;
             scrController c = scrController.instance;
+            AttemptTracker.ObserveContext(c);
             if (c != null && c.gameworld) AttemptTracker.ValidateCurrentRun(c);
         }
         private void SceneChanged(Scene previous, Scene current) {
-            InputController.Reset();
+            MenuInputBlock.Reset();
             LayoutEditorController.CancelActive();
-            try { XPerfectModule.RestoreOldSceneText(current); XPerfectMeterZoneController.RemoveOldScene(current); Main.SaveFromUi(); }
+            try { NativeJudgmentColors.RestoreOldScene(current); Main.SaveFromUi(); }
             catch (Exception ex) { Main.Log(ex.ToString()); }
         }
         private void OnApplicationQuit() { LayoutEditorController.CancelActive(); Main.SaveFromUi(); }

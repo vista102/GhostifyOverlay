@@ -66,6 +66,32 @@ public static class KeyViewerTests {
         Check((long)Get(data,"TotalCount")==long.MaxValue,"ghost rain does not count a gameplay tap");
         object ghost=Get(keys.GetValue(0),"LastGhostRain");Call(viewer,"WorkIndex",36,false,10L);
         Check((bool)Get(ghost,"FinishSize"),"ghost release finishes its corresponding rain");
+        Set(viewer,"_focused",true);
+        Set(data,"TotalCount",42L);counts[2]=12;
+        long[] countsBefore=(long[])counts.Clone();
+        int kpsBefore=((System.Collections.Concurrent.ConcurrentQueue<long>)Get(viewer,"_pressTimes")).Count;
+        Call(viewer,"SynchronizeHeldKey",36,true,20L);
+        object resumed=Get(keys.GetValue(0),"LastGhostRain");
+        Check(resumed!=null && !ReferenceEquals(resumed,ghost) && (long)Get(resumed,"StartTime")==20L && !(bool)Get(resumed,"FinishSize"),"a ghost held across focus/menu/visibility reset gets a fresh bar at resume time");
+        int queuedBefore=(int)queue.GetType().GetProperty("Count").GetValue(queue,null);
+        Call(viewer,"WorkIndex",36,true,21L);
+        Check((int)queue.GetType().GetProperty("Count").GetValue(queue,null)==queuedBefore,"resynchronization still suppresses duplicate down callbacks");
+        Call(viewer,"WorkIndex",36,false,22L);
+        Check((bool)Get(resumed,"FinishSize"),"the real release finishes the resumed ghost bar");
+        Set(viewer,"_suspended",true);Call(viewer,"SynchronizeHeldKey",37,true,23L);
+        Check(Get(keys.GetValue(1),"LastGhostRain")==null && (int)queue.GetType().GetProperty("Count").GetValue(queue,null)==queuedBefore,"suspended preview/focus state does not create hidden ghost bars");
+        Set(viewer,"_suspended",false);Call(viewer,"SynchronizeHeldKey",37,true,24L);
+        Check(Get(keys.GetValue(1),"LastGhostRain")!=null,"a ghost that was held during suspension appears when input resumes");
+        Call(viewer,"SynchronizeHeldKey",2,true,25L);
+        Check(Get(keys.GetValue(2),"LastRain")!=null,"held normal rain also resumes without requiring a second press");
+        Check(counts.SequenceEqual(countsBefore) && (long)Get(data,"TotalCount")==42L && ((System.Collections.Concurrent.ConcurrentQueue<long>)Get(viewer,"_pressTimes")).Count==kpsBefore,"restoring held bars never invents counts or KPS hits");
+        queuedBefore=(int)queue.GetType().GetProperty("Count").GetValue(queue,null);
+        Call(viewer,"SynchronizeHeldKey",20,true,26L);
+        Check((int)queue.GetType().GetProperty("Count").GetValue(queue,null)==queuedBefore,"foot state restoration does not create a hand rain");
+        Set(settings,"useGhostRain",false);Call(viewer,"SynchronizeHeldKey",38,true,27L);
+        Check(Get(keys.GetValue(2),"LastGhostRain")==null,"disabled ghost rain remains disabled during state recovery");
+        Set(settings,"useGhostRain",true);Set(viewer,"_focused",false);Call(viewer,"SynchronizeHeldKey",39,true,28L);
+        Check(Get(keys.GetValue(3),"LastGhostRain")==null,"lost application focus does not restart a ghost bar before return");
         var labels=new Dictionary<int,List<int>>();
         labels[1]=new List<int>{0,1};labels[2]=new List<int>{20};
         var mapped=(IDictionary)T("KeyViewer").GetMethod("ToArrayMap",All).MakeGenericMethod(typeof(int)).Invoke(null,new object[]{labels});
@@ -117,12 +143,12 @@ public static class KeyViewerTests {
     private static void Metadata() {
         bool noImmediate=Mod.GetTypes().SelectMany(t=>t.GetMethods(All|BindingFlags.DeclaredOnly)).All(m=>m.Name!="OnGUI");
         Check(noImmediate,"all mod UI has no OnGUI entry point");
-        foreach(string name in new[]{"Initialize0KeyViewer","Initialize1KeyViewer","Initialize2KeyViewer","Initialize3KeyViewer","InitializeFootKeyViewer"})
+        foreach(string name in new[]{"Initialize0KeyViewer","Initialize1KeyViewer","Initialize3KeyViewer","InitializeFootKeyViewer"})
             Check(T("KeyViewer").GetMethods(All).Any(m=>m.Name==name),"upstream layout routine retained: "+name);
         Type game=AppDomain.CurrentDomain.GetAssemblies().Select(a=>a.GetType("AsyncInputManager")).First(t=>t!=null);
         Check(game.GetMethod("ToggleHook",All)!=null && game.GetProperty("isActive",All)!=null && game.GetField("_instance",All)!=null,"game hook lease API resolves in the installed game assembly");
         int listeners=new[]{game}.Concat(game.GetNestedTypes(All)).SelectMany(t=>t.GetMethods(All|BindingFlags.DeclaredOnly)).Count(m=>m.ReturnType==typeof(void)&&m.GetParameters().Length==1&&m.GetParameters()[0].ParameterType.Name=="SkyHookEvent");
         Check(listeners>0,"game event listener is discoverable without starting native hooks");
-        Check(!T("KeyViewerSetting").GetField("AutoSetupKeyLimit").GetValue(New("KeyViewerSetting")).Equals(true),"viewer does not silently enable or replace the key limiter");
+        Check(T("KeyViewerSetting").GetField("AutoSetupKeyLimit")==null,"key viewer no longer carries key limiter setup");
     }
 }

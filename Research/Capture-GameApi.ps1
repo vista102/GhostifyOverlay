@@ -1,0 +1,16 @@
+param([string]$GameDir='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice',[string]$SteamManifest='C:\Program Files (x86)\Steam\steamapps\appmanifest_977950.acf',[string]$OutputFile)
+$ErrorActionPreference='Stop'
+$game=$GameDir
+$managed=Join-Path $game 'A Dance of Fire and Ice_Data\Managed'
+foreach($dir in @($managed,(Join-Path $managed 'UnityModManager'))){Get-ChildItem -LiteralPath $dir -Filter *.dll | ForEach-Object {try{[Reflection.Assembly]::LoadFrom($_.FullName)|Out-Null}catch{}}}
+$assembly=[Reflection.Assembly]::LoadFrom((Join-Path $managed 'Assembly-CSharp.dll'))
+$flags=[Reflection.BindingFlags]'Public,NonPublic,Static,Instance,DeclaredOnly'
+$names=@('HitMargin','DetailedResults','scrMisc','scrMarginTracker','scrMistakesManager','scrPlayerManager','scrHitTextManager','scrHitTextMesh','scrHitErrorMeter','RDInput','RDInputType','RDInputType_Keyboard','RDInputType_AsyncKeyboard','AsyncInputManager','RDConstants','scrController','scrVfxPlus','ffxSetFilterPlus','ffxBloomPlus','ffxFlashPlus','ffxHallOfMirrorsPlus','ffxShakeScreenPlus','ffxMoveFloorPlus','HitMarginHelper','HitMarginGeneral','HitMarginLimit','HitMarginPerfectTextPreset','HitMarginPerfectTickPreset','HitMarginTextPreset','HitMarginColorPreset','HitMarginHidePreset','ColourSchemeHitMargin','ADOFAI.ErrorMeterTick','scrMisc+HitMarginGeneralValuesStruct`1','scrMisc+HitMarginGeneralWithXPerfectValuesStruct`1','GCS','RDC','scrPlayer','scrPlanet','scrFloor','Persistence','scrLevelMaker','AsyncInputManager+<>c','SkyHook.SkyHookEvent')
+$types=@(foreach($name in $names){$type=$assembly.GetType($name,$false); if(!$type){foreach($loadedAssembly in [AppDomain]::CurrentDomain.GetAssemblies()){$type=$loadedAssembly.GetType($name,$false);if($type){break}}};if($type){@{Name=$name;Exists=$true;Enum=if($type.IsEnum){@([Enum]::GetNames($type))}else{@()};EnumValues=if($type.IsEnum){@([Enum]::GetNames($type)|ForEach-Object{@{Name=$_;Value=[int][Enum]::Parse($type,$_)}})}else{@()};Methods=@($type.GetMethods($flags)|ForEach-Object{$_.ToString()});Fields=@($type.GetFields($flags)|ForEach-Object{$_.ToString()});Properties=@($type.GetProperties($flags)|ForEach-Object{$_.ToString()})}}else{@{Name=$name;Exists=$false}}})
+$manifest=[IO.File]::ReadAllText($SteamManifest)
+$result=@{Captured=(Get-Date -Format o);SteamBranch=[regex]::Match($manifest,'"BetaKey"\s+"([^"]+)"').Groups[1].Value;SteamBuild=[regex]::Match($manifest,'"buildid"\s+"([^"]+)"').Groups[1].Value;UnityVersion=(Get-Item (Join-Path $game 'UnityPlayer.dll')).VersionInfo.ProductVersion;UnitySha256=(Get-FileHash -LiteralPath (Join-Path $game 'UnityPlayer.dll')).Hash;AssemblySha256=(Get-FileHash -LiteralPath (Join-Path $managed 'Assembly-CSharp.dll')).Hash;Types=$types}
+if([string]::IsNullOrWhiteSpace($OutputFile)){$OutputFile=Join-Path $PSScriptRoot ('GameApi-'+$result.SteamBranch+'-'+$result.SteamBuild+'.json')}
+[IO.File]::WriteAllText($OutputFile,($result|ConvertTo-Json -Depth 6),[Text.UTF8Encoding]::new($false))
+'Current HitMargin: '+($types|Where-Object{$_.Name -eq 'HitMargin'}).Enum -join ', '
+$types|Where-Object{$_.Name -in @('scrMarginTracker','scrMistakesManager','DetailedResults','AsyncInputManager','RDInput')}|ForEach-Object{$_|ConvertTo-Json -Depth 4 -Compress}
+'API baseline captured; no game methods invoked'

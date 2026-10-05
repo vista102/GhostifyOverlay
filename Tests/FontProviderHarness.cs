@@ -43,22 +43,24 @@ namespace DonQuixoteOverlay {
         private static void Check(bool condition, string name) { if (!condition) throw new Exception("FAIL " + name); Results.Add("PASS " + name); }
         public static string[] Run(string modDirectory) {
             Main.Entry.Path = modDirectory;
-            var primary = FontAssetProvider.GoogleSans;
+            var primary = FontAssetProvider.GmarketSans;
             Check(primary != null && primary.fallbackFontAssetTable != null && primary.fallbackFontAssetTable.Count == 1, "null TMP fallback list no longer aborts initialization");
-            Check(primary.fallbackFontAssetTable[0].name == "GhostifyOverlay.NotoSansKR", "Noto Sans KR fallback attaches to the GoogleSans font");
-            Check(TMPro.TMP_FontAsset.FilePaths.Count == 2 && TMPro.TMP_FontAsset.FilePaths[0].EndsWith("GoogleSans-Regular.ttf") && TMPro.TMP_FontAsset.FilePaths[1].EndsWith("NotoSansKR-Regular.ttf"), "both bundled files reach the file-path font API");
-            Check(object.ReferenceEquals(primary, FontAssetProvider.OverlayFont) && TMPro.TMP_FontAsset.FilePaths.Count == 2 && primary.fallbackFontAssetTable.Count == 1, "cached UI access does not duplicate fonts or fallback entries");
+            Check(primary.fallbackFontAssetTable[0].name == "GhostifyOverlay.NotoSansKR", "Noto Sans KR fallback attaches to the GmarketSans font");
+            Check(TMPro.TMP_FontAsset.FilePaths.Count == 2 && TMPro.TMP_FontAsset.FilePaths[0].EndsWith("GmarketSansTTFMedium.ttf") && TMPro.TMP_FontAsset.FilePaths[1].EndsWith("NotoSansKR-Regular.ttf"), "both bundled files reach the file-path font API");
+            Check(object.ReferenceEquals(primary,FontAssetProvider.OverlayFont),"overlay and keys restore the original Medium face used by settings");
+            Check(object.ReferenceEquals(primary,FontAssetProvider.OverlayFont) && TMPro.TMP_FontAsset.FilePaths.Count==2,"repeated UI and overlay access reuses Medium without loading Light");
             FontAssetProvider.Dispose();
             Check(UnityEngine.Object.Destroyed.Count == 6, "disable releases both generated fonts, atlases and materials");
-            var again = FontAssetProvider.GoogleSans;
+            var again = FontAssetProvider.GmarketSans;
             Check(!object.ReferenceEquals(primary, again) && again.fallbackFontAssetTable.Count == 1, "reactivation rebuilds the font cache and fallback safely");
             FontAssetProvider.Dispose();
-            TMPro.TMP_FontAsset.FailFile = "GoogleSans-Regular.ttf";
-            var fallback = FontAssetProvider.GoogleSans;
-            Check(fallback != null && fallback.name == "GhostifyOverlay.NotoSansKR" && RuntimeStatus.Errors.Contains("font.GoogleSans"), "failed native font creation reports the problem and uses Noto Sans KR fallback");
+            TMPro.TMP_FontAsset.FailFile = "GmarketSansTTFMedium.ttf";
+            var fallback = FontAssetProvider.GmarketSans;
+            Check(fallback != null && fallback.name == "GhostifyOverlay.NotoSansKR" && RuntimeStatus.Errors.Contains("font.GmarketSans"), "failed native font creation reports the problem and uses Noto Sans KR fallback");
+            Check(object.ReferenceEquals(fallback,FontAssetProvider.OverlayFont),"overlay shares the safe Korean fallback when Medium cannot load");
             FontAssetProvider.Dispose();
             TMPro.TMP_FontAsset.FailFile = "*";
-            Check(FontAssetProvider.GoogleSans == null && RuntimeStatus.Errors.Contains("font.NotoSansKR"), "two failed font faces are handled without a startup exception");
+            Check(FontAssetProvider.GmarketSans == null && RuntimeStatus.Errors.Contains("font.NotoSansKR"), "two failed font faces are handled without a startup exception");
             return Results.ToArray();
         }
     }

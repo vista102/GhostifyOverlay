@@ -9,6 +9,7 @@
 /Installer/test-fixture-*/
 /Tests/*fixture*/
 /Tests/effect-storage-*/
+/Tests/feedback-v2-*/
 *.dll
 *.pdb
 *.exe
@@ -32,9 +33,15 @@
 /Tools/ImportJipper.py
 /Tests/*.reference.txt
 /Tests/*results.txt
+/Research/GameApi-*.json
+/Research/ApiDiff-*.json
 
 # Previous, unused fonts are not part of the shipped project
 /Assets/BMDOHYEON_ttf.ttf
 /Assets/Galmuri11-Bold.ttf
 /Assets/Montserrat-Regular.ttf
 /Assets/Montserrat-OFL.txt
+/Assets/GoogleSans-Regular.ttf
+/Assets/GoogleSans-OFL.txt
+/Research/GmarketOfficial/
+Tests/FeedbackV3Harness-*.dll

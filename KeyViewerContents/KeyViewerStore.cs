@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 using System.Globalization;
 
@@ -50,15 +51,52 @@ internal static class KeyViewerStore {
             Settings ??= new(); Save();
         }
     }
-    private static KeyViewerSetting Read(string path) => Normalize(JsonConvert.DeserializeObject<KeyViewerSetting>(File.ReadAllText(path)) ?? throw new JsonSerializationException("Key viewer settings root is null."));
+    private static KeyViewerSetting Read(string path) => Deserialize(File.ReadAllText(path));
+    internal static KeyViewerSetting Deserialize(string json) {
+        var root=JObject.Parse(json);
+        if(root["SchemaVersion"]==null)root["SchemaVersion"]=1;
+        // Handle both enum names and numbers before deserialization rejects a
+        // removed name. Unknown legacy fields are ignored after migration.
+        if(IsLegacyStyle(root["KeyViewerStyle"],"Key20",2)) {
+            root["KeyViewerStyle"]=(int)KeyviewerStyle.Key16;
+            Copy("key20","key16",16);Copy("key20Text","key16Text",16);Copy("GhostKey20","GhostKey16",16);
+        }
+        if(IsLegacyStyle(root["FootKeyViewerStyle"],"Key6",3)) {
+            root["FootKeyViewerStyle"]=(int)FootKeyviewerStyle.Key4;
+            Copy("footkey6","footkey4",4);Copy("footkey6Text","footkey4Text",4);
+        }
+        return Normalize(root.ToObject<KeyViewerSetting>() ?? throw new JsonSerializationException("Key viewer settings root is null."));
+        void Copy(string source,string target,int length) {
+            if(root[source] is not JArray old)return;
+            var values=new JArray();for(int i=0;i<Math.Min(length,old.Count);i++)values.Add(old[i].DeepClone());root[target]=values;
+        }
+    }
+    private static bool IsLegacyStyle(JToken value,string name,int number) => value != null &&
+        (value.Type==JTokenType.Integer && (int)value==number || value.Type==JTokenType.String && string.Equals((string)value,name,StringComparison.OrdinalIgnoreCase));
     internal static void Save() { if (_path != null) JsonFileStore.Save(_path, Settings); }
     internal static KeyViewerSetting Normalize(KeyViewerSetting s) {
         KeyViewerSetting defaults = new();
         if(s.SchemaVersion<2) {
             s.BackgroundClicked=defaults.BackgroundClicked;s.OutlineClicked=defaults.OutlineClicked;
-            s.TextClicked=defaults.TextClicked;s.RainColor=defaults.RainColor;s.RainColor3=defaults.RainColor3;
+            s.TextClicked=defaults.TextClicked;s.RainColor=defaults.RainColor;
             s.SchemaVersion=2;
         }
+        if(s.SchemaVersion<3) {
+            s.BackgroundClicked=MigrateAccent(s.BackgroundClicked);
+            s.Outline=MigrateAccent(s.Outline);s.OutlineClicked=MigrateAccent(s.OutlineClicked);
+            s.RainColor=MigrateAccent(s.RainColor);s.RainColor2=MigrateAccent(s.RainColor2);
+            if(s.Background == Color.black && s.Text == Color.white) { s.Background=defaults.Background;s.Text=defaults.Text; }
+            s.SchemaVersion=3;
+        }
+        if(s.SchemaVersion<4) {
+            if(s.GhostRainColor == Color.white) s.GhostRainColor=defaults.GhostRainColor;
+            s.SchemaVersion=4;
+        }
+        if(s.SchemaVersion<5) {
+            s.KpsColors=KeyViewerCounterPalette.FromKeys(s);s.TotalColors=KeyViewerCounterPalette.FromKeys(s);
+            s.SchemaVersion=5;
+        }
+        s.KpsColors=KeyViewerCounterPalette.Normalize(s.KpsColors);s.TotalColors=KeyViewerCounterPalette.Normalize(s.TotalColors);
         if (!Enum.IsDefined(typeof(KeyviewerStyle), s.KeyViewerStyle)) s.KeyViewerStyle = defaults.KeyViewerStyle;
         if (!Enum.IsDefined(typeof(FootKeyviewerStyle), s.FootKeyViewerStyle)) s.FootKeyViewerStyle = defaults.FootKeyViewerStyle;
         s.Size = SettingsNormalization.Bounded(s.Size, .45f, 2f, 1f);
@@ -66,7 +104,6 @@ internal static class KeyViewerStore {
         s.YLocation = SettingsNormalization.Bounded(s.YLocation, 0, 800, 200);
         s.rainSpeed = SettingsNormalization.Bounded(s.rainSpeed, 10, 500, 100);
         s.rainHeight = SettingsNormalization.Bounded(s.rainHeight, 20, 800, 200);
-        s.AutoSetupKeyLimit = false; // Existing whitelist is changed only by an explicit copy action.
         foreach (var field in typeof(KeyViewerSetting).GetFields()) {
             if (field.FieldType == typeof(KeyCode[])) {
                 KeyCode[] def = (KeyCode[])field.GetValue(defaults), old = (KeyCode[])field.GetValue(s);
@@ -84,6 +121,12 @@ internal static class KeyViewerStore {
             }
         }
         return s;
+    }
+    private static Color MigrateAccent(Color color) {
+        if(Math.Abs(color.r-1f)<.0001f && Math.Abs(color.g-202f/255f)<.0001f && Math.Abs(color.b-58f/255f)<.0001f) {
+            float alpha=color.a;color=DQColors.KeyAccent;color.a=alpha;
+        }
+        return color;
     }
 }
 

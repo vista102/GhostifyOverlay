@@ -20,13 +20,10 @@ public class Rain {
         rainTransform.anchorMin = rainTransform.anchorMax = rainTransform.pivot = new Vector2(0.5f, 1);
         rainTransform.anchoredPosition = rainTransform.sizeDelta = Vector2.zero;
         rainTransform.localScale = Vector3.one;
-        if(isGhost) {
-            Image img = rainPrefab.AddComponent<Image>();
-            img.sprite = KeyViewerAssets.GhostRain;
-            img.type = UnityEngine.UI.Image.Type.Tiled;
-            img.raycastTarget = false;
-            Image = img;
-        } else { var image = rainPrefab.AddComponent<UnityEngine.UI.Image>(); image.raycastTarget = false; Image = image; }
+        var image = rainPrefab.AddComponent<Image>();
+        image.type = UnityEngine.UI.Image.Type.Simple;
+        image.raycastTarget = false;
+        Image = image;
         IsGhost = isGhost;
     }
 }

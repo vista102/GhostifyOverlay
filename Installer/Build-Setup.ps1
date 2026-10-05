@@ -8,8 +8,9 @@ $output=Join-Path $project 'dist'
 $work=Join-Path $PSScriptRoot 'obj'
 New-Item -ItemType Directory -Path $output,$work -Force | Out-Null
 $files=@(Get-ChildItem -LiteralPath $release -Recurse -File)
-if($files.Count -ne 12){throw 'Unexpected mod Release files'}
-$manifest=@{Version=$info.Version;Files=@($files | ForEach-Object {
+if($files.Count -ne 14){throw 'Unexpected mod Release files'}
+$compatibility=Get-Content -LiteralPath (Join-Path $release 'GameCompatibility.json') -Raw -Encoding UTF8|ConvertFrom-Json
+$manifest=@{Version=$info.Version;GameCompatibility=$compatibility;Files=@($files | ForEach-Object {
     $relative=$_.FullName.Substring($release.Length).TrimStart('\','/').Replace('\','/')
     if($relative.StartsWith('UserData',[StringComparison]::OrdinalIgnoreCase)){throw 'UserData cannot be packaged'}
     @{Path=$relative;Sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash}

@@ -25,13 +25,16 @@ namespace DonQuixoteOverlay {
 
         internal static PatchGroup[] Catalog() {
             return new[] {
-                new PatchGroup("overlay", "기존 오버레이·입력·판정", true, new[] {
-                    typeof(LegacyInputPatch), typeof(AsyncInputPatch),
+                new PatchGroup("inputUi", "설정 UI 입력 보호", true, new[] {
+                    typeof(MenuBlockKeyboardPatch), typeof(MenuBlockAsyncKeyboardPatch),
                     typeof(MenuBlockGetStatePatch), typeof(MenuBlockWentDownPatch), typeof(MenuBlockIsDownPatch), typeof(MenuBlockWentUpPatch),
-                    typeof(MenuBlockGetMainPatch), typeof(MenuBlockGetStateKeysPatch),
-                    typeof(XPerfectCalculatePatch), typeof(XPerfectRecordPatch), typeof(XPerfectResetPatch), typeof(XPerfectCheckpointPatch), typeof(XPerfectRevertPatch),
-                    typeof(JudgmentVisibilityPatch), typeof(XPerfectTextPatch), typeof(XPerfectTextInitPatch), typeof(XPerfectDetailedResultsPatch),
-                    typeof(AutoPlayTileTextPositionPatch), typeof(XPerfectErrorMeterPatch), typeof(XPerfectMeterZoneAwakePatch), typeof(XPerfectMeterZoneLayoutPatch) }),
+                    typeof(MenuBlockGetMainPatch), typeof(MenuBlockGetStateKeysPatch) }),
+                new PatchGroup("statistics", "콤보·시도 횟수", false, new[] {
+                    typeof(NativeComboHitPatch), typeof(NativeTrackerResetPatch), typeof(NativeComboRevertPatch), typeof(OverlayBeginRunPatch),
+                    typeof(AttemptLeaveMapPatch), typeof(AttemptOpenMapPatch), typeof(AttemptOpenWorldPatch) }),
+                new PatchGroup("judgmentColors", "세부 판정 색상", false, new[] { typeof(NativeJudgmentColorPatch), typeof(NativeJudgmentColorResetPatch) }),
+                new PatchGroup("resultsOrder", "세부 결과 표시 순서", false, new[] { typeof(NativeResultsOrderPatch) }),
+                new PatchGroup("ghostInput", "고스트 레인 입력 호환", false, new[] { typeof(KeyViewerContents.RawGhostInputPatch) }),
                 new PatchGroup("filters", "VFX 필터 제거", false, new[] { typeof(DisableInitialFiltersPatch), typeof(DisableFilterPatch) }, FilterApi),
                 new PatchGroup("bloom", "Bloom 제거", false, new[] { typeof(DisableBloomPatch) }),
                 new PatchGroup("flash", "Flash 제거", false, new[] { typeof(DisableFlashPatch) }),

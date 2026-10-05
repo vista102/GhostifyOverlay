@@ -1,4 +1,4 @@
-param([string]$GameDir='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice')
+﻿param([string]$GameDir='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice')
 $ErrorActionPreference='Stop'
 $managed=Join-Path $GameDir 'A Dance of Fire and Ice_Data\Managed'
 foreach($dir in @($managed,(Join-Path $managed 'UnityModManager'))) {
@@ -23,43 +23,25 @@ function Equal($expected,$actual,[string]$name) {
     if($expected -ne $actual) {throw "$name expected $expected, got $actual"}
     $script:passed++; "PASS $name"
 }
-$x=ModType 'XPerfectModule'
-foreach($case in @(@(0,'XPerfect'),@(15,'XPerfect'),@(-15,'XPerfect'),@(15.001,'MinusPerfect'),@(-15.001,'PlusPerfect'))) {
-    Equal $case[1] (Call $x 'ClassifySignedDelta' @([float]$case[0],[float]15)).ToString() "signed boundary $($case[0])"
-}
-Equal $true ((Call $x 'GetSignedDeltaDegrees' @([float]1,[float]0,$true)) -gt 0) 'clockwise sign'
-Equal $true ((Call $x 'GetSignedDeltaDegrees' @([float]1,[float]0,$false)) -lt 0) 'counterclockwise sign'
-foreach($bpm in @(60,120,360,1000)) {
-    $actual=Call $x 'GetActualBoundaryDegrees' @([double]$bpm,[double]1,[float]1)
-    $native=[scrMisc]::TimeToAngleInRad(.01667,$bpm,1,$false)*57.295780181884766
-    Equal ([Math]::Max([double]15,[double]$native)) $actual "15 degrees / time boundary at $bpm BPM"
-}
-$input=ModType 'InputController'
-foreach($case in @(@('Alpha3','3'),@('Left Shift','LEFTSHIFT'),@('MouseLeft','MOUSE1'),@('Forward Slash','SLASH'),@('RControl','RIGHTCONTROL'))) {
-    Equal $case[1] (Call $input 'Normalize' @($case[0])) "key alias $($case[0])"
-}
-Equal 'MOUSE1' (Call $input 'Normalize' @([UnityEngine.KeyCode]::Mouse0)) 'typed mouse left'
-Equal 'MOUSE2' (Call $input 'Normalize' @([UnityEngine.KeyCode]::Mouse1)) 'typed mouse right'
 $settings=[Activator]::CreateInstance((ModType 'DonQuixoteSettings'))
-Equal 'Google Sans' $settings.Overlay.Font 'GoogleSans default'
+Equal 'Gmarket Sans' $settings.Overlay.Font 'GmarketSans default'
 $settings.Overlay.Font='Galmuri'
 Call (ModType 'SettingsNormalization') 'Normalize' @($settings)|Out-Null
-Equal 'Google Sans' $settings.Overlay.Font 'previous font preference adopts requested GoogleSans'
+Equal 'Gmarket Sans' $settings.Overlay.Font 'previous font preference adopts requested GmarketSans'
 $reader=[LifecycleTests].GetMethod('Calls',$flags)
-$styleCalls=$reader.Invoke($null,@((ModType 'XPerfectModule').GetMethod('StyleText',$flags)))
-Equal $false (@($styleCalls|Where-Object {$_.DeclaringType -eq (ModType 'FontAssetProvider')}).Count -gt 0) 'judgment text does not use mod font provider'
-Equal $true (@($styleCalls|Where-Object {$_.Name -eq 'set_fontSharedMaterial'}).Count -gt 0) 'native judgment font material retained'
+$styleCalls=$reader.Invoke($null,@((ModType 'NativeJudgmentColors').GetMethod('Apply',$flags)))
+Equal $false (@($styleCalls|Where-Object {$_.Name -in @('set_font','set_fontSharedMaterial','set_fontSize','set_text','set_enableAutoSizing')}).Count -gt 0) 'native judgment fonts, scale and text are left to the game'
 $uiCalls=$reader.Invoke($null,@((ModType 'DarkNeonTheme').GetMethod('FontFor',$flags)))
-Equal $true (@($uiCalls|Where-Object {$_.Name -eq 'get_GoogleSans'}).Count -gt 0) 'all settings text uses GoogleSans entry point'
+Equal $true (@($uiCalls|Where-Object {$_.Name -eq 'get_GmarketSans'}).Count -gt 0) 'all settings text uses GmarketSans entry point'
 $overlayCalls=$reader.Invoke($null,@((ModType 'FontAssetProvider').GetProperty('OverlayFont',$flags).GetGetMethod($true)))
-Equal $true (@($overlayCalls|Where-Object {$_.Name -eq 'get_GoogleSans'}).Count -gt 0) 'overlay uses GoogleSans entry point'
+Equal $true (@($overlayCalls|Where-Object {$_.Name -eq 'get_GmarketSans'}).Count -gt 0) 'overlay uses GmarketSans entry point'
 Add-Type -AssemblyName System.Drawing
 $fontCollection=New-Object System.Drawing.Text.PrivateFontCollection
 try {
-    $fontCollection.AddFontFile((Join-Path $project 'Assets\GoogleSans-Regular.ttf'))
-    Equal 'Google Sans' $fontCollection.Families[0].Name 'bundled static font is valid GoogleSans'
+    $fontCollection.AddFontFile((Join-Path $project 'Assets\GmarketSansTTFMedium.ttf'))
+    Equal 'Gmarket Sans TTF Medium' $fontCollection.Families[0].Name 'bundled static font is valid GmarketSans'
 } finally { $fontCollection.Dispose() }
-Equal $true (Test-Path -LiteralPath (Join-Path $project 'bin\Release\GhostifyOverlay\Assets\GoogleSans-OFL.txt')) 'font license included in Release'
+Equal $true (Test-Path -LiteralPath (Join-Path $project 'bin\Release\GhostifyOverlay\Assets\GmarketSans-OFL.txt')) 'font license included in Release'
 $notoFonts=New-Object System.Drawing.Text.PrivateFontCollection
 try {
     $notoFonts.AddFontFile((Join-Path $project 'Assets\NotoSansKR-Regular.ttf'))
@@ -76,42 +58,6 @@ Equal 'GhostifyOverlay.dll' $branding.AssemblyName 'mod manager loads renamed Gh
 Equal 'GhostifyOverlay' $assembly.GetName().Name 'compiled assembly has the new project name'
 Equal $true (Test-Path -LiteralPath (Join-Path $project 'GhostifyOverlay.csproj')) 'project file has the new Ghostify name'
 (ModType 'Main').GetField('Settings',$flags).SetValue($null,$settings)
-Call $x 'Reset' @()|Out-Null
-function Record([string]$judge) {
-    $x.GetField('_lastJudge',$flags).SetValue($null,[Enum]::Parse((ModType 'DetailedJudge'),$judge))
-    Call $x 'Record' @([HitMargin]::Perfect)|Out-Null
-}
-Record 'XPerfect'
-Call $x 'MarkCheckpoint' @()|Out-Null
-Record 'MinusPerfect';Record 'PlusPerfect'
-Equal 1 $x.GetProperty('XCount').GetValue($null,$null) 'X count'
-Equal 1 $x.GetProperty('MinusCount').GetValue($null,$null) 'minus count'
-Equal 1 $x.GetProperty('PlusCount').GetValue($null,$null) 'plus count'
-Call $x 'Revert' @()|Out-Null
-Equal 1 $x.GetProperty('XCount').GetValue($null,$null) 'checkpoint keeps previous X'
-Equal 0 $x.GetProperty('MinusCount').GetValue($null,$null) 'checkpoint removes minus'
-Equal 0 $x.GetProperty('PlusCount').GetValue($null,$null) 'checkpoint removes plus'
-$settings.Judgments.HideAll=$true
-Record 'XPerfect'
-Equal 2 $x.GetProperty('XCount').GetValue($null,$null) 'hidden judgment text still counts'
-Call $x 'Reset' @()|Out-Null
-Equal 0 $x.GetProperty('XCount').GetValue($null,$null) 'new run resets X'
-$settings.Input.KeyLimiterEnabled=$true
-Call (ModType 'SettingsNormalization') 'Normalize' @($settings)|Out-Null
-Equal $false $settings.Input.KeyLimiterEnabled 'empty whitelist cannot enable limiter'
-$settings.Input.AllowedKeys.Add('D')
-$settings.Input.KeyLimiterEnabled=$true
-Call (ModType 'SettingsNormalization') 'Normalize' @($settings)|Out-Null
-Equal $true $settings.Input.KeyLimiterEnabled 'explicit whitelist supports limiter'
-$keys=New-Object 'System.Collections.Generic.List[AnyKeyCode]'
-foreach($code in @([UnityEngine.KeyCode]::D,[UnityEngine.KeyCode]::A,[UnityEngine.KeyCode]::D)) { $keys.Add([AnyKeyCode]::new($code)) }
-Call $input 'FilterKeys' @($keys,$settings.Input)|Out-Null
-Equal 2 $keys.Count 'limiter removes disallowed key and preserves repeated allowed hits'
-Equal 'D' (Call $input 'Normalize' @($keys[0].value)) 'first allowed key retained'
-$settings.Input.AllowedKeys.Clear();$settings.Input.AllowedKeys.Add('A')
-Call $input 'FilterKeys' @($keys,$settings.Input)|Out-Null
-Equal 0 $keys.Count 'whitelist update invalidates cache'
-$settings.Input.AllowedKeys.Clear();$settings.Input.AllowedKeys.Add('D')
 foreach($case in @(@(1,$false,$false),@(2,$false,$true),@(1,$true,$true))) {
     Equal $case[2] (Call (ModType 'AttemptTracker') 'IsProgressStart' @([int]$case[0],[bool]$case[1])) 'attempt split'
 }
@@ -119,7 +65,7 @@ foreach($name in @('EditorModules','MusicLibraryController','RecordingController
     Equal $null $assembly.GetType('DonQuixoteOverlay.'+$name) "excluded type $name"
 }
 Equal $true ($null -ne $assembly.GetType('DonQuixoteOverlay.EffectGate')) 'requested original effects are included'
-Equal $null (ModType 'InputSettings').GetField('ChatterEnabled') 'chatter setting absent'
+Equal $null $assembly.GetType('DonQuixoteOverlay.InputSettings') 'key limiter and chatter settings are absent'
 Equal $null (ModType 'Main').GetMethod('ToggleRecordingMode',$flags) 'recording shortcut absent'
 Equal 'qkddn.DonQuixoteOverlay' (ModType 'Main').GetField('HarmonyId',$flags).GetRawConstantValue() 'independent Harmony ID'
 Equal 'DonQuixoteOverlay' ((Get-Content -LiteralPath (Join-Path $project 'Info.json') -Raw|ConvertFrom-Json).Id) 'independent UMM ID'
@@ -132,8 +78,7 @@ Call (ModType 'SettingsStore') 'Save' @($settings)|Out-Null
 $loaded=Call (ModType 'SettingsStore') 'Load' @()
 Equal 17 $loaded.Overlay.FullAttempts['fixture'] 'full attempts reload'
 Equal 23 $loaded.Overlay.FullProgressAttempts['fixture'] 'full progress attempts reload'
-Equal $true $loaded.Judgments.HideAll 'text hiding reload'
-Equal 'D' $loaded.Input.AllowedKeys[0] 'whitelist reload'
+Equal 3 $loaded.SchemaVersion 'settings schema migrated to native judgments'
 foreach($part in @('TopLeft','TopRight','Attempts','Judgments','Combo','DetailedPerfect')) {
     $layout=(ModType 'LayoutStore').GetField('Current').GetValue($null)
     $layout.GetType().GetField($part+'X').SetValue($layout,[float]45)

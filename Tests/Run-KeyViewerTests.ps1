@@ -1,4 +1,4 @@
-param([string]$GameDir='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice')
+﻿param([string]$GameDir='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice')
 $ErrorActionPreference='Stop'
 $managed=Join-Path $GameDir 'A Dance of Fire and Ice_Data\Managed'
 foreach($dir in @($managed,(Join-Path $managed 'UnityModManager'))) {
@@ -15,11 +15,15 @@ function T($name) {$mod.GetType('DonQuixoteOverlay.KeyViewerContents.'+$name,$tr
 function Invoke-Test($type,$name,[object[]]$arguments) {for($i=0;$i -lt $arguments.Count;$i++){$arguments[$i]=$arguments[$i].PSObject.BaseObject};try {$type.GetMethod($name,$flags).Invoke($null,$arguments)} catch {throw $_.Exception.ToString()}}
 function Assert($value,$name) {if(!$value){throw "FAIL $name"};$script:passed++;"PASS $name"}
 $savedColors=Get-Content -LiteralPath (Join-Path $PSScriptRoot 'UserSavedKeyColors-20261003.json') -Raw|ConvertFrom-Json
+$savedColors.Background='#FFFFFFFF';$savedColors.Text='#292929FF'
+foreach($name in @('BackgroundClicked','Outline','OutlineClicked','RainColor')){$savedColors.$name='#FFC939FF'}
+$savedColors.PSObject.Properties.Remove('RainColor3')
 $defaults=[Activator]::CreateInstance((T 'KeyViewerSetting'))
 foreach($field in $savedColors.PSObject.Properties) {
     Assert ((Invoke-Test (T 'KeyViewerColorConverter') 'Format' @($defaults.GetType().GetField($field.Name).GetValue($defaults))) -eq $field.Value) ('new/reset key color matches saved in-game '+$field.Name)
 }
 $custom=[Activator]::CreateInstance((T 'KeyViewerSetting'))
+$custom.SchemaVersion=2
 $custom.Background=[UnityEngine.Color]::new(.1,.2,.3,.4);$custom.Outline=[UnityEngine.Color]::new(.5,.6,.7,.8);$custom.Text=[UnityEngine.Color]::new(.9,.8,.7,.6)
 $beforeBackground=Invoke-Test (T 'KeyViewerColorConverter') 'Format' @($custom.Background)
 $beforeOutline=Invoke-Test (T 'KeyViewerColorConverter') 'Format' @($custom.Outline)
@@ -45,11 +49,11 @@ Invoke-Test (T 'KeyViewerStore') 'Initialize' @($fixture)|Out-Null
 $loaded=(T 'KeyViewerStore').GetField('Settings',$flags).GetValue($null)
 Assert ($loaded.YLocation -eq 315 -and @(Get-ChildItem -LiteralPath $fixture -Filter 'keyviewer.json.corrupt-*').Count -eq 1) 'corrupt key viewer settings are backed up and recover the previous snapshot'
 $json=Get-Content -LiteralPath (Join-Path $fixture 'keyviewer.json') -Encoding UTF8 -Raw|ConvertFrom-Json
-$json.key16=@(100000);$json.key16Text=$null;$json.Size=999;$json.Background='invalid';$json.AutoSetupKeyLimit=$true
+$json.key16=@(100000);$json.key16Text=$null;$json.Size=999;$json.Background='invalid';$json|Add-Member -NotePropertyName AutoSetupKeyLimit -NotePropertyValue $true -Force
 $json|ConvertTo-Json -Depth 12|Set-Content -LiteralPath (Join-Path $fixture 'keyviewer.json') -Encoding UTF8
 Invoke-Test (T 'KeyViewerStore') 'Initialize' @($fixture)|Out-Null
 $loaded=(T 'KeyViewerStore').GetField('Settings',$flags).GetValue($null)
-Assert ($loaded.key16.Count -eq 16 -and $loaded.key16Text.Count -eq 16 -and $loaded.Size -eq 2 -and !$loaded.AutoSetupKeyLimit) 'partial settings repair array sizes, key IDs and finite limits without enabling the limiter'
+Assert ($loaded.key16.Count -eq 16 -and $loaded.key16Text.Count -eq 16 -and $loaded.Size -eq 2 -and $null -eq $loaded.GetType().GetField('AutoSetupKeyLimit')) 'partial settings repair array sizes, key IDs and finite limits after removing legacy limiter setup'
 Assert ($loaded.YLocation -eq 315) 'invalid individual color does not reset unrelated layout settings'
 $counts=(T 'KeyCountData').GetField('Instance',$flags).GetValue($null)
 $counts.Count[0]=2147483648;$counts.TotalCount=2147483648

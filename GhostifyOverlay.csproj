@@ -103,7 +103,7 @@
     <Compile Include="GameplayPatches.cs" />
     <Compile Include="EffectRestoration.cs" />
     <Compile Include="EffectLifetime.cs" />
-    <Compile Include="InputController.cs" />
+    <Compile Include="UiInputBlock.cs" />
     <Compile Include="KeyCaptureUiLease.cs" />
     <Compile Include="LayoutEditorController.cs" />
     <Compile Include="KeyViewerContents\AsyncInputHook.cs" />
@@ -112,6 +112,7 @@
     <Compile Include="KeyViewerContents\KeyViewer.cs" />
     <Compile Include="KeyViewerContents\KeyViewer.Input.cs" />
     <Compile Include="KeyViewerContents\KeyViewer.Layout.cs" />
+    <Compile Include="KeyViewerContents\KeyViewerGeometry.cs" />
     <Compile Include="KeyViewerContents\KeyViewerSetting.cs" />
     <Compile Include="KeyViewerContents\KeyViewerStore.cs" />
     <Compile Include="KeyViewerContents\KeyviewerStyle.cs" />
@@ -130,9 +131,16 @@
     <Compile Include="Settings.cs" />
     <Compile Include="SettingsWindow.cs" />
     <Compile Include="SettingsWindow.Effects.cs" />
+    <Compile Include="SettingsWindow.KeyEditor.cs" />
+    <Compile Include="SettingsWindow.Colors.cs" />
+    <Compile Include="ColorPalette.cs" />
+    <Compile Include="OverlayPalette.cs" />
     <Compile Include="UiComponents.cs" />
     <Compile Include="UiTheme.cs" />
-    <Compile Include="XPerfectModule.cs" />
+    <Compile Include="NativeJudgments.cs" />
+    <Compile Include="NativeInputSync.cs" />
+    <Compile Include="OverlayMetadata.cs" />
+    <Compile Include="OverlayMetrics.cs" />
     <Content Include="THIRD-PARTY-NOTICES.md"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
     <Content Include="Licenses\JipperResourcePack-BSD-3-Clause.txt"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
     <Content Include="Licenses\JipperResourcePack-source.json"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
@@ -142,15 +150,17 @@
     <Content Include="README.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="GameCompatibility.json"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
     <Content Include="Assets\NotoSansKR-Regular.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\NotoSansKR-OFL.txt"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
     <Content Include="Assets\NotoSansKR-source.json"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
-    <Content Include="Assets\GoogleSans-Regular.ttf">
+    <Content Include="Assets\GmarketSansTTFMedium.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\GoogleSans-OFL.txt">
+    <Content Include="Assets\GmarketSansTTFLight.ttf"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
+    <Content Include="Assets\GmarketSans-OFL.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

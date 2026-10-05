@@ -7,10 +7,8 @@ using UnityEngine;
 namespace DonQuixoteOverlay {
     [Serializable]
     public sealed class DonQuixoteSettings {
-        public int SchemaVersion = 2;
+        public int SchemaVersion = 3;
         public EffectsSettings Effects = new EffectsSettings();
-        public JudgmentSettings Judgments = new JudgmentSettings();
-        public InputSettings Input = new InputSettings();
         public OverlaySettings Overlay = new OverlaySettings();
 
         public static DonQuixoteSettings CreateDefault() { return new DonQuixoteSettings(); }
@@ -42,22 +40,6 @@ namespace DonQuixoteOverlay {
     }
 
     [Serializable]
-    public sealed class JudgmentSettings {
-        public bool EnableXPerfect = true;
-        public float TextSizeScale = 0.72f;
-        public bool HidePerfect;
-        public bool HideXPerfect;
-        public bool HidePlusMinusPerfect;
-        public bool HideAll;
-    }
-
-    [Serializable]
-    public sealed class InputSettings {
-        public bool KeyLimiterEnabled;
-        public List<string> AllowedKeys = new List<string>();
-    }
-
-    [Serializable]
     public sealed class OverlaySettings {
         public bool Enabled = true;
         public bool ShowProgress = true;
@@ -71,7 +53,14 @@ namespace DonQuixoteOverlay {
         public bool ShowTheoreticalKps = true;
         public bool ShowJudgmentCounts = true;
         public bool ShowAttempts = true;
-        public string Font = "Google Sans";
+        public bool ShowSongInfo = true;
+        public bool ShowTimingRanges = true;
+        public bool ShowFps = true;
+        public string Font = "Gmarket Sans";
+        [JsonConverter(typeof(KeyViewerContents.KeyViewerColorConverter))] public Color TextColor=Color.white;
+        [JsonConverter(typeof(KeyViewerContents.KeyViewerColorConverter))] public Color ValueColor=DQColors.KeyAccent;
+        [JsonConverter(typeof(KeyViewerContents.KeyViewerColorConverter))] public Color ProgressBarColor=DQColors.KeyAccent;
+        [JsonConverter(typeof(KeyViewerContents.KeyViewerColorConverter))] public Color AttemptsColor=Color.white;
         public Dictionary<string, int> FullAttempts = new Dictionary<string, int>();
         public Dictionary<string, int> FullProgressAttempts = new Dictionary<string, int>();
     }
@@ -130,20 +119,16 @@ namespace DonQuixoteOverlay {
     internal static class SettingsNormalization {
         internal static DonQuixoteSettings Normalize(DonQuixoteSettings value) {
             if (value.Effects == null) value.Effects = new EffectsSettings();
-            if (value.Judgments == null) value.Judgments = new JudgmentSettings();
-            if (value.Input == null) value.Input = new InputSettings();
             if (value.Overlay == null) value.Overlay = new OverlaySettings();
-            if (value.SchemaVersion < 2) value.SchemaVersion = 2;
+            if (value.SchemaVersion < 3) value.SchemaVersion = 3;
 
             value.Effects.FilterExcludeList = CleanList(value.Effects.FilterExcludeList);
             // As in the original mod, zero bypasses the Move Track limit.
             value.Effects.MoveTrackMax = Math.Max(0, Math.Min(9999, value.Effects.MoveTrackMax));
-            value.Judgments.TextSizeScale = Bounded(value.Judgments.TextSizeScale, .4f, 1.2f, .72f);
-            value.Input.AllowedKeys = CleanList(value.Input.AllowedKeys);
-            if (value.Input.AllowedKeys.Count == 0) value.Input.KeyLimiterEnabled = false;
             if (value.Overlay.FullAttempts == null) value.Overlay.FullAttempts = new Dictionary<string, int>();
             if (value.Overlay.FullProgressAttempts == null) value.Overlay.FullProgressAttempts = new Dictionary<string, int>();
-            value.Overlay.Font = "Google Sans";
+            value.Overlay.Font = "Gmarket Sans";
+            OverlayPalette.Normalize(value.Overlay);
             return value;
         }
 
@@ -167,11 +152,25 @@ namespace DonQuixoteOverlay {
             value.AttemptsX = Coordinate(value.AttemptsX); value.AttemptsY = Coordinate(value.AttemptsY);
             value.JudgmentsX = Coordinate(value.JudgmentsX); value.JudgmentsY = Coordinate(value.JudgmentsY);
             value.ComboX = Coordinate(value.ComboX); value.ComboY = Coordinate(value.ComboY);
+            value.SongInfoX = Coordinate(value.SongInfoX); value.SongInfoY = Coordinate(value.SongInfoY);
+            value.TimingRangesX = Coordinate(value.TimingRangesX); value.TimingRangesY = Coordinate(value.TimingRangesY);
             value.DetailedPerfectX = Coordinate(value.DetailedPerfectX); value.DetailedPerfectY = Coordinate(value.DetailedPerfectY);
             value.TopLeftScale = SectionScale(value.TopLeftScale); value.TopRightScale = SectionScale(value.TopRightScale);
             value.AttemptsScale = SectionScale(value.AttemptsScale); value.JudgmentsScale = SectionScale(value.JudgmentsScale);
             value.ComboScale = SectionScale(value.ComboScale); value.DetailedPerfectScale = SectionScale(value.DetailedPerfectScale);
-            if (value.SchemaVersion < 3) value.SchemaVersion = 3;
+            value.SongInfoScale = SectionScale(value.SongInfoScale); value.TimingRangesScale = SectionScale(value.TimingRangesScale);
+            if (value.SchemaVersion < 4) {
+                value.TimingRangesX = value.TimingRangesY = 0f;
+                value.SchemaVersion = 4;
+            }
+            if (value.SchemaVersion < 5) {
+                // Bake the former parent offset into the timing section once;
+                // subsequent edits to the detailed section no longer affect it.
+                value.TimingRangesX += value.DetailedPerfectX;
+                value.TimingRangesY += value.DetailedPerfectY + 38f * value.DetailedPerfectScale + 8f - OverlayPlacement.TimingHeight;
+                value.SongInfoX = value.SongInfoY = 0f;
+                value.SchemaVersion = 5;
+            }
             return value;
         }
     }
@@ -223,7 +222,7 @@ namespace DonQuixoteOverlay {
 
     [Serializable]
     public sealed class LayoutData {
-        public int SchemaVersion = 3;
+        public int SchemaVersion = 5;
         public float TopLeftX;
         public float TopLeftY;
         public float TopRightX;
@@ -242,6 +241,12 @@ namespace DonQuixoteOverlay {
         public float JudgmentsScale = .799999952f;
         public float ComboScale = 1f;
         public float DetailedPerfectScale = .799999952f;
+        public float SongInfoX;
+        public float SongInfoY;
+        public float SongInfoScale = 1f;
+        public float TimingRangesX;
+        public float TimingRangesY;
+        public float TimingRangesScale = 1f;
     }
 
     public static class LayoutStore {

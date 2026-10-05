@@ -7,6 +7,17 @@ using SkyHook;
 using UnityEngine;
 namespace DonQuixoteOverlay.KeyViewerContents;
 
+[HarmonyPatch(typeof(SkyHookManager),"HookCallback")]
+internal static class RawGhostInputPatch {
+    // A void prefix with no ref/out parameters still runs when another prefix
+    // returns false. Only the viewer's ghost stream sees rejected presses.
+    [HarmonyPriority(Priority.First)]
+    private static void Prefix(SkyHookManager __instance,SkyHookEvent __0) {
+        if(!Main.Enabled || (__instance.requireFocus && !SkyHookManager.IsFocused && __0.Type==SkyHook.EventType.KeyPressed))return;
+        KeyViewer.Instance?.ObserveRawEvent(__0);
+    }
+}
+
 internal static class AsyncInputHook {
     private static bool _setup, _owned;
     private static volatile bool _acquired, _gameEnabled;

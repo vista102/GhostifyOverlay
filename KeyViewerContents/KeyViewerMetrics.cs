@@ -7,5 +7,5 @@ public static class KeyViewerMetrics {
     public const float HandStep = HandSide + Gap;
     public const float SlimHeight = 30;
     public const float FooterWidth = 212;
-    public static float RainWidth(int rowColor) => rowColor == 1 ? HandSide : rowColor == 3 ? 30 : 40;
+    public static float RainWidth(int rowColor) => rowColor == 1 ? HandSide : 40;
 }

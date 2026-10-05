@@ -9,7 +9,7 @@ public sealed class Key {
     public TMP_Text Text, Value;
     public Image Background;
     public Outline Outline;
-    public int Color, SiblingIndex;
+    public int Color, SiblingIndex, CounterIndex;
     public RainPool RainPool;
     public RawRain LastRain, LastGhostRain;
     private bool _requested, _current;
@@ -21,30 +21,11 @@ public sealed class Key {
         _dirty = false;
         if (!force && _requested == _current) return;
         var settings = KeyViewer.Settings;
-        Background.color = _requested ? settings.BackgroundClicked : settings.Background;
-        Outline.effectColor = _requested ? settings.OutlineClicked : settings.Outline;
-        Text.color = _requested ? settings.TextClicked : settings.Text;
-        if (Value != null) Value.color = Text.color;
+        var colors = KeyViewerColors.Resolve(settings, CounterIndex, _requested);
+        Background.color = colors.Background;
+        Outline.effectColor = colors.Outline;
+        Text.color = colors.Text;
+        if (Value != null) Value.color = colors.Value;
         _current = _requested;
-    }
-}
-
-internal static class KeyViewerAssets {
-    private static Sprite _ghost;
-    internal static Sprite GhostRain {
-        get {
-            if (_ghost != null) return _ghost;
-            Texture2D texture = new(8, 12, TextureFormat.RGBA32, false);
-            texture.name = "DonQuixoteOverlay.GhostRain";
-            var pixels = new Color[96];
-            for (int y = 0; y < 12; y++) for (int x = 0; x < 8; x++) pixels[y * 8 + x] = y < 7 ? UnityEngine.Color.white : UnityEngine.Color.clear;
-            texture.SetPixels(pixels); texture.Apply();
-            _ghost = Sprite.Create(texture, new Rect(0,0,8,12), new Vector2(.5f,.5f), 100);
-            return _ghost;
-        }
-    }
-    internal static void Dispose() {
-        if (_ghost == null) return;
-        Object.Destroy(_ghost.texture); Object.Destroy(_ghost); _ghost = null;
     }
 }

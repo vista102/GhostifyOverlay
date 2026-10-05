@@ -1,3 +1,4 @@
+param([switch]$SkipShippingInstall)
 $ErrorActionPreference='Stop'
 $project=Split-Path $PSScriptRoot
 $root=Join-Path $PSScriptRoot ('test-fixture-'+[Guid]::NewGuid().ToString('N'))
@@ -25,6 +26,7 @@ for($i=0;$i -lt $testArgs.Length;$i++){$testArgs[$i]=$testArgs[$i].PSObject.Base
 try{$results=$assembly.GetType('GhostifySetup.InstallerTests',$true).GetMethod('Run').Invoke($null,$testArgs)}catch{throw $_.Exception.ToString()}
 $results
 'Installer assertions passed: '+$results.Count
+if($SkipShippingInstall){'Shipping EXE installation skipped; active user game is preserved.';return}
 # Run the exact shipping EXE backend against a separate, disposable game fixture.
 $game=$assembly.GetType('GhostifySetup.InstallerTests',$true).GetMethod('Game').Invoke($null,@('shipping-exe'))
 $exe=Join-Path $project ('dist\GhostifyOverlay-Setup-'+$info.Version+'.exe')

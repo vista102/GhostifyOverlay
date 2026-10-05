@@ -13,10 +13,21 @@ using Microsoft.Win32;
 
 namespace GhostifySetup {
     public sealed class PackageFile { public string Path { get; set; } public string Sha256 { get; set; } }
-    public sealed class PackageManifest { public string Version { get; set; } public PackageFile[] Files { get; set; } }
+    public sealed class PackageManifest {
+        public string Version { get; set; }
+        public PackageFile[] Files { get; set; }
+        public GameCompatibility GameCompatibility { get; set; }
+    }
+    public sealed class GameCompatibility {
+        public string GameVersion { get; set; }
+        public string Branch { get; set; }
+        public string SteamBuild { get; set; }
+        public string AssemblySha256 { get; set; }
+    }
     public sealed class GameState {
         public string GameDir, ModsDir, Target, ParamsPath, ExistingVersion, UmmVersion;
-        public bool IsUpdate;
+        public bool IsUpdate, VerifiedGameBuild;
+        public string Compatibility;
     }
     public sealed class InstallResult { public bool Success { get; set; } public string Message { get; set; } public string Backup { get; set; } }
 
@@ -26,12 +37,18 @@ namespace GhostifySetup {
         private readonly byte[] _payload;
         private readonly PackageManifest _manifest;
         private readonly string _backupRoot;
+        private readonly Func<bool> _gameRunning;
         public string Version { get { return _manifest.Version; } }
 
-        public InstallerEngine(byte[] payload, string manifest, string backupRoot = null) {
+        public InstallerEngine(byte[] payload, string manifest, string backupRoot = null) : this(payload,manifest,backupRoot,GameRunning) { }
+        internal InstallerEngine(byte[] payload,string manifest,string backupRoot,Func<bool> gameRunning) {
+            _gameRunning=gameRunning ?? GameRunning;
             _payload = payload;
             _manifest = new JavaScriptSerializer().Deserialize<PackageManifest>(manifest);
-            if (_manifest == null || _manifest.Files == null || _manifest.Files.Length != 12 || string.IsNullOrEmpty(_manifest.Version)) throw new InvalidDataException("설치 파일 정보가 올바르지 않습니다.");
+            if (_manifest == null || _manifest.Files == null || _manifest.Files.Length != 14 || string.IsNullOrEmpty(_manifest.Version)
+                || _manifest.GameCompatibility == null || string.IsNullOrWhiteSpace(_manifest.GameCompatibility.GameVersion)
+                || string.IsNullOrWhiteSpace(_manifest.GameCompatibility.Branch) || _manifest.GameCompatibility.AssemblySha256 == null
+                || _manifest.GameCompatibility.AssemblySha256.Length != 64) throw new InvalidDataException("설치 파일 정보가 올바르지 않습니다.");
             var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var file in _manifest.Files) {
                 ValidateRelative(file.Path);
@@ -99,6 +116,10 @@ namespace GhostifySetup {
             NoRedirect(mods); SafeTree(target); NoRedirect(config);
             if (File.Exists(target)) throw new IOException("모드 설치 경로가 폴더가 아닙니다.");
             var result = new GameState { GameDir = root, ModsDir = mods, Target = target, ParamsPath = config, UmmVersion = ummVersion.ToString(), IsUpdate = Directory.Exists(target) };
+            string gameAssembly = Child(managed, "Assembly-CSharp.dll"); NoRedirect(gameAssembly);
+            result.VerifiedGameBuild = File.Exists(gameAssembly) && HashFile(gameAssembly).Equals(_manifest.GameCompatibility.AssemblySha256, StringComparison.OrdinalIgnoreCase);
+            result.Compatibility = _manifest.GameCompatibility.GameVersion + " " + _manifest.GameCompatibility.Branch
+                + (result.VerifiedGameBuild ? " · 빌드 확인 완료" : "용 · 현재 빌드 미검증");
             if (result.IsUpdate) {
                 string info = Child(target, "Info.json");
                 if (!File.Exists(info)) throw new InvalidDataException("기존 모드 폴더를 확인해 주세요. 다른 파일을 덮어쓰지 않습니다.");
@@ -164,7 +185,7 @@ namespace GhostifySetup {
         }
         public InstallResult Install(string gameDir, Action<int, string> progress = null) {
             var state = Inspect(gameDir);
-            if (GameRunning()) throw new InvalidOperationException("얼불춤을 완전히 종료한 뒤 다시 설치해 주세요.");
+            if (_gameRunning()) throw new InvalidOperationException("얼불춤을 완전히 종료한 뒤 다시 설치해 주세요.");
             Action<int, string> report = progress ?? ((p, s) => { });
             string key = Hash(Encoding.UTF8.GetBytes(state.GameDir.ToUpperInvariant())).Substring(0, 20);
             using (var mutex = new System.Threading.Mutex(false, "Local\\GhostifySetup-" + key)) {
@@ -188,7 +209,7 @@ namespace GhostifySetup {
                     if (oldParams != null) File.WriteAllBytes(Child(backup, "Params.xml"), oldParams);
                     if (state.IsUpdate) CopyTree(state.Target, Child(backup, "previous-mod"));
                     report(35, "기존 설정과 파일을 백업했습니다.");
-                    if (GameRunning()) throw new InvalidOperationException("얼불춤을 종료한 뒤 다시 설치해 주세요.");
+                    if (_gameRunning()) throw new InvalidOperationException("얼불춤을 종료한 뒤 다시 설치해 주세요.");
                     Directory.CreateDirectory(state.Target);
                     foreach (var file in _manifest.Files) {
                         string output = Child(state.Target, file.Path); NoRedirect(output);
@@ -197,6 +218,7 @@ namespace GhostifySetup {
                         AtomicBytes(output, File.ReadAllBytes(Child(stage, file.Path)));
                     }
                     report(75, "Ghostify Overlay를 활성화하고 있습니다.");
+                    if (_gameRunning()) throw new InvalidOperationException("얼불춤을 종료한 뒤 다시 설치해 주세요.");
                     byte[] current = File.Exists(state.ParamsPath) ? File.ReadAllBytes(state.ParamsPath) : null;
                     if ((oldParams == null) != (current == null) || (oldParams != null && Hash(oldParams) != Hash(current))) throw new IOException("설치 중 모드 매니저 설정이 바뀌었습니다. 다시 설치해 주세요.");
                     XmlElement mod = document.SelectSingleNode("/Param/ModParams/Mod[@Id='DonQuixoteOverlay']") as XmlElement;

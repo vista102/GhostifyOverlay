@@ -1,4 +1,4 @@
-param([string]$GameDir='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice')
+﻿param([string]$GameDir='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice')
 $ErrorActionPreference='Stop'
 $managed=Join-Path $GameDir 'A Dance of Fire and Ice_Data\Managed'
 foreach($dir in @($managed,(Join-Path $managed 'UnityModManager'))){foreach($file in Get-ChildItem -LiteralPath $dir -Filter '*.dll'){try{[Reflection.Assembly]::LoadFrom($file.FullName)|Out-Null}catch{}}}
@@ -9,31 +9,14 @@ $passed=0
 function T([string]$name){$mod.GetType('DonQuixoteOverlay.'+$name,$true)}
 function Invoke-Method($type,[string]$name,[object[]]$values){for($i=0;$i -lt $values.Count;$i++){$values[$i]=$values[$i].PSObject.BaseObject};try{$type.GetMethod($name,$flags).Invoke($null,$values)}catch{throw $_.Exception.ToString()}}
 function Check($value,[string]$label){if(!$value){throw ('FAIL '+$label)};$script:passed++;'PASS '+$label}
-$counts=New-Object int[] 12
-$counts[[int][HitMargin]::Perfect]=2;$counts[[int][HitMargin]::Auto]=3
+$counts=New-Object int[] 16
+$counts[[int][HitMargin]::XPerfect]=2;$counts[[int][HitMargin]::Auto]=3
 Check ((Invoke-Method (T 'OverlayController') 'JudgmentCount' @($counts,[int]4)) -eq 5) 'ordinary Perfect includes three Auto tiles exactly once'
 $counts[[int][HitMargin]::TooEarly]=4
 Check ((Invoke-Method (T 'OverlayController') 'JudgmentCount' @($counts,[int]1)) -eq 4) 'Auto inclusion does not alter the early judgment bucket'
 Check ((Invoke-Method (T 'OverlayController') 'JudgmentCount' @((New-Object int[] 2),[int]4)) -eq 0) 'short or absent trackers safely return zero'
 $settings=[Activator]::CreateInstance((T 'DonQuixoteSettings'))
 (T 'Main').GetField('Settings',$flags).SetValue($null,$settings)
-$xp=T 'XPerfectModule';$judge=T 'DetailedJudge'
-Invoke-Method $xp 'Reset' @()|Out-Null
-$xp.GetField('_lastJudge',$flags).SetValue($null,[Enum]::Parse($judge,'XPerfect'))
-Invoke-Method $xp 'Record' @([HitMargin]::Perfect)|Out-Null
-Invoke-Method $xp 'Record' @([HitMargin]::Auto)|Out-Null
-Invoke-Method $xp 'Record' @([HitMargin]::Auto)|Out-Null
-Check ($xp.GetProperty('XCount').GetValue($null,$null) -eq 3) 'detailed cumulative includes both Auto tiles without a pending judgment'
-Invoke-Method $xp 'MarkCheckpoint' @()|Out-Null
-Invoke-Method $xp 'Record' @([HitMargin]::Auto)|Out-Null
-$xp.GetField('_lastJudge',$flags).SetValue($null,[Enum]::Parse($judge,'PlusPerfect'))
-Invoke-Method $xp 'Record' @([HitMargin]::Perfect)|Out-Null
-Invoke-Method $xp 'Revert' @()|Out-Null
-Check ($xp.GetProperty('XCount').GetValue($null,$null) -eq 3 -and $xp.GetProperty('PlusCount').GetValue($null,$null) -eq 0) 'checkpoint reverts Auto and manual detailed judgments together'
-$first=[Runtime.Serialization.FormatterServices]::GetUninitializedObject([scrMarginTracker])
-$second=[Runtime.Serialization.FormatterServices]::GetUninitializedObject([scrMarginTracker])
-[scrMistakesManager]::marginTrackers=[scrMarginTracker[]]@($first,$second)
-Check ((Invoke-Method $xp 'IsDisplayedTracker' @($first)) -and !(Invoke-Method $xp 'IsDisplayedTracker' @($second))) 'ordinary and detailed cumulative counters use the same player tracker'
 $metrics=T 'KeyViewerContents.KeyViewerMetrics'
 $side=$metrics.GetField('HandSide').GetRawConstantValue()
 $step=$metrics.GetField('HandStep').GetRawConstantValue()
@@ -46,7 +29,7 @@ $keySettings=[Activator]::CreateInstance((T 'KeyViewerContents.KeyViewerSetting'
 $keySettings.SchemaVersion=1;$keySettings.XLocation=375;$keySettings.YLocation=420;$keySettings.Size=1.4;$keySettings.key16Text[0]='alias'
 $normalized=Invoke-Method (T 'KeyViewerContents.KeyViewerStore') 'Normalize' @($keySettings)
 $pressed=Invoke-Method (T 'KeyViewerContents.KeyViewerColorConverter') 'Format' @($normalized.BackgroundClicked)
-Check ($pressed -eq '#FFCA3AFF' -and $normalized.SchemaVersion -eq 2) 'old orange key theme migrates to the attached yellow'
+Check ($pressed -eq '#FFC939FF' -and $normalized.SchemaVersion -eq 3) 'old orange key theme migrates to the attached yellow'
 Check ($normalized.XLocation -eq 375 -and $normalized.YLocation -eq 420 -and [Math]::Abs($normalized.Size-1.4) -lt .001 -and $normalized.key16Text[0] -eq 'alias') 'theme migration preserves key position, scale and aliases'
 $layout=[Activator]::CreateInstance((T 'LayoutData'))
 $saved=Get-Content -LiteralPath (Join-Path $PSScriptRoot 'UserSavedLayout-20261002.json') -Raw|ConvertFrom-Json
@@ -62,23 +45,13 @@ Check ((Invoke-Method $accuracy 'DisplayKey' @([float]0)) -eq 0) 'a real zero ac
 Check ((Invoke-Method $accuracy 'DisplayKey' @([float]-1)) -eq 0) 'negative accuracy cannot enter the display'
 Check ((Invoke-Method $accuracy 'DisplayKey' @([float]98.125)) -eq 9812) 'accuracy uses the existing midpoint-to-even rounding'
 Check ((Invoke-Method $accuracy 'DisplayKey' @([float]::MaxValue)) -eq [int]::MaxValue) 'extreme finite accuracy cannot overflow into a negative integer'
-foreach($pair in @(@('_plusCount',2),@('_xCount',1),@('_minusCount',3))) {$xp.GetField($pair[0],$flags).SetValue($null,[int]$pair[1])}
-$plus='<color=#60FF4E>2</color>';$exact='<color=#4DCCFF>1</color>';$minus='<color=#60FF4E>3</color>'
-Check ((Invoke-Method $xp 'FormatCounts' @('  ')) -eq ($plus+'  '+$exact+'  '+$minus)) 'cumulative detailed counts use asymmetric + / X / - order and original colors'
-Check ((Invoke-Method $xp 'FormatCounts' @(' / ')) -eq ($plus+' / '+$exact+' / '+$minus)) 'results use the same + / X / - order and original colors'
-foreach($pair in @(@('XPerfect','#4DCCFFFF'),@('PlusPerfect','#60FF4EFF'),@('MinusPerfect','#60FF4EFF'))) {
-    $color=Invoke-Method $xp 'DetailedTextColor' @([Enum]::Parse($judge,$pair[0]))
-    Check ((Invoke-Method (T 'KeyViewerContents.KeyViewerColorConverter') 'Format' @($color)) -eq $pair[1]) ('native judgment text restores original color: '+$pair[0])
-}
 Add-Type -Path (Join-Path $PSScriptRoot 'ILReader.cs') -ReferencedAssemblies 'System.Core'
 $calls=[LifecycleTests].GetMethod('Calls',$flags)
 function Calls($type,[string]$method){$calls.Invoke($null,@($type.GetMethod($method,$flags)))}
-Check (@(Calls $xp 'StyleText'|Where-Object {$_.Name -eq 'DetailedTextColor'}).Count -eq 2) 'both native text branches call the verified original palette'
-Check (@(Calls (T 'OverlayController') 'RefreshDetailedPerfectText'|Where-Object {$_.Name -eq 'FormatCounts'}).Count -eq 1 -and @(Calls (T 'XPerfectDetailedResultsPatch') 'Postfix'|Where-Object {$_.Name -eq 'FormatCounts'}).Count -eq 1) 'HUD and result patches use the same verified count formatter'
 Check (@(Calls (T 'OverlayController') 'RefreshStatusText'|Where-Object {$_.Name -eq 'DisplayKey'}).Count -eq 2) 'both accuracy displays sanitize native values before integer conversion'
 Check (@(Calls (T 'OverlayController') 'ApplyFont'|Where-Object {$_.Name -eq 'ForFont'}).Count -eq 1 -and @(Calls (T 'OverlayController') 'ApplyFont'|Where-Object {$_.Name -eq 'UpdateMeshPadding'}).Count -eq 1) 'overlay applies the owned shadow preset and updates SDF padding'
 Check (@(Calls (T 'OverlayController') 'OnDisable'|Where-Object {$_.Name -eq 'Dispose' -and $_.DeclaringType -eq (T 'OverlayTextShadow')}).Count -eq 1) 'disabling the mod releases its shadow preset'
-Check ((T 'DQColors').GetField('AccentHex',$flags).GetRawConstantValue() -eq 'FFCA3A' -and (T 'DQColors').GetField('KeyAccentHex',$flags).GetRawConstantValue() -eq 'FFCA3A') 'all UI and key highlights share the requested yellow'
+Check ((T 'DQColors').GetField('AccentHex',$flags).GetRawConstantValue() -eq 'FFC939' -and (T 'DQColors').GetField('KeyAccentHex',$flags).GetRawConstantValue() -eq 'FFC939') 'all UI and key highlights share the requested yellow'
 Check (@(Calls (T 'SettingsWindow') 'BeginCapture'|Where-Object {$_.Name -eq 'Acquire' -and $_.DeclaringType -eq (T 'KeyCaptureUiLease')}).Count -eq 1) 'both binding flows start with the verified Enter-safe UI lease'
 Check (@(Calls (T 'SettingsWindow') 'StopCapture'|Where-Object {$_.Name -eq 'Dispose' -and $_.DeclaringType -eq (T 'KeyCaptureUiLease')}).Count -eq 1 -and @(Calls (T 'SettingsWindow') 'OnDestroy'|Where-Object {$_.Name -eq 'Dispose' -and $_.DeclaringType -eq (T 'KeyCaptureUiLease')}).Count -eq 1) 'capture completion and UI teardown release shared navigation'
 $kind=(T 'UiButtonKind')
