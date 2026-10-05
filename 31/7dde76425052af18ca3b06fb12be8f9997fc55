@@ -1,0 +1,181 @@
+OverlayMetadata.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-61
+Tests/Run-KeyViewerTests.ps1
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1,18-20,26,52,56
+Main.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 29,55,57-59,67,84,88,90
+Installer/InstallerEngine.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 16-26,29-30,40,43-45,48-51,119-122,188,212,221
+KeyViewerContents/KeyViewerGeometry.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-48
+ALPHA_MIGRATION_PLAN.md
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-192
+Installer/Program.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 63,74,76,109,162,182,213
+KeyViewerContents/KeyViewer.Layout.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-22
+FEEDBACK_0.4.1_VALIDATION.md
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-53
+Info.json
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 5
+Tests/RainRegressionHarness.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-236
+FEEDBACK_0.4.3_VALIDATION.md
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-4,7-50,53
+  s_a3eee352378bd3::t_61327b3ebc5473 5-6,51-52
+Tests/Run-FeedbackV5Tests.ps1
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-73
+NativeJudgments.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-201
+OverlayPresentation.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 15,20,30,34,56-57,83,86,88,90,92
+README.md
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1,9,13,17,19,23-62,64-73,75-103,107,128,135,141,143-145
+  s_a3eee352378bd3::t_61327b3ebc5473 3-5,120-121
+Tests/KeyViewerTests.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 69-94,146,152
+Tests/Run-EffectIntegrationTests.ps1
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1,36-37,51,57,68,70,74,82
+GhostifyOverlay.csproj
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 106,115,134-137,140-143,153,159,162-163
+OverlayMetrics.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-27
+Tests/Run-FeedbackV4Tests.ps1
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-111
+KeyViewerContents/RainPool.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 12-34,52-60,62
+Research/Compare-AlphaApi.ps1
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-56
+Tests/ColorRowHarness.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-96
+SettingsWindow.Colors.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-39
+Tests/Run-FeedbackTests.ps1
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-75
+KeyViewerContents/RainManager.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 9,13-21,35-56,60,62,64,78-79,89,115
+Research/Capture-GameApi.ps1
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-16
+Tests/Run-RainRegressionTests.ps1
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-13
+SettingsWindow.KeyEditor.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-102
+OverlayController.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 13-14,26,28-30,32-36,39,42,58,64,99,101,143-146,157-170,231,236-240,251,256,258-260,262,264-266,288,292-299,324,332-334,352,359,378-380,383-385,387,389,394,397-400,407-408,416-449,473,478-479,481-482,485-486,490-492,495,526,549,553,565,572,575,580,587,593-594,596,605-614
+Tests/Run-PatchTests.ps1
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 12,31-32
+.gitignore
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 12,36-37,44-47
+Installer/README.md
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 3,11,27,29,32-33
+Tests/FeedbackV3Tests.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-210
+Tests/Run-FeedbackV2Tests.ps1
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-101
+KeyViewerContents/AsyncInputHook.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 10-20
+Research/Inspect-AlphaMetadata.ps1
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-34
+KeyViewerContents/KeyViewerSetting.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 6,40-43,57,60,68,76-109
+FEEDBACK_0.4.2_VALIDATION.md
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-52
+Installer/Run-InstallerTests.ps1
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1,29
+LayoutEditorController.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 12,42-44,66-68,87-88,117,126,138-139,152-153,165-166
+Tests/Run-FeedbackV3Tests.ps1
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-17
+KeyViewerContents/KeyviewerStyle.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 5-9
+Tests/OverlayPresentationTests.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 14,30,35,40,46,49-50,59,78-82,90,104
+UiInputBlock.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 2,4,6-13,15-24,29,31,35,37,62
+KeyViewerContents/Rain.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 23-26,29
+NativeInputSync.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-71
+Tests/FontProviderHarness.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 46,48-51,54,57-60,63
+AI_ATTRIBUTION.md
+  s_a3eee352378bd3::t_61327b3ebc5473 1-26
+Research/Inspect-GameMethodBody.ps1
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-93
+GameCompatibility.json
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-9
+UiTheme.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 7,10,140
+SettingsWindow.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 18,57,71-72,121-122,124-125,127-128,147,156-160,170-171,173-174,176-177,180-181,188-189,191-200,206
+Tests/Run-LogicTests.ps1
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1,27,30,32-33,35,37,41-42,44,68,81
+Installer/Verify-Shipping.ps1
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-59
+KeyViewerContents/KeyViewer.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 16,26,78,82-84,99,112-116,132,148,150,154,160-161,172
+ColorPalette.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-95
+FEEDBACK_0.4.0_VALIDATION.md
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-53
+Installer/Build-Setup.ps1
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 11-13
+KeyViewerContents/KeyViewerStore.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 4,54-75,81,84-99,125-130
+PatchRegistry.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 28-29,31-37
+KeyViewerContents/KeyViewerMetrics.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 10
+Settings.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 10,56-63,123,130-131,155-156,161-173,225,244-249
+THIRD-PARTY-NOTICES.md
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 5
+KeyViewerContents/FootKeyviewerStyle.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 5-11
+Tests/Run-UserAdjustments.ps1
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1,12-13,32,54
+KeyViewerContents/Key.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 12,24-28,31
+KeyViewerContents/KeyViewer.Input.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 13,15-18,22-28,57,60,92,94,101,106-120,123,125,129,139-140,144-183,197,209-214,216-217,224-231,238,244,257-258
+Tests/Run-ColorRowTests.ps1
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-11
+Research/Probe-SignedJudgments.ps1
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-24
+Installer/InstallerTests.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 26,43,50-57,79-82,97,99,101,103,105,110-111
+Installer/InstallerUiTests.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 66-67,76-79
+Tests/Run-AlphaTests.ps1
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-108
+Tests/Run-UiFixTests.ps1
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 6
+Tests/UiFixHarness.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 64,69,78,107-108,110-111,114
+OverlayPalette.cs
+  s_1b1e2d4ad17dbf::t_dcd46fccbabe8c 1-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "317dde76425052af18ca3b06fb12be8f9997fc55",
+  "prompts": {},
+  "sessions": {
+    "s_1b1e2d4ad17dbf": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-0.4.3-retrospective",
+        "model": "not-recorded-retrospective"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    },
+    "s_a3eee352378bd3": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-0.4.3-publication",
+        "model": "gpt-6"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
