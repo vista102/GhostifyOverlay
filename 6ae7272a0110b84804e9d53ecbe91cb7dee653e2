@@ -1,0 +1,19 @@
+README.md
+  s_3bad0432cdcd89::t_c4c5d5823eaae6 1,3,5-7,11,13-15,17,19,21,23-25,27,29,31,33,35,37-40,42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6ae7272a0110b84804e9d53ecbe91cb7dee653e2",
+  "prompts": {},
+  "sessions": {
+    "s_3bad0432cdcd89": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-readme-simplification",
+        "model": "gpt-6"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
