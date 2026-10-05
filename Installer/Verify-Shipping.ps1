@@ -5,6 +5,8 @@ $taskInfo=Get-Content -LiteralPath (Join-Path $taskProject 'Info.json') -Raw -En
 $taskExe=Join-Path $taskProject ('dist\GhostifyOverlay-Setup-'+$taskInfo.Version+'.exe')
 $taskZip=Join-Path $taskProject ('dist\GhostifyOverlay-'+$taskInfo.Version+'.zip')
 $taskRelease=Join-Path $taskProject 'bin\Release\GhostifyOverlay'
+& (Join-Path $PSScriptRoot 'Verify-Notices.ps1') -Root $taskProject
+& (Join-Path $PSScriptRoot 'Verify-Notices.ps1') -Root $taskRelease
 $taskWork=Join-Path $taskProject ('Backups\ShippingVerify-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $taskWork -Force|Out-Null
 Add-Type -AssemblyName System.IO.Compression

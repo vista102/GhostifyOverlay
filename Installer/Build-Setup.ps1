@@ -4,6 +4,8 @@ $project=Split-Path $PSScriptRoot
 if(!$SkipModBuild){& (Join-Path $project 'Build.ps1') -GameDir $GameDir}
 $info=Get-Content -LiteralPath (Join-Path $project 'Info.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 $release=(Resolve-Path -LiteralPath (Join-Path $project 'bin\Release\GhostifyOverlay')).Path
+& (Join-Path $PSScriptRoot 'Verify-Notices.ps1') -Root $project
+& (Join-Path $PSScriptRoot 'Verify-Notices.ps1') -Root $release
 $output=Join-Path $project 'dist'
 $work=Join-Path $PSScriptRoot 'obj'
 New-Item -ItemType Directory -Path $output,$work -Force | Out-Null

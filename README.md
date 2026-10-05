@@ -10,7 +10,7 @@
 
 **지원 환경:** Windows 10/11, 얼불춤 3.4.0 alpha(build 25590222), Unity Mod Manager 0.33.0 이상, .NET Framework 4.8.
 
-1. [최신 릴리스](https://github.com/vista102/GhostifyOverlay/releases/latest)에서 `GhostifyOverlay-Setup-0.4.3.exe`를 다운로드합니다.
+1. [최신 릴리스](https://github.com/vista102/GhostifyOverlay/releases/latest)에서 `GhostifyOverlay-Setup-0.4.4.exe`를 다운로드합니다.
 2. 게임을 종료한 뒤 EXE를 실행하고, 게임 폴더를 확인해 **설치하기 / 업데이트**를 누릅니다.
 3. 게임을 실행하고 Unity Mod Manager에서 **Ghostify Overlay**를 활성화합니다.
 
