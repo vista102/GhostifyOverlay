@@ -45,6 +45,7 @@ namespace DonQuixoteOverlay {
             if (value && _canvas == null) return;
             if (value == Visible) return;
             if (value) {
+                LayoutEditorController.CancelActive();
                 if (EventSystem.current == null) {
                     _ownedEventSystem = new GameObject("DonQuixoteOverlay.EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
                     _ownedEventSystem.transform.SetParent(transform, false);
@@ -148,9 +149,7 @@ namespace DonQuixoteOverlay {
             Label("손·발 키를 게임의 ‘특정 키만 입력으로 간주’에 반영합니다.\n고스트 키는 제외합니다. 연동을 끄면 게임에서 직접 변경할 수 있습니다.",64).textWrappingMode=TextWrappingModes.Normal;
             ValueButton(()=>"손 배치: "+HandSize()+"키",()=>{KeyViewerStore.Settings.KeyViewerStyle=NextStyle(KeyViewerStore.Settings.KeyViewerStyle);ChangedKeyViewer();});
             ValueButton(()=>"발 배치: "+FootSize()+"키",()=>{KeyViewerStore.Settings.FootKeyViewerStyle=NextStyle(KeyViewerStore.Settings.FootKeyViewerStyle);ChangedKeyViewer();});
-            Numeric("위치 X",()=>KeyViewerStore.Settings.XLocation,v=>{KeyViewerStore.Settings.XLocation=v;KeyViewerStore.Normalize(KeyViewerStore.Settings);KeyViewer.Instance?.ApplyPosition();});
-            Numeric("위치 Y",()=>KeyViewerStore.Settings.YLocation,v=>{KeyViewerStore.Settings.YLocation=v;ChangedKeyViewer();});
-            Numeric("전체 배율 · 0.45~2",()=>KeyViewerStore.Settings.Size,v=>{KeyViewerStore.Settings.Size=v;KeyViewerStore.Normalize(KeyViewerStore.Settings);KeyViewer.Instance?.ApplyPosition();});
+            Button("키뷰어 위치·크기 편집",()=>{SetVisible(false);Main.Root.GetComponent<LayoutEditorController>().Begin(6);});
             Numeric("키 간격 · 0~30 (기본 4)",()=>KeyViewerStore.Settings.KeyGap,v=>{KeyViewerStore.Settings.KeyGap=v;ChangedKeyViewer();});
             Heading("레인");
             Toggle("레인 표시",()=>KeyViewerStore.Settings.useRain,v=>{KeyViewerStore.Settings.useRain=v;ChangedKeyViewer();});

@@ -14,7 +14,7 @@ $model=Join-Path $fixture 'Model.cs'
 $csc='C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\Roslyn\csc.exe'
 $json='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice\A Dance of Fire and Ice_Data\Managed\Newtonsoft.Json.dll'
 $harness=Join-Path $fixture 'GroupUi.dll'
-& $csc /nologo /target:library /langversion:latest /r:System.Core.dll ('/r:'+(Join-Path (Split-Path $json) 'netstandard.dll')) "/r:$json" "/out:$harness" $model (Join-Path $project 'OverlayConfiguration.cs') (Join-Path $project 'SettingsWindow.Overlay.cs') (Join-Path $project 'SettingsWindow.Sliders.cs') (Join-Path $PSScriptRoot 'OverlayGroupUiHarness.cs')
+& $csc /nologo /target:library /langversion:latest /r:System.Core.dll ('/r:'+(Join-Path (Split-Path $json) 'netstandard.dll')) "/r:$json" "/out:$harness" $model (Join-Path $project 'OverlayConfiguration.cs') (Join-Path $project 'SettingsWindow.Overlay.cs') (Join-Path $project 'LayoutEditorController.cs') (Join-Path $project 'LayoutEditSession.cs') (Join-Path $PSScriptRoot 'OverlayGroupUiHarness.cs')
 if($LASTEXITCODE -ne 0){throw 'Group UI harness compilation failed'}
 [Reflection.Assembly]::LoadFrom($json)|Out-Null
 $assembly=[Reflection.Assembly]::LoadFrom($harness)

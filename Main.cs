@@ -34,6 +34,7 @@ namespace DonQuixoteOverlay {
                 Root.AddComponent<OverlayRuntime>();
                 Root.AddComponent<OverlayController>().Initialize();
                 Root.AddComponent<SettingsWindow>();
+                Root.AddComponent<LayoutEditorController>();
                 Root.AddComponent<KeyViewerContents.KeyViewer>();
                 Enabled = true;
                 return true;
@@ -48,6 +49,7 @@ namespace DonQuixoteOverlay {
             // Each cleanup remains independent so one failed restore cannot leave patches installed.
             Exception failure = null;
             Action[] actions = {
+                () => LayoutEditorController.CancelActive(),
                 () => KeyViewerContents.AsyncInputHook.Reset(),
                 () => NativeJudgmentColors.RestoreAll(),
                 () => { if (Root != null) { Root.SetActive(false); UnityEngine.Object.Destroy(Root); Root = null; } },
@@ -62,12 +64,12 @@ namespace DonQuixoteOverlay {
         private static void Update(UnityModManager.ModEntry entry, float delta) {
             if (!Enabled) return;
             NativeInputSync.Tick();
-            if (_dirty && Time.unscaledTime >= _saveAt) SaveFromUi();
+            if (_dirty && !LayoutEditorController.IsActive && Time.unscaledTime >= _saveAt) SaveFromUi();
             bool alt = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt) || Input.GetKey(KeyCode.AltGr);
             if (alt && Input.GetKeyDown(KeyCode.D) && SettingsWindow.Instance != null) SettingsWindow.Instance.Toggle();
         }
         internal static bool IsSettingsWindowOpen { get { return Enabled && SettingsWindow.Instance != null && SettingsWindow.Instance.Visible; } }
-        internal static void Save() { SettingsStore.Save(Settings); LayoutStore.Save(); KeyViewerContents.KeyViewerStore.Save(); KeyViewerContents.KeyCountData.Instance.Flush(KeyViewerContents.KeyViewer.CurrentTicks, true); _dirty = false; }
+        internal static void Save() { LayoutEditorController.CancelActive(); SettingsStore.Save(Settings); LayoutStore.Save(); KeyViewerContents.KeyViewerStore.Save(); KeyViewerContents.KeyCountData.Instance.Flush(KeyViewerContents.KeyViewer.CurrentTicks, true); _dirty = false; }
         internal static void RequestSave() { _dirty = true; _saveAt = Time.unscaledTime + .35f; }
         internal static bool SaveFromUi() { try { Save(); return true; } catch (Exception ex) { Log(ex.ToString()); _saveAt = Time.unscaledTime + 2f; return false; } }
         internal static void Log(string message) { if (Entry != null) Entry.Logger.Log("[GhostifyOverlay] " + message); }
@@ -82,6 +84,7 @@ namespace DonQuixoteOverlay {
             if (c != null && c.gameworld) AttemptTracker.ValidateCurrentRun(c);
         }
         private void SceneChanged(Scene previous, Scene current) {
+            LayoutEditorController.CancelActive();
             MenuInputBlock.Reset();
             try { NativeJudgmentColors.RestoreOldScene(current); Main.SaveFromUi(); }
             catch (Exception ex) { Main.Log(ex.ToString()); }

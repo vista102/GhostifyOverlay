@@ -55,7 +55,8 @@ $missingSchema=Call (T 'SettingsStore') 'Load' @()
 Check (!$missingSchema.Overlay.ShowDetailedJudgments -and $missingSchema.Overlay.FullAttempts['saved'] -eq 12) 'schema-less legacy files preserve hidden details and attempt records'
 $keys=Call (T 'KeyViewerContents.KeyViewerStore') 'Deserialize' @('{"SchemaVersion":5,"ShowTotalKpsKey16":false,"KeyGap":12}')
 Check ($null -eq $keys.GetType().GetField('ShowTotalKpsKey16') -and $keys.KeyGap -eq 12) 'old footer OFF value is ignored without resetting key spacing'
-foreach($name in @('EffectsSettings','EffectGate','EffectLifetime','EffectRestoration','DisableBloomPatch','DisableInitialFiltersPatch','LimitMoveTrackPatch','LayoutEditorController')){Check ($null -eq $mod.GetType('DonQuixoteOverlay.'+$name)) ('removed runtime type '+$name)}
+foreach($name in @('EffectsSettings','EffectGate','EffectLifetime','EffectRestoration','DisableBloomPatch','DisableInitialFiltersPatch','LimitMoveTrackPatch')){Check ($null -eq $mod.GetType('DonQuixoteOverlay.'+$name)) ('removed runtime type '+$name)}
+Check ($null -ne $mod.GetType('DonQuixoteOverlay.LayoutEditorController')) 'screen layout editing is restored'
 Check (@(Call (T 'PatchRegistry') 'Catalog' @()).Count -eq 5) 'only required overlay and input patch groups remain'
 $typedCatalog=(T 'PatchRegistry').GetMethod('Catalog',$flags).Invoke($null,@())
 Call (T 'PatchRegistry') 'ValidateCatalog' @($mod,$typedCatalog)|Out-Null

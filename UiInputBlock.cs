@@ -9,7 +9,7 @@ namespace DonQuixoteOverlay {
         private static bool _reported;
         public static bool IsActive {
             get {
-                if (!Main.IsSettingsWindowOpen) return false;
+                if (!Main.IsSettingsWindowOpen && !LayoutEditorController.IsActive) return false;
                 try { return !RDC.auto; } catch { return true; }
             }
         }

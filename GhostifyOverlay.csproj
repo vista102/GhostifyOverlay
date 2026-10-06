@@ -103,6 +103,8 @@
     <Compile Include="UiInputBlock.cs" />
     <Compile Include="KeyCaptureUiLease.cs" />
     <Compile Include="OverlayConfiguration.cs" />
+    <Compile Include="LayoutEditorController.cs" />
+    <Compile Include="LayoutEditSession.cs" />
     <Compile Include="KeyViewerContents\AsyncInputHook.cs" />
     <Compile Include="KeyViewerContents\FootKeyviewerStyle.cs" />
     <Compile Include="KeyViewerContents\Key.cs" />

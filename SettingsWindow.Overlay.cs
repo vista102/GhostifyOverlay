@@ -7,12 +7,11 @@ namespace DonQuixoteOverlay {
     public sealed partial class SettingsWindow {
         private readonly List<GameObject> _overlayGroupPages=new List<GameObject>();
         private readonly List<Button> _overlayGroupButtons=new List<Button>();
-        private int _overlayGroupIndex;
         private LayoutElement _overlayGroupHeight;
         private void BuildOverlayGroups() {
             Toggle("오버레이 전체 표시",()=>Main.Settings.Overlay.Enabled,v=>Main.Settings.Overlay.Enabled=v);
             var original=_page;
-            var host=Row(580);
+            var host=Row(340);
             _overlayGroupHeight=host.GetComponent<LayoutElement>();
             DarkNeonUi.ControlSurface(host,DQColors.Card,DQRadii.Card,true);
             for(int i=0;i<OverlayGroups.All.Length;i++) {
@@ -25,41 +24,23 @@ namespace DonQuixoteOverlay {
                 Heading(group.Title);
                 Toggle("이 그룹 표시",()=>OverlayGroups.Get(Main.Settings.Overlay,group.EnabledField),v=>OverlayGroups.Set(Main.Settings.Overlay,group.EnabledField,v));
                 OverlayMemberGrid(group);
-                for(int p=0;p<group.Parts.Length;p++) {
-                    var part=group.Parts[p];
-                    Label(group.PartLabels[p]+" · 위치 / 크기",28);
-                    OverlayPositionRow(part);
-                    ValueSlider("크기",.45f,2f,()=>OverlayTransforms.Get(LayoutStore.Current,part,"Scale"),v=>OverlayTransforms.Set(LayoutStore.Current,part,"Scale",v));
-                }
-                Button("이 그룹 배치 기본값",()=>{foreach(var part in group.Parts)OverlayTransforms.Reset(LayoutStore.Current,part);Main.RequestSave();foreach(Action refresh in _refresh)refresh();});
             }
             _page=original;SelectOverlayGroup(0);
+            Button("위치·크기 편집",()=>{SetVisible(false);Main.Root.GetComponent<LayoutEditorController>().Begin();});
+            Label("숫자 / Tab 항목 선택 · 방향키 이동 · Ctrl+↑↓ 크기\n길게 누르면 연속 조절 · Enter 저장 · Esc 취소",60);
         }
         private void SelectOverlayGroup(int index) {
-            ClosePalette();StopCapture();_overlayGroupIndex=index;
-            _overlayGroupHeight.preferredHeight=new[]{570f,530f,760f,760f,480f}[index];
+            ClosePalette();StopCapture();
             for(int i=0;i<_overlayGroupPages.Count;i++) {_overlayGroupPages[i].SetActive(i==index);DarkNeonUi.SetButtonState(_overlayGroupButtons[i],i==index?UiButtonKind.Tab:UiButtonKind.Secondary);}
         }
         private void OverlayMemberGrid(OverlayGroup group) {
-            int rows=(group.Fields.Length+1)/2;var row=Row(rows*42);
+            const int rows=3;var row=Row(rows*52);
             for(int i=0;i<group.Fields.Length;i++) {
                 string field=group.Fields[i];int column=i%2,line=i/2;
                 Button button=null;
                 button=DarkNeonUi.ToggleCard(group.Labels[i],row.transform,new Vector2(column*.5f,1f-(line+1f)/rows),new Vector2((column+1)*.5f,1f-line/(float)rows),OverlayGroups.Get(Main.Settings.Overlay,field),()=>{OverlayGroups.Set(Main.Settings.Overlay,field,!OverlayGroups.Get(Main.Settings.Overlay,field));button.GetComponent<DQToggleVisual>().SetValue(OverlayGroups.Get(Main.Settings.Overlay,field));Main.RequestSave();});
-                var rect=(RectTransform)button.transform;rect.offsetMin=new Vector2(column==0?0:4,3);rect.offsetMax=new Vector2(column==0?-4:0,-3);
+                var rect=(RectTransform)button.transform;rect.offsetMin=new Vector2(column==0?0:4,4);rect.offsetMax=new Vector2(column==0?-4:0,-4);
                 _refresh.Add(()=>button.GetComponent<DQToggleVisual>().SetValue(OverlayGroups.Get(Main.Settings.Overlay,field)));
-            }
-        }
-        private void OverlayPositionRow(OverlayPart part) {
-            var row=Row(36);
-            for(int i=0;i<2;i++) {
-                string axis=i==0?"X":"Y";float left=i*.5f;
-                DarkNeonUi.Text(axis,row.transform,new Vector2(left,0),new Vector2(left+.07f,1),17,DQColors.Text,TextAlignmentOptions.Left,false).raycastTarget=false;
-                var input=DarkNeonUi.Input(part+axis,row.transform,new Vector2(left+.08f,0),new Vector2(left+.48f,1),"값",true);input.characterLimit=12;
-                input.onSelect.AddListener(_=>StopCapture());
-                Action refresh=()=>{if(!input.isFocused)input.SetTextWithoutNotify(OverlayTransforms.Get(LayoutStore.Current,part,axis).ToString("0.##",System.Globalization.CultureInfo.InvariantCulture));};
-                _refresh.Add(refresh);
-                input.onEndEdit.AddListener(raw=>{if(float.TryParse(raw,System.Globalization.NumberStyles.Float,System.Globalization.CultureInfo.InvariantCulture,out var value)&&OverlayTransforms.Set(LayoutStore.Current,part,axis,value))Main.RequestSave();input.SetTextWithoutNotify(OverlayTransforms.Get(LayoutStore.Current,part,axis).ToString("0.##",System.Globalization.CultureInfo.InvariantCulture));});
             }
         }
     }

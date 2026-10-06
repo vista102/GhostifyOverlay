@@ -44,7 +44,7 @@ namespace DonQuixoteOverlay {
         private static Sprite _switchTrackSprite;
         private static Sprite _switchThumbSprite;
         private static Sprite _closeSprite;
-        private const int SwitchWidth = 56, SwitchHeight = 32, SwitchThumbSize = 26;
+        private const int SwitchWidth = 46, SwitchHeight = 26, SwitchThumbSize = 20;
         private const float SwitchInset = 3f, SwitchRightMargin = 14f, SwitchLabelGap = 12f;
         internal const float SwitchTravel = (SwitchWidth - SwitchThumbSize) * .5f - SwitchInset;
 
