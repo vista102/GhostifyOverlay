@@ -82,7 +82,7 @@ public partial class KeyViewer : MonoBehaviour {
         var controller = scrController.instance;
         bool editor = ADOBase.isLevelEditor && scnEditor.instance != null;
         bool gameplay = controller != null && KeyViewerVisibility.IsPlaying(controller.gameworld, editor, editor && scnEditor.instance.playMode);
-        bool preview = Main.IsSettingsWindowOpen || LayoutEditorController.IsActive;
+        bool preview = Main.IsSettingsWindowOpen;
         bool visible = !Settings.ViewerOnlyGameplay || gameplay || preview;
         if (visible != _visible) { _visible = visible; KeyViewerObject.SetActive(visible); ResetTransient(true); }
         bool suspended = !_focused || !visible || preview;

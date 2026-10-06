@@ -34,18 +34,8 @@ namespace DonQuixoteOverlay {
                     typeof(AttemptLeaveMapPatch), typeof(AttemptOpenMapPatch), typeof(AttemptOpenWorldPatch) }),
                 new PatchGroup("judgmentColors", "세부 판정 색상", false, new[] { typeof(NativeJudgmentColorPatch), typeof(NativeJudgmentColorResetPatch) }),
                 new PatchGroup("resultsOrder", "세부 결과 표시 순서", false, new[] { typeof(NativeResultsOrderPatch) }),
-                new PatchGroup("ghostInput", "고스트 레인 입력 호환", false, new[] { typeof(KeyViewerContents.RawGhostInputPatch) }),
-                new PatchGroup("filters", "VFX 필터 제거", false, new[] { typeof(DisableInitialFiltersPatch), typeof(DisableFilterPatch) }, FilterApi),
-                new PatchGroup("bloom", "Bloom 제거", false, new[] { typeof(DisableBloomPatch) }),
-                new PatchGroup("flash", "Flash 제거", false, new[] { typeof(DisableFlashPatch) }),
-                new PatchGroup("mirrors", "Hall of Mirrors 제거", false, new[] { typeof(DisableHallOfMirrorsPatch) }),
-                new PatchGroup("shake", "화면 흔들림 제거", false, new[] { typeof(DisableShakePatch) }),
-                new PatchGroup("moveTrack", "MoveTrack 제한", false, new[] { typeof(LimitMoveTrackPatch) })
+                new PatchGroup("ghostInput", "고스트 레인 입력 호환", false, new[] { typeof(KeyViewerContents.RawGhostInputPatch) })
             };
-        }
-        private static string FilterApi() {
-            FieldInfo field = AccessTools.Field(typeof(scrVfxPlus), "filterToComp");
-            return field != null && field.FieldType == typeof(Dictionary<Filter, UnityEngine.MonoBehaviour>) ? null : "filterToComp API를 사용할 수 없습니다.";
         }
         internal static void Apply(Harmony harmony, Assembly assembly) {
             PatchGroup[] groups = Catalog();

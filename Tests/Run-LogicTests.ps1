@@ -64,7 +64,7 @@ foreach($case in @(@(1,$false,$false),@(2,$false,$true),@(1,$true,$true))) {
 foreach($name in @('EditorModules','MusicLibraryController','RecordingController','InputEventDecisions','DmNoteController','PlanetSettings')) {
     Equal $null $assembly.GetType('DonQuixoteOverlay.'+$name) "excluded type $name"
 }
-Equal $true ($null -ne $assembly.GetType('DonQuixoteOverlay.EffectGate')) 'requested original effects are included'
+Equal $null $assembly.GetType('DonQuixoteOverlay.EffectGate') 'duplicate effect removal module is absent'
 Equal $null $assembly.GetType('DonQuixoteOverlay.InputSettings') 'key limiter and chatter settings are absent'
 Equal $null (ModType 'Main').GetMethod('ToggleRecordingMode',$flags) 'recording shortcut absent'
 Equal 'qkddn.DonQuixoteOverlay' (ModType 'Main').GetField('HarmonyId',$flags).GetRawConstantValue() 'independent Harmony ID'
@@ -78,7 +78,7 @@ Call (ModType 'SettingsStore') 'Save' @($settings)|Out-Null
 $loaded=Call (ModType 'SettingsStore') 'Load' @()
 Equal 17 $loaded.Overlay.FullAttempts['fixture'] 'full attempts reload'
 Equal 23 $loaded.Overlay.FullProgressAttempts['fixture'] 'full progress attempts reload'
-Equal 3 $loaded.SchemaVersion 'settings schema migrated to native judgments'
+Equal 4 $loaded.SchemaVersion 'settings schema migrated to grouped overlays'
 foreach($part in @('TopLeft','TopRight','Attempts','Judgments','Combo','DetailedPerfect')) {
     $layout=(ModType 'LayoutStore').GetField('Current').GetValue($null)
     $layout.GetType().GetField($part+'X').SetValue($layout,[float]45)

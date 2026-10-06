@@ -100,12 +100,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Compile Include="GameplayPatches.cs" />
-    <Compile Include="EffectRestoration.cs" />
-    <Compile Include="EffectLifetime.cs" />
     <Compile Include="UiInputBlock.cs" />
     <Compile Include="KeyCaptureUiLease.cs" />
-    <Compile Include="LayoutEditorController.cs" />
+    <Compile Include="OverlayConfiguration.cs" />
     <Compile Include="KeyViewerContents\AsyncInputHook.cs" />
     <Compile Include="KeyViewerContents\FootKeyviewerStyle.cs" />
     <Compile Include="KeyViewerContents\Key.cs" />
@@ -130,7 +127,8 @@
     <Compile Include="RuntimeStatus.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="SettingsWindow.cs" />
-    <Compile Include="SettingsWindow.Effects.cs" />
+    <Compile Include="SettingsWindow.Overlay.cs" />
+    <Compile Include="SettingsWindow.Sliders.cs" />
     <Compile Include="SettingsWindow.KeyEditor.cs" />
     <Compile Include="SettingsWindow.Colors.cs" />
     <Compile Include="ColorPalette.cs" />

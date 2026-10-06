@@ -7,8 +7,7 @@ using UnityEngine;
 namespace DonQuixoteOverlay {
     [Serializable]
     public sealed class DonQuixoteSettings {
-        public int SchemaVersion = 3;
-        public EffectsSettings Effects = new EffectsSettings();
+        public int SchemaVersion = 4;
         public OverlaySettings Overlay = new OverlaySettings();
 
         public static DonQuixoteSettings CreateDefault() { return new DonQuixoteSettings(); }
@@ -27,21 +26,9 @@ namespace DonQuixoteOverlay {
 
 
     [Serializable]
-    public sealed class EffectsSettings {
-        public bool Enabled;
-        public bool DisableFilter;
-        public List<string> FilterExcludeList = new List<string>();
-        public bool DisableBloom;
-        public bool DisableFlash;
-        public bool DisableHallOfMirrors;
-        public bool DisableScreenShake;
-        public bool MoveTrackLimitEnabled = true;
-        public int MoveTrackMax = 30;
-    }
-
-    [Serializable]
     public sealed class OverlaySettings {
         public bool Enabled = true;
+        public bool Group1Enabled = true, Group2Enabled = true, Group3Enabled = true, Group4Enabled = true, Group5Enabled = true;
         public bool ShowProgress = true;
         public bool ShowAccuracy = true;
         public bool ShowXAccuracy = true;
@@ -50,8 +37,10 @@ namespace DonQuixoteOverlay {
         public bool ShowProgressBar = true;
         public bool ShowCombo = true;
         public bool ShowBpm = true;
+        public bool ShowPitch = true;
         public bool ShowTheoreticalKps = true;
         public bool ShowJudgmentCounts = true;
+        public bool ShowDetailedJudgments = true;
         public bool ShowAttempts = true;
         public bool ShowSongInfo = true;
         public bool ShowTimingRanges = true;
@@ -104,7 +93,9 @@ namespace DonQuixoteOverlay {
         }
 
         private static DonQuixoteSettings Read(string path) {
-            DonQuixoteSettings value = JsonConvert.DeserializeObject<DonQuixoteSettings>(File.ReadAllText(path));
+            var root=Newtonsoft.Json.Linq.JObject.Parse(File.ReadAllText(path));
+            if(root["SchemaVersion"]==null)root["SchemaVersion"]=1;
+            DonQuixoteSettings value = root.ToObject<DonQuixoteSettings>();
             if (value == null) throw new JsonSerializationException("Settings JSON root is null.");
             return SettingsNormalization.Normalize(value);
         }
@@ -117,24 +108,13 @@ namespace DonQuixoteOverlay {
 
     internal static class SettingsNormalization {
         internal static DonQuixoteSettings Normalize(DonQuixoteSettings value) {
-            if (value.Effects == null) value.Effects = new EffectsSettings();
             if (value.Overlay == null) value.Overlay = new OverlaySettings();
-            if (value.SchemaVersion < 3) value.SchemaVersion = 3;
-
-            value.Effects.FilterExcludeList = CleanList(value.Effects.FilterExcludeList);
-            // As in the original mod, zero bypasses the Move Track limit.
-            value.Effects.MoveTrackMax = Math.Max(0, Math.Min(9999, value.Effects.MoveTrackMax));
+            if (value.SchemaVersion < 4) { value.Overlay.ShowDetailedJudgments=value.Overlay.ShowJudgmentCounts; value.SchemaVersion=4; }
             if (value.Overlay.FullAttempts == null) value.Overlay.FullAttempts = new Dictionary<string, int>();
             if (value.Overlay.FullProgressAttempts == null) value.Overlay.FullProgressAttempts = new Dictionary<string, int>();
             value.Overlay.Font = "Gmarket Sans";
             OverlayPalette.Normalize(value.Overlay);
             return value;
-        }
-
-        private static List<string> CleanList(List<string> values) {
-            if (values == null) return new List<string>();
-            values.RemoveAll(string.IsNullOrWhiteSpace);
-            return values;
         }
 
         internal static float Bounded(float value, float minimum, float maximum, float fallback) {
@@ -148,6 +128,8 @@ namespace DonQuixoteOverlay {
         internal static LayoutData Normalize(LayoutData value) {
             value.TopLeftX = Coordinate(value.TopLeftX); value.TopLeftY = Coordinate(value.TopLeftY);
             value.TopRightX = Coordinate(value.TopRightX); value.TopRightY = Coordinate(value.TopRightY);
+            value.ProgressBarX = Coordinate(value.ProgressBarX); value.ProgressBarY = Coordinate(value.ProgressBarY);
+            value.ProgressBarScale = SectionScale(value.ProgressBarScale);
             value.AttemptsX = Coordinate(value.AttemptsX); value.AttemptsY = Coordinate(value.AttemptsY);
             value.JudgmentsX = Coordinate(value.JudgmentsX); value.JudgmentsY = Coordinate(value.JudgmentsY);
             value.ComboX = Coordinate(value.ComboX); value.ComboY = Coordinate(value.ComboY);
@@ -222,6 +204,8 @@ namespace DonQuixoteOverlay {
     [Serializable]
     public sealed class LayoutData {
         public int SchemaVersion = 5;
+        public float ProgressBarX, ProgressBarY;
+        public float ProgressBarScale = 1f;
         public float TopLeftX;
         public float TopLeftY;
         public float TopRightX;

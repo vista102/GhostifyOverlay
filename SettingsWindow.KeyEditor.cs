@@ -56,14 +56,14 @@ namespace DonQuixoteOverlay {
         private void RefreshKeyEditor() {
             if(_keyEditorRoot==null)return;
             var settings=KeyViewerStore.Settings;
-            int signature=(int)settings.KeyViewerStyle+10*(int)settings.FootKeyViewerStyle+(settings.ShowTotalKpsKey16?100:0);
+            int signature=(int)settings.KeyViewerStyle+10*(int)settings.FootKeyViewerStyle;
             if(signature!=_previewSignature || settings.KeyGap!=_previewGap) {
                 _previewSignature=signature;
                 _previewGap=settings.KeyGap;
                 if(_keyPreview!=null){_keyPreview.SetActive(false);Destroy(_keyPreview);}
                 _previewKeys.Clear();
                 _keyPreview=DarkNeonUi.Rect("Layout preview",_keyEditorRoot,new Vector2(.02f,.08f),new Vector2(.60f,.86f));
-                var slots=KeyViewerGeometry.HandsWithGap(settings.KeyViewerStyle,settings.ShowTotalKpsKey16,settings.KeyGap);
+                var slots=KeyViewerGeometry.HandsWithGap(settings.KeyViewerStyle,true,settings.KeyGap);
                 slots.AddRange(KeyViewerGeometry.FeetWithGap(FootSize(),settings.KeyGap));
                 float scale=FootSize()==0?1.06f:.68f;
                 float extent=1;foreach(var slot in slots)extent=Math.Max(extent,slot.X+slot.Width);

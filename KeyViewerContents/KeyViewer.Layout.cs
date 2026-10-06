@@ -6,7 +6,7 @@ public partial class KeyViewer {
     private void Initialize1KeyViewer() => InitializeHandLayout();
     private void Initialize3KeyViewer() => InitializeHandLayout();
     private void InitializeHandLayout() {
-        var slots=KeyViewerGeometry.HandsWithGap(Settings.KeyViewerStyle,Settings.ShowTotalKpsKey16,Settings.KeyGap);
+        var slots=KeyViewerGeometry.HandsWithGap(Settings.KeyViewerStyle,true,Settings.KeyGap);
         Kps=Total=null;
         foreach(var slot in slots) {
             var key=CreateKey(slot.Index,slot.X,slot.Y+Settings.YLocation,slot.Width,slot.RainRow,slot.Slim);

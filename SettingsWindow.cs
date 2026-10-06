@@ -45,7 +45,6 @@ namespace DonQuixoteOverlay {
             if (value && _canvas == null) return;
             if (value == Visible) return;
             if (value) {
-                LayoutEditorController.CancelActive();
                 if (EventSystem.current == null) {
                     _ownedEventSystem = new GameObject("DonQuixoteOverlay.EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
                     _ownedEventSystem.transform.SetParent(transform, false);
@@ -67,7 +66,6 @@ namespace DonQuixoteOverlay {
                 _statusRevision = RuntimeStatus.Revision;
                 _status.text = RuntimeStatus.ErrorCount > 0 ? RuntimeStatus.Details() : RuntimeStatus.Summary;
             }
-            RefreshEffectColumns();
             if (Input.GetKeyDown(KeyCode.Escape)) { if (_palette!=null) ClosePalette(); else if (_capturing) StopCapture(); else SetVisible(false); return; }
             if (_palette!=null) return;
             if (!_capturing || Time.frameCount <= _captureFrame + 1) return;
@@ -115,16 +113,8 @@ namespace DonQuixoteOverlay {
             viewport.AddComponent<RectMask2D>(); scroll.viewport=viewport.GetComponent<RectTransform>();
             // A raycast surface lets mouse wheel scrolling work between controls.
             viewport.AddComponent<Image>().color = new Color(0,0,0,.001f);
-            NewPage("이펙트"); BuildEffectsPage();
             NewPage("오버레이");
-            Heading("플레이 오버레이");
-            string[] fields={"Enabled","ShowProgress","ShowAccuracy","ShowXAccuracy","ShowMusicTime","ShowMapTime","ShowProgressBar","ShowCombo","ShowBpm","ShowTheoreticalKps","ShowJudgmentCounts","ShowAttempts","ShowSongInfo","ShowTimingRanges","ShowFps"};
-            string[] names={"오버레이","진행도","Accuracy","XAccuracy","곡 시간","맵 시간","진행 막대","콤보","BPM / Pitch","이론 KPS","누적 / 세부 정확 숫자","Attempt / Prac Attempt / Full","곡명 / 작곡가","타이밍 스케일","FPS · 초당 10회 갱신"};
-            for(int i=0;i<fields.Length;i++) { FieldInfo f=typeof(OverlaySettings).GetField(fields[i]);Toggle(names[i],()=> (bool)f.GetValue(Main.Settings.Overlay),v=>f.SetValue(Main.Settings.Overlay,v)); }
-            Label("UI / 오버레이 폰트: Gmarket Sans · 판정 텍스트: 게임 기본 폰트",40);
-            Label("세부 누적 숫자는 게임의 세부 판정 표시 설정을 따릅니다.",40);
-            Button("섹션 위치·크기 편집",()=>{SetVisible(false);Main.Root.GetComponent<LayoutEditorController>().Begin();});
-            Label("1~9 섹션 선택 · 방향키 이동 · Ctrl+↑↓ 크기\nEnter 저장 · Esc 취소",60);
+            BuildOverlayGroups();
             BuildOverlayColors();
             NewPage("키뷰어"); BuildKeyViewerPage();
             for(int i=0;i<_pages.Count;i++) {
@@ -158,7 +148,6 @@ namespace DonQuixoteOverlay {
             Label("손·발 키를 게임의 ‘특정 키만 입력으로 간주’에 반영합니다.\n고스트 키는 제외합니다. 연동을 끄면 게임에서 직접 변경할 수 있습니다.",64).textWrappingMode=TextWrappingModes.Normal;
             ValueButton(()=>"손 배치: "+HandSize()+"키",()=>{KeyViewerStore.Settings.KeyViewerStyle=NextStyle(KeyViewerStore.Settings.KeyViewerStyle);ChangedKeyViewer();});
             ValueButton(()=>"발 배치: "+FootSize()+"키",()=>{KeyViewerStore.Settings.FootKeyViewerStyle=NextStyle(KeyViewerStore.Settings.FootKeyViewerStyle);ChangedKeyViewer();});
-            Toggle("16키에서 KPS / Total 표시",()=>KeyViewerStore.Settings.ShowTotalKpsKey16,v=>{KeyViewerStore.Settings.ShowTotalKpsKey16=v;ChangedKeyViewer();});
             Numeric("위치 X",()=>KeyViewerStore.Settings.XLocation,v=>{KeyViewerStore.Settings.XLocation=v;KeyViewerStore.Normalize(KeyViewerStore.Settings);KeyViewer.Instance?.ApplyPosition();});
             Numeric("위치 Y",()=>KeyViewerStore.Settings.YLocation,v=>{KeyViewerStore.Settings.YLocation=v;ChangedKeyViewer();});
             Numeric("전체 배율 · 0.45~2",()=>KeyViewerStore.Settings.Size,v=>{KeyViewerStore.Settings.Size=v;KeyViewerStore.Normalize(KeyViewerStore.Settings);KeyViewer.Instance?.ApplyPosition();});
@@ -172,7 +161,7 @@ namespace DonQuixoteOverlay {
             Label("KPS는 최근 1초 입력이며 위 오버레이의 이론 KPS와 별개입니다.",40).textWrappingMode=TextWrappingModes.Normal;
             Heading("키 색상");
             string[] colorFields={"Background","BackgroundClicked","Outline","OutlineClicked","Text","TextClicked","RainColor","RainColor2","GhostRainColor"};
-            string[] colorNames={"기본 키 배경","누른 키 배경","기본 테두리","누른 테두리","기본 글자","누른 키 글자","레인 1","레인 2","고스트 레인"};
+            string[] colorNames={"기본 키 배경","누른 키 배경","기본 테두리","누른 테두리","기본 글자","누른 키 글자","상단 레인","하단 레인","고스트 레인"};
             for(int i=0;i<colorFields.Length;i++) {
                 FieldInfo field=typeof(KeyViewerSetting).GetField(colorFields[i]);
                 ColorRow(colorNames[i],()=>(Color)field.GetValue(KeyViewerStore.Settings),c=>{field.SetValue(KeyViewerStore.Settings,c);KeyViewer.Instance?.RefreshColors();RefreshKeyEditor();});

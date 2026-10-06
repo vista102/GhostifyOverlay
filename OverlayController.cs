@@ -370,36 +370,39 @@ namespace DonQuixoteOverlay {
             if (c == null || !c.gameworld) { SetTexts(false); return; }
             SetTexts(true);
             OverlaySettings s = Main.Settings.Overlay;
+            var show=new OverlayVisibility(s);
             float progress = MapProgress(c);
-            SetActiveIfChanged(_progressFill.parent.gameObject, s.ShowProgressBar);
-            if (s.ShowProgressBar) SetAnchorMaxIfChanged(_progressFill, new Vector2(progress, 1f));
+            SetActiveIfChanged(_progressFill.parent.gameObject, show.ProgressBar);
+            if (show.ProgressBar) SetAnchorMaxIfChanged(_progressFill, new Vector2(progress, 1f));
 
             scrMistakesManager mistakes = scrPlayerManager.instance == null ? null : scrPlayerManager.instance.mistakesManager;
             scrMarginTracker displayedTracker = NativeJudgments.DisplayedTracker;
             float acc = displayedTracker == null ? 100f : displayedTracker.percentAcc * 100f;
             float xacc = displayedTracker == null ? 100f : displayedTracker.percentXAcc * 100f;
-            RefreshStatusText(s, c, progress, acc, xacc);
-            SetActiveIfChanged(_status.gameObject, s.ShowProgress || s.ShowAccuracy || s.ShowXAccuracy || s.ShowMusicTime || s.ShowMapTime);
-            bool showCombo = s.ShowCombo && PatchRegistry.IsAvailable("statistics");
+            RefreshStatusText(s, c, progress, acc, xacc,show);
+            SetActiveIfChanged(_status.gameObject, show.Status);
+            bool showCombo = show.Combo && PatchRegistry.IsAvailable("statistics");
             SetActiveIfChanged(_comboText.gameObject, showCombo);
             if (showCombo && _lastCombo != _combo) {
                 _lastCombo = _combo;
                 _comboText.text = "<size=78><color=" + Hex(s.ValueColor) + ">" + _combo + "</color></size>\n<size=30>Combo</size>";
             }
-            bool showBpmBlock = s.ShowBpm || s.ShowTheoreticalKps || s.ShowFps;
+            bool showBpmBlock = show.Metrics;
             SetActiveIfChanged(_bpm.gameObject, showBpmBlock);
-            if (showBpmBlock) RefreshBpmText(s, c);
-            SetActiveIfChanged(_judgmentRoot.gameObject, s.ShowJudgmentCounts);
-            if (s.ShowJudgmentCounts && UpdateJudgments(mistakes)) LayoutJudgmentValues();
-            bool showDetailed = NativeJudgments.DetailedTextVisible(s.ShowJudgmentCounts);
+            if (showBpmBlock) RefreshBpmText(s, c,show);
+            SetActiveIfChanged(_judgmentRoot.gameObject, show.Judgments);
+            if (show.Judgments && UpdateJudgments(mistakes)) LayoutJudgmentValues();
+            bool showDetailed = NativeJudgments.DetailedTextVisible(show.Detailed);
             SetActiveIfChanged(_xPerfectAboveMeter.gameObject, showDetailed);
             if (showDetailed) RefreshDetailedPerfectText();
-            bool showAttempts = s.ShowAttempts && PatchRegistry.IsAvailable("statistics");
+            bool showAttempts = show.Attempts && PatchRegistry.IsAvailable("statistics");
             SetActiveIfChanged(_attempts.gameObject, showAttempts);
             if (showAttempts) RefreshAttemptText();
-            RefreshMetadata(s, c);
+            RefreshMetadata(s, c,show);
             SetScaleIfChanged(_contentRoot, Vector3.one);
             LayoutData layout = LayoutStore.Current;
+            SetPositionIfChanged((RectTransform)_progressFill.parent,new Vector2(layout.ProgressBarX,-13f+layout.ProgressBarY));
+            SetScaleIfChanged((RectTransform)_progressFill.parent,Vector3.one*SafeSectionScale(layout.ProgressBarScale));
             SetPositionIfChanged(_status.rectTransform, new Vector2(16f + layout.TopLeftX, -18f + layout.TopLeftY));
             SetPositionIfChanged(_bpm.rectTransform, new Vector2(-16f + layout.TopRightX, -18f + layout.TopRightY));
             SetPositionIfChanged(_attempts.rectTransform, new Vector2(500f + layout.AttemptsX, 28f + layout.AttemptsY));
@@ -425,22 +428,22 @@ namespace DonQuixoteOverlay {
             SetScaleIfChanged(_timingRanges.rectTransform, Vector3.one * SafeSectionScale(layout.TimingRangesScale));
         }
 
-        private void RefreshMetadata(OverlaySettings settings, scrController controller) {
-            SetActiveIfChanged(_songInfo.gameObject, settings.ShowSongInfo && !string.IsNullOrEmpty(_songInfo.text));
-            SetActiveIfChanged(_timingRanges.gameObject, settings.ShowTimingRanges);
+        private void RefreshMetadata(OverlaySettings settings, scrController controller,OverlayVisibility show) {
+            SetActiveIfChanged(_songInfo.gameObject, show.SongInfo && !string.IsNullOrEmpty(_songInfo.text));
+            SetActiveIfChanged(_timingRanges.gameObject, show.Timing);
             if (Time.unscaledTime < _metadataNextUpdate) return;
             _metadataNextUpdate = Time.unscaledTime + .1f;
             try {
-                string song = settings.ShowSongInfo ? OverlayMetadata.CurrentSong(controller) : string.Empty;
+                string song = show.SongInfo ? OverlayMetadata.CurrentSong(controller) : string.Empty;
                 if (_songInfo.text != song) _songInfo.text = song;
                 RuntimeStatus.Clear("overlay.song-info");
             } catch (Exception ex) {
                 _songInfo.text = string.Empty;
                 RuntimeStatus.Failure("overlay.song-info", "곡 정보", ex);
             }
-            SetActiveIfChanged(_songInfo.gameObject, settings.ShowSongInfo && !string.IsNullOrEmpty(_songInfo.text));
+            SetActiveIfChanged(_songInfo.gameObject, show.SongInfo && !string.IsNullOrEmpty(_songInfo.text));
             try {
-                string ranges = settings.ShowTimingRanges ? OverlayMetadata.CurrentTiming(controller) : string.Empty;
+                string ranges = show.Timing ? OverlayMetadata.CurrentTiming(controller) : string.Empty;
                 if (_timingRanges.text != ranges) _timingRanges.text = ranges;
                 RuntimeStatus.Clear("overlay.timing-ranges");
             } catch (Exception ex) {
@@ -453,9 +456,9 @@ namespace DonQuixoteOverlay {
         internal static string FormatAttempts(int attempt, int practice, int full, int fullPractice) {
             return "Attempt " + attempt + "\nPrac Attempt " + practice + "\nFull Attempt " + full + "\nFull Prac Attempt " + fullPractice;
         }
-        private void RefreshStatusText(OverlaySettings settings, scrController controller, float progress, float accuracy, float xAccuracy) {
-            int flags = (settings.ShowProgress ? 1 : 0) | (settings.ShowAccuracy ? 2 : 0) | (settings.ShowXAccuracy ? 4 : 0)
-                | (settings.ShowMusicTime ? 8 : 0) | (settings.ShowMapTime ? 16 : 0);
+        private void RefreshStatusText(OverlaySettings settings, scrController controller, float progress, float accuracy, float xAccuracy,OverlayVisibility show) {
+            int flags = (show.Progress ? 1 : 0) | (show.Accuracy ? 2 : 0) | (show.XAccuracy ? 4 : 0)
+                | (show.MusicTime ? 8 : 0) | (show.MapTime ? 16 : 0);
             int progressKey = Mathf.RoundToInt(progress * 10000f);
             int accuracyKey = OverlayAccuracy.DisplayKey(accuracy);
             int xAccuracyKey = OverlayAccuracy.DisplayKey(xAccuracy);
@@ -466,7 +469,7 @@ namespace DonQuixoteOverlay {
                 AttemptTracker.StartedMidMap, AttemptTracker.StartProgress)) _status.text = _statusText.Text;
         }
 
-        private void RefreshBpmText(OverlaySettings settings, scrController controller) {
+        private void RefreshBpmText(OverlaySettings settings, scrController controller,OverlayVisibility show) {
             float tbpm = 0f, cbpm = 0f, pitch = 1f;
             try {
                 pitch = ADOBase.conductor.song.pitch;
@@ -474,20 +477,20 @@ namespace DonQuixoteOverlay {
                 scrFloor floor = controller.currFloor;
                 cbpm = floor != null && floor.nextfloor != null ? (float)(60d / (floor.nextfloor.entryTime - floor.entryTime) * pitch) : tbpm;
             } catch { }
-            int flags = (settings.ShowBpm ? 1 : 0) | (settings.ShowTheoreticalKps ? 2 : 0) | (settings.ShowFps ? 4 : 0);
-            int tbpmKey = settings.ShowBpm ? Mathf.RoundToInt(tbpm * 100f) : 0;
-            int cbpmKey = settings.ShowBpm ? Mathf.RoundToInt(cbpm * 100f) : 0;
-            int kpsKey = settings.ShowTheoreticalKps ? Mathf.RoundToInt(cbpm / 60f * 100f) : 0;
-            int pitchKey = Mathf.RoundToInt(pitch * 10000f);
-            int fpsKey = _fps.HasSample ? _fps.Value : -1;
+            int flags = (show.Bpm ? 1 : 0) | (show.Kps ? 2 : 0) | (show.Fps ? 4 : 0) | (show.Pitch?8:0);
+            int tbpmKey = show.Bpm ? Mathf.RoundToInt(tbpm * 100f) : 0;
+            int cbpmKey = show.Bpm ? Mathf.RoundToInt(cbpm * 100f) : 0;
+            int kpsKey = show.Kps ? Mathf.RoundToInt(cbpm / 60f * 100f) : 0;
+            int pitchKey = show.Pitch?Mathf.RoundToInt(pitch * 10000f):0;
+            int fpsKey = show.Fps&&_fps.HasSample ? _fps.Value : -1;
             if (_lastBpmFlags == flags && _lastTbpmKey == tbpmKey && _lastCbpmKey == cbpmKey && _lastKpsKey == kpsKey && _lastPitchKey == pitchKey && _lastFps == fpsKey) return;
             _lastBpmFlags = flags; _lastTbpmKey = tbpmKey; _lastCbpmKey = cbpmKey; _lastKpsKey = kpsKey; _lastPitchKey = pitchKey;
             _lastFps = fpsKey;
             string accent = "<color=" + Hex(settings.ValueColor) + ">";
-            _bpm.text = (settings.ShowBpm ? "TBPM | " + accent + (tbpmKey / 100f).ToString("0.##") + "</color>\nCBPM | " + accent + (cbpmKey / 100f).ToString("0.##") + "</color>\n" : "")
-                + (settings.ShowTheoreticalKps ? "KPS | " + accent + (kpsKey / 100f).ToString("0.00") + "</color>\n" : "")
-                + "Pitch | " + accent + FormatPitch(pitchKey) + "</color>"
-                + (settings.ShowFps ? "\nFPS | " + accent + (fpsKey < 0 ? "—" : fpsKey.ToString()) + "</color>" : "");
+            _bpm.text = ((show.Bpm ? "TBPM | " + accent + (tbpmKey / 100f).ToString("0.##") + "</color>\nCBPM | " + accent + (cbpmKey / 100f).ToString("0.##") + "</color>\n" : "")
+                + (show.Kps ? "KPS | " + accent + (kpsKey / 100f).ToString("0.00") + "</color>\n" : "")
+                + (show.Pitch?"Pitch | " + accent + FormatPitch(pitchKey) + "</color>\n":"")
+                + (show.Fps ? "FPS | " + accent + (fpsKey < 0 ? "—" : fpsKey.ToString()) + "</color>" : "")).TrimEnd('\n');
         }
 
         private void RefreshDetailedPerfectText() {
@@ -595,7 +598,7 @@ namespace DonQuixoteOverlay {
             _textsVisible = value;
             SetActiveIfChanged(_status.gameObject, value); SetActiveIfChanged(_comboText.gameObject, value); SetActiveIfChanged(_bpm.gameObject, value);
             SetActiveIfChanged(_judgmentRoot.gameObject, value);
-            SetActiveIfChanged(_xPerfectAboveMeter.gameObject, value && Main.Settings != null && NativeJudgments.DetailedTextVisible(Main.Settings.Overlay.ShowJudgmentCounts));
+            SetActiveIfChanged(_xPerfectAboveMeter.gameObject, value && Main.Settings != null && NativeJudgments.DetailedTextVisible(new OverlayVisibility(Main.Settings.Overlay).Detailed));
             SetActiveIfChanged(_attempts.gameObject, value); SetActiveIfChanged(_progressFill.parent.gameObject, value);
             SetActiveIfChanged(_songInfo.gameObject, value); SetActiveIfChanged(_timingRanges.gameObject, value);
         }

@@ -61,7 +61,7 @@ namespace DonQuixoteOverlay.KeyViewerContents {
         public float X,Y,Width,Height;
         public object RainPool = new object();
     }
-    public class KeyViewerSetting { public float YLocation=200,KeyGap=4; public bool ShowTotalKpsKey16=true; public KeyviewerStyle KeyViewerStyle=KeyviewerStyle.Key16; }
+    public class KeyViewerSetting { public float YLocation=200,KeyGap=4; public KeyviewerStyle KeyViewerStyle=KeyviewerStyle.Key16; }
     public sealed class KeyViewerUpdater { public bool enabled; }
     public partial class KeyViewer {
         public const int HandOutIndex=20;
@@ -76,7 +76,7 @@ namespace DonQuixoteOverlay.KeyViewerContents {
         }
         public void Build(int style,float y=200,bool footer=true) {
             Settings.KeyViewerStyle=style==16?KeyviewerStyle.Key16:style==12?KeyviewerStyle.Key12:KeyviewerStyle.Key10;
-            Settings.YLocation=y;Settings.ShowTotalKpsKey16=footer;
+            Settings.YLocation=y;
             if(style==16)Initialize1KeyViewer();
             else if(style==12)Initialize0KeyViewer();
             else Initialize3KeyViewer();
@@ -102,7 +102,7 @@ namespace DonQuixoteOverlay {
             var moved=new KeyViewerContents.KeyViewer();moved.Build(16,375);
             Check(moved.Keys.Take(16).Select((k,i)=>k.Y-viewer.Keys[i].Y==175 && k.X==viewer.Keys[i].X && k.Width==50).All(x=>x),"saved Y shifts the actual frame grid without resizing it");
             var hidden=new KeyViewerContents.KeyViewer();hidden.Build(16,200,false);
-            Check(hidden.Kps==null && hidden.Total==null && hidden.Keys[0].Y==285 && hidden.Keys[12].Y==231 && hidden.Keys.Take(16).All(k=>k.Width==50),"hiding the footer preserves original row offsets and fixed sizes");
+            Check(hidden.Kps!=null && hidden.Total!=null && hidden.Keys[0].Y==315 && hidden.Keys[12].Y==261 && hidden.Keys.Take(16).All(k=>k.Width==50),"obsolete footer hiding cannot disable KPS / Total or change sixteen-key row offsets");
             var twelve=new KeyViewerContents.KeyViewer();twelve.Build(12);
             Check(twelve.Keys.Take(12).All(k=>k.Width==50 && k.Height==50) && twelve.Kps.Width==104 && twelve.Total.Width==104 && twelve.Total.X==324,"twelve-key inputs are square with two-column KPS / Total cells");
             Check(KeyViewerContents.KeyViewer.BackSequence12.Select((index,i)=>twelve.Keys[index].X==108+54*i && twelve.Keys[index].Y==225 && ReferenceEquals(twelve.Keys[index].RainPool,twelve.Keys[i+2].RainPool)).All(x=>x),"twelve-key lower row matches the reference and shares the matching upper lane");
