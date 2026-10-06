@@ -1,0 +1,49 @@
+Tests/Run-LayoutEditorTests.ps1
+  s_350c85cc78e176::t_a221c4b4b888a7 1-57
+FEEDBACK_0.4.7_VALIDATION.md
+  s_350c85cc78e176::t_a221c4b4b888a7 1-40
+SettingsWindow.cs
+  s_350c85cc78e176::t_a221c4b4b888a7 48,152
+Tests/OverlayGroupUiHarness.cs
+  s_350c85cc78e176::t_a221c4b4b888a7 12,16,21-27,32,34,36,49,52-57,60,63,65-66,80,98-103,109-113,116-139
+KeyViewerContents/KeyViewer.cs
+  s_350c85cc78e176::t_a221c4b4b888a7 85
+Tests/Run-OverlayGroupUiTests.ps1
+  s_350c85cc78e176::t_a221c4b4b888a7 17
+Main.cs
+  s_350c85cc78e176::t_a221c4b4b888a7 37,52,67,72,87
+UiInputBlock.cs
+  s_350c85cc78e176::t_a221c4b4b888a7 12
+LayoutEditorController.cs
+  s_350c85cc78e176::t_a221c4b4b888a7 1-93
+UiComponents.cs
+  s_350c85cc78e176::t_a221c4b4b888a7 47
+LayoutEditSession.cs
+  s_350c85cc78e176::t_a221c4b4b888a7 1-35
+Info.json
+  s_350c85cc78e176::t_a221c4b4b888a7 5
+README.md
+  s_350c85cc78e176::t_a221c4b4b888a7 7,13,24-25
+SettingsWindow.Overlay.cs
+  s_350c85cc78e176::t_a221c4b4b888a7 14,29-30,33,37,42
+GhostifyOverlay.csproj
+  s_350c85cc78e176::t_a221c4b4b888a7 106-107
+Tests/Run-OverlayGroupTests.ps1
+  s_350c85cc78e176::t_a221c4b4b888a7 58-59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7200e3d8f0c9ec1e6c15211b093a71919ffb0944",
+  "prompts": {},
+  "sessions": {
+    "s_350c85cc78e176": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-0.4.7-layout",
+        "model": "gpt-6"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
