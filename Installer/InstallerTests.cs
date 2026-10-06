@@ -15,7 +15,7 @@ namespace GhostifySetup {
         private static void Check(bool value, string label) { if (!value) throw new Exception("FAIL " + label); Passed.Add("PASS " + label); }
         private static bool Fails(Action action) { try { action(); return false; } catch { return true; } }
         private static string Config(string game) { return Path.Combine(game, InstallerEngine.GameName + "_Data", "Managed", "UnityModManager", "Params.xml"); }
-        private static string Target(string game) { return Path.Combine(game, "Mods", InstallerEngine.ModId); }
+        private static string Target(string game) { return Path.Combine(game, "Mods", InstallerEngine.ModFolder); }
         public static string Game(string name) {
             string game = Path.Combine(_root, name + " 한글 경로"); Directory.CreateDirectory(game);
             File.WriteAllText(Path.Combine(game, InstallerEngine.GameName + ".exe"), "fixture");
@@ -110,6 +110,35 @@ namespace GhostifySetup {
                 var runningEngine=new InstallerEngine(bytes,manifest,Path.Combine(root,"Backups"));
                 Check(Fails(() => runningEngine.Install(running)) && !Directory.Exists(Target(running)), "a running game blocks installation before writes"); process.WaitForExit();
             }
+            foreach(int failAt in new[]{0,35,75,95}) {
+                string legacyGame=Game("legacy-"+failAt), legacy=Path.Combine(legacyGame,"Mods",InstallerEngine.ModId);
+                Directory.CreateDirectory(Path.Combine(legacy,"UserData","nested"));
+                File.WriteAllText(Path.Combine(legacy,"Info.json"),"{\"Id\":\"DonQuixoteOverlay\",\"Version\":\"0.4.4\"}");
+                File.WriteAllText(Path.Combine(legacy,"old.dll"),"old mod bytes");
+                File.WriteAllText(Path.Combine(legacy,"UserData","settings.json"),"saved settings");
+                File.WriteAllText(Path.Combine(legacy,"UserData","nested","counts.json.bak"),"saved nested backup");
+                var before=Snapshot(legacyGame);
+                var inspection=engine.Inspect(legacyGame);
+                Check(inspection.IsUpdate && inspection.Target==Target(legacyGame) && inspection.PreviousTarget==legacy,"legacy folder is recognized read-only: "+failAt);
+                Check(Same(before,legacyGame),"legacy inspection leaves all files unchanged: "+failAt);
+                if(failAt==0) {
+                    var result=engine.Install(legacyGame);
+                    Check(result.Success && !Directory.Exists(legacy) && Directory.Exists(Target(legacyGame)),"legacy update leaves only the Ghostify Overlay folder");
+                    Check(File.ReadAllText(Path.Combine(Target(legacyGame),"UserData","settings.json"))=="saved settings" && File.ReadAllText(Path.Combine(Target(legacyGame),"UserData","nested","counts.json.bak"))=="saved nested backup","folder migration preserves user files and nested backups byte-for-byte");
+                    Check(File.ReadAllText(Path.Combine(result.Backup,"previous-mod","old.dll"))=="old mod bytes","migration backs up the entire previous mod");
+                    Check(engine.Inspect(legacyGame).PreviousTarget==Target(legacyGame),"subsequent updates use the new folder");
+                    Directory.CreateDirectory(legacy);File.WriteAllText(Path.Combine(legacy,"Info.json"),"{\"Id\":\"DonQuixoteOverlay\"}");
+                    var duplicated=Snapshot(legacyGame);
+                    Check(Fails(()=>engine.Install(legacyGame)) && Same(duplicated,legacyGame),"duplicate old and new folders are rejected without overwriting either");
+                }else {
+                    Check(Fails(()=>engine.Install(legacyGame,(p,s)=>{if(p==failAt)throw new IOException("migration fixture failure");})),"migration failure is reported: "+failAt);
+                    Check(!Directory.Exists(Target(legacyGame)) && Same(before,legacyGame),"migration rollback restores original folder, bytes and UMM: "+failAt);
+                }
+            }
+            string foreignLegacy=Game("foreign-legacy"), foreignPath=Path.Combine(foreignLegacy,"Mods",InstallerEngine.ModId);
+            Directory.CreateDirectory(foreignPath);File.WriteAllText(Path.Combine(foreignPath,"Info.json"),"{\"Id\":\"Other\"}");
+            var foreignBefore=Snapshot(foreignLegacy);
+            Check(Fails(()=>engine.Install(foreignLegacy)) && Same(foreignBefore,foreignLegacy),"an unrelated mod in the legacy folder cannot be moved or overwritten");
             return Passed.ToArray();
         }
     }

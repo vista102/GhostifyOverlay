@@ -25,7 +25,7 @@ namespace GhostifySetup {
         public string AssemblySha256 { get; set; }
     }
     public sealed class GameState {
-        public string GameDir, ModsDir, Target, ParamsPath, ExistingVersion, UmmVersion;
+        public string GameDir, ModsDir, Target, PreviousTarget, ParamsPath, ExistingVersion, UmmVersion;
         public bool IsUpdate, VerifiedGameBuild;
         public string Compatibility;
     }
@@ -33,6 +33,7 @@ namespace GhostifySetup {
 
     public sealed class InstallerEngine {
         public const string ModId = "DonQuixoteOverlay";
+        public const string ModFolder = "Ghostify Overlay";
         public const string GameName = "A Dance of Fire and Ice";
         private readonly byte[] _payload;
         private readonly PackageManifest _manifest;
@@ -112,16 +113,18 @@ namespace GhostifySetup {
             if (!File.Exists(ummDll)) throw new FileNotFoundException("Unity Mod Manager를 먼저 설치해 주세요.");
             Version ummVersion = AssemblyName.GetAssemblyName(ummDll).Version;
             if (ummVersion < new Version(0, 33, 0)) throw new InvalidDataException("Unity Mod Manager 0.33.0 이상이 필요합니다.");
-            string mods = Child(root, "Mods"), target = Child(mods, ModId), config = Child(umm, "Params.xml");
-            NoRedirect(mods); SafeTree(target); NoRedirect(config);
-            if (File.Exists(target)) throw new IOException("모드 설치 경로가 폴더가 아닙니다.");
-            var result = new GameState { GameDir = root, ModsDir = mods, Target = target, ParamsPath = config, UmmVersion = ummVersion.ToString(), IsUpdate = Directory.Exists(target) };
+            string mods = Child(root, "Mods"), target = Child(mods, ModFolder), legacy = Child(mods, ModId), config = Child(umm, "Params.xml");
+            NoRedirect(mods); SafeTree(target); SafeTree(legacy); NoRedirect(config);
+            if (File.Exists(target) || File.Exists(legacy)) throw new IOException("모드 설치 경로가 폴더가 아닙니다.");
+            if (Directory.Exists(target) && Directory.Exists(legacy)) throw new IOException("Ghostify Overlay의 새 폴더와 이전 폴더가 모두 있습니다. 하나를 백업해 옮긴 뒤 다시 설치해 주세요.");
+            string previousTarget=Directory.Exists(legacy)?legacy:target;
+            var result = new GameState { GameDir = root, ModsDir = mods, Target = target, PreviousTarget=previousTarget, ParamsPath = config, UmmVersion = ummVersion.ToString(), IsUpdate = Directory.Exists(previousTarget) };
             string gameAssembly = Child(managed, "Assembly-CSharp.dll"); NoRedirect(gameAssembly);
             result.VerifiedGameBuild = File.Exists(gameAssembly) && HashFile(gameAssembly).Equals(_manifest.GameCompatibility.AssemblySha256, StringComparison.OrdinalIgnoreCase);
             result.Compatibility = _manifest.GameCompatibility.GameVersion + " " + _manifest.GameCompatibility.Branch
                 + (result.VerifiedGameBuild ? " · 빌드 확인 완료" : "용 · 현재 빌드 미검증");
             if (result.IsUpdate) {
-                string info = Child(target, "Info.json");
+                string info = Child(previousTarget, "Info.json");
                 if (!File.Exists(info)) throw new InvalidDataException("기존 모드 폴더를 확인해 주세요. 다른 파일을 덮어쓰지 않습니다.");
                 var previous = JsonFile(info);
                 if (!previous.ContainsKey("Id") || (string)previous["Id"] != ModId) throw new InvalidDataException("설치 경로에 다른 모드가 있습니다.");
@@ -176,7 +179,7 @@ namespace GhostifySetup {
         private static Dictionary<string, string> UserHashes(string target) {
             string data = Child(target, "UserData"); SafeTree(data);
             var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            if (Directory.Exists(data)) foreach (string file in Directory.GetFiles(data, "*", SearchOption.AllDirectories)) result.Add(file, HashFile(file));
+            if (Directory.Exists(data)) foreach (string file in Directory.GetFiles(data, "*", SearchOption.AllDirectories)) result.Add(file.Substring(data.Length), HashFile(file));
             return result;
         }
         private static void VerifyUsers(Dictionary<string, string> before, string target) {
@@ -197,19 +200,24 @@ namespace GhostifySetup {
                 state = Inspect(gameDir);
                 byte[] oldParams = File.Exists(state.ParamsPath) ? File.ReadAllBytes(state.ParamsPath) : null;
                 var document = LoadParams(state.ParamsPath);
-                var users = UserHashes(state.Target);
+                var users = UserHashes(state.PreviousTarget);
                 string stage = Child(state.ModsDir, ".GhostifyOverlay-stage-" + Guid.NewGuid().ToString("N"));
                 string backup = Child(_backupRoot, DateTime.Now.ToString("yyyyMMdd-HHmmss") + "-" + Guid.NewGuid().ToString("N").Substring(0, 8));
-                var touched = new List<string>(); bool paramsWritten = false;
+                var touched = new List<string>(); bool paramsWritten = false, migrated = false;
                 byte[] writtenParams = null;
                 try {
                     report(5, "설치 파일을 확인하고 있습니다.");
                     Directory.CreateDirectory(state.ModsDir); Directory.CreateDirectory(stage); Extract(stage);
                     NoRedirect(_backupRoot); Directory.CreateDirectory(backup);
                     if (oldParams != null) File.WriteAllBytes(Child(backup, "Params.xml"), oldParams);
-                    if (state.IsUpdate) CopyTree(state.Target, Child(backup, "previous-mod"));
+                    if (state.IsUpdate) CopyTree(state.PreviousTarget, Child(backup, "previous-mod"));
                     report(35, "기존 설정과 파일을 백업했습니다.");
                     if (_gameRunning()) throw new InvalidOperationException("얼불춤을 종료한 뒤 다시 설치해 주세요.");
+                    if (state.PreviousTarget != state.Target) {
+                        // Both absolute paths were resolved under this game's Mods
+                        // directory, checked for redirects, and the old Info ID verified.
+                        Directory.Move(state.PreviousTarget,state.Target); migrated=true;
+                    }
                     Directory.CreateDirectory(state.Target);
                     foreach (var file in _manifest.Files) {
                         string output = Child(state.Target, file.Path); NoRedirect(output);
@@ -254,7 +262,8 @@ namespace GhostifySetup {
                             if (HashFile(state.ParamsPath) != Hash(writtenParams)) throw new IOException("다른 프로그램이 모드 매니저 설정을 변경했습니다.");
                             if (oldParams != null) AtomicBytes(state.ParamsPath, oldParams); else File.Delete(state.ParamsPath);
                         }
-                        VerifyUsers(users, state.Target);
+                        if(migrated) { SafeTree(state.Target); NoRedirect(state.PreviousTarget); Directory.Move(state.Target,state.PreviousTarget); }
+                        VerifyUsers(users, state.PreviousTarget);
                     } catch (Exception rollback) { throw new IOException("설치가 중단되었고 일부 파일을 복원하지 못했습니다. 백업: " + backup + "\n" + failure.Message + "\n" + rollback.Message, failure); }
                     throw new IOException("설치를 완료하지 못했습니다. 변경한 파일은 복원했습니다.\n" + failure.Message + "\n백업: " + backup, failure);
                 } finally {

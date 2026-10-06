@@ -10,18 +10,20 @@
 
 **지원 환경:** Windows 10/11, 얼불춤 3.4.0 alpha(build 25590222), Unity Mod Manager 0.33.0 이상, .NET Framework 4.8.
 
-1. [최신 릴리스](https://github.com/vista102/GhostifyOverlay/releases/latest)에서 `GhostifyOverlay-Setup-0.4.4.exe`를 다운로드합니다.
+1. [최신 릴리스](https://github.com/vista102/GhostifyOverlay/releases/latest)에서 `GhostifyOverlay-Setup-0.4.5.exe`를 다운로드합니다.
 2. 게임을 종료한 뒤 EXE를 실행하고, 게임 폴더를 확인해 **설치하기 / 업데이트**를 누릅니다.
 3. 게임을 실행하고 Unity Mod Manager에서 **Ghostify Overlay**를 활성화합니다.
 
 업데이트 시 기존 설정·키 배치·누적 기록은 유지됩니다.
+모드는 `Mods/Ghostify Overlay`에 설치하며, 이전 `DonQuixoteOverlay` 폴더는 EXE 업데이트 시 자동 이전합니다.
 
 ## 사용 방법
 
 **Alt+D**로 설정창을 열고, **Esc** 또는 우측 상단 **X**로 닫습니다.
 
-- **오버레이:** 표시할 정보를 선택하고 글자·수치·시도 횟수·진행 막대 색상을 조절합니다.
+- **오버레이:** 표시할 정보를 선택하고 수치·시도 횟수·진행 막대 색상을 조절합니다. 글자·곡 정보·타이밍은 흰색으로 고정하며, Pitch는 백분율, FPS는 초당 10회 갱신합니다.
 - **키뷰어:** 손·발 배치를 선택한 뒤 미리보기의 키를 클릭합니다. 오른쪽 메뉴에서 입력 키·표시 이름·고스트 키를 설정합니다. 레인과 KPS·Total의 색상도 따로 조절할 수 있습니다.
+- **키 간격:** 0~30으로 조절합니다. 기본값 4는 기존 배치를 유지하며 키·레인의 크기는 바뀌지 않습니다.
 - **이펙트:** **이펙트 비활성화**를 켠 뒤 제거할 효과와 타일 제한을 선택합니다.
 
 색상은 HEX 코드로 입력하거나, 입력칸 옆의 색상 네모를 눌러 팔레트에서 선택합니다.

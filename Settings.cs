@@ -57,7 +57,6 @@ namespace DonQuixoteOverlay {
         public bool ShowTimingRanges = true;
         public bool ShowFps = true;
         public string Font = "Gmarket Sans";
-        [JsonConverter(typeof(KeyViewerContents.KeyViewerColorConverter))] public Color TextColor=Color.white;
         [JsonConverter(typeof(KeyViewerContents.KeyViewerColorConverter))] public Color ValueColor=DQColors.KeyAccent;
         [JsonConverter(typeof(KeyViewerContents.KeyViewerColorConverter))] public Color ProgressBarColor=DQColors.KeyAccent;
         [JsonConverter(typeof(KeyViewerContents.KeyViewerColorConverter))] public Color AttemptsColor=Color.white;

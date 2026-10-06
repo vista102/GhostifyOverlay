@@ -15,6 +15,7 @@ namespace DonQuixoteOverlay {
         private Button _keyBind, _ghostBind;
         private GameObject _ghostDetail;
         private int _selectedKey=-1, _previewSignature=-1;
+        private float _previewGap=float.NaN;
         private void BuildKeyLayoutEditor() {
             Heading("키 배치 편집");
             Label("아래 키를 선택하면 오른쪽에서 입력 키·표시 이름·고스트 키를 변경할 수 있습니다.",44).textWrappingMode=TextWrappingModes.Normal;
@@ -56,14 +57,17 @@ namespace DonQuixoteOverlay {
             if(_keyEditorRoot==null)return;
             var settings=KeyViewerStore.Settings;
             int signature=(int)settings.KeyViewerStyle+10*(int)settings.FootKeyViewerStyle+(settings.ShowTotalKpsKey16?100:0);
-            if(signature!=_previewSignature) {
+            if(signature!=_previewSignature || settings.KeyGap!=_previewGap) {
                 _previewSignature=signature;
+                _previewGap=settings.KeyGap;
                 if(_keyPreview!=null){_keyPreview.SetActive(false);Destroy(_keyPreview);}
                 _previewKeys.Clear();
                 _keyPreview=DarkNeonUi.Rect("Layout preview",_keyEditorRoot,new Vector2(.02f,.08f),new Vector2(.60f,.86f));
-                var slots=KeyViewerGeometry.Hands(settings.KeyViewerStyle,settings.ShowTotalKpsKey16);
-                slots.AddRange(KeyViewerGeometry.Feet(FootSize()));
+                var slots=KeyViewerGeometry.HandsWithGap(settings.KeyViewerStyle,settings.ShowTotalKpsKey16,settings.KeyGap);
+                slots.AddRange(KeyViewerGeometry.FeetWithGap(FootSize(),settings.KeyGap));
                 float scale=FootSize()==0?1.06f:.68f;
+                float extent=1;foreach(var slot in slots)extent=Math.Max(extent,slot.X+slot.Width);
+                scale=Math.Min(scale,480f/extent);
                 foreach(var slot in slots) {
                     int selected=slot.Index;
                     var button=DarkNeonUi.Button("",_keyPreview.transform,Vector2.zero,Vector2.zero,UiButtonKind.Secondary,()=>{StopCapture();_selectedKey=selected;RefreshKeyEditor();});

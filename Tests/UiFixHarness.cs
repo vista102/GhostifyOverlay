@@ -61,7 +61,7 @@ namespace DonQuixoteOverlay.KeyViewerContents {
         public float X,Y,Width,Height;
         public object RainPool = new object();
     }
-    public class KeyViewerSetting { public float YLocation=200; public bool ShowTotalKpsKey16=true; public KeyviewerStyle KeyViewerStyle=KeyviewerStyle.Key16; }
+    public class KeyViewerSetting { public float YLocation=200,KeyGap=4; public bool ShowTotalKpsKey16=true; public KeyviewerStyle KeyViewerStyle=KeyviewerStyle.Key16; }
     public sealed class KeyViewerUpdater { public bool enabled; }
     public partial class KeyViewer {
         public const int HandOutIndex=20;
@@ -112,6 +112,14 @@ namespace DonQuixoteOverlay {
             viewer.Feet(16);
             Check(viewer.Keys.Skip(20).All(k=>k.Width==30 && k.Height==30) && viewer.Keys.Skip(20).GroupBy(k=>k.Y).All(g=>g.Select(k=>k.X).OrderBy(x=>x).SequenceEqual(Enumerable.Range(0,8).Select(i=>432f+34*i))),"sixteen foot cells retain the source 30x30 frames and spacing");
             Check(KeyViewerContents.KeyViewerMetrics.RainWidth(1)==50 && KeyViewerContents.KeyViewerMetrics.RainWidth(2)==40,"the two retained rain widths keep the source slot semantics");
+            KeyViewerContents.KeyViewer.Settings.KeyGap=12;
+            try {
+                var spaced=new KeyViewerContents.KeyViewer();spaced.Build(16);
+                Check(spaced.Keys.Take(8).Select((k,i)=>k.X==62*i && k.Width==50 && k.Height==50).All(x=>x) && spaced.Keys[0].Y-spaced.Keys[12].Y==62,"production builder applies a saved gap to both axes without growing hand keys");
+                Check(KeyViewerContents.KeyViewer.BackSequence16.Select((index,i)=>ReferenceEquals(spaced.Keys[index].RainPool,spaced.Keys[i].RainPool) && spaced.Keys[index].X==spaced.Keys[i].X).All(x=>x),"nondefault spacing preserves the production lower-row lane mapping");
+                spaced.Feet(16);
+                Check(spaced.Keys.Skip(20).All(k=>k.Width==30 && k.Height==30) && spaced.Keys.Skip(20).GroupBy(k=>k.Y).All(g=>g.Select(k=>k.X).OrderBy(x=>x).SequenceEqual(Enumerable.Range(0,8).Select(i=>496f+42*i))),"production builder also spaces foot keys without growing their frames");
+            }finally { KeyViewerContents.KeyViewer.Settings.KeyGap=4; }
         }
         private static void Shadow() {
             var font=new TMPro.TMP_FontAsset();font.material.Keywords.Add("UNDERLAY_INNER");

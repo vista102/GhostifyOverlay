@@ -39,7 +39,7 @@ namespace DonQuixoteOverlay.KeyViewerContents {
 namespace DonQuixoteOverlay {
     internal enum UiButtonKind { Secondary }
     internal static class DQColors {internal static UnityEngine.Color Text=>UnityEngine.Color.white;}
-    public sealed class OverlaySettings {public UnityEngine.Color TextColor=UnityEngine.Color.white,ValueColor=new UnityEngine.Color("#FFC939FF"),AttemptsColor=UnityEngine.Color.white,ProgressBarColor=new UnityEngine.Color("#FFC939FF");}
+    public sealed class OverlaySettings {public UnityEngine.Color ValueColor=new UnityEngine.Color("#FFC939FF"),AttemptsColor=UnityEngine.Color.white,ProgressBarColor=new UnityEngine.Color("#FFC939FF");}
     internal sealed class Settings {public OverlaySettings Overlay=new OverlaySettings();}
     internal static class Main {internal static Settings Settings=new Settings();internal static int Saves;internal static void RequestSave(){Saves++;}}
     internal sealed class OverlayController {internal static OverlayController Instance=new OverlayController();internal int Applied;internal void ApplySettings(){Applied++;}}
@@ -72,24 +72,24 @@ namespace DonQuixoteOverlay {
         public static string[] TestColorRows() {
             var results=new List<string>();Main.Settings=new Settings();Main.Saves=0;OverlayController.Instance.Applied=0;
             var window=new SettingsWindow();window.BuildOverlayColors();window.RefreshRows();
-            Check(results,window.rows.Count==4,"actual color UI contains shared text / value, independent attempts and progress bar only");
+            Check(results,window.rows.Count==3,"actual color UI contains values, attempts and progress bar; fixed white labels have no color control");
             var row=window.rows[0];var rect=(UnityEngine.RectTransform)row.Button.transform;
             Check(results,rect.sizeDelta.x==32 && rect.sizeDelta.y==32 && rect.anchorMin.x==1 && rect.anchorMax.x==1 && rect.anchoredPosition.x==-4 && row.Input.transform.offsetMax.x==-44,"actual palette swatch is square and sits eight units directly beside HEX");
             Check(results,window.rows.All(r=>r.Button.Caption==""),"palette buttons use color squares without separate Palette labels");
             row.Input.onEndEdit.Invoke("#12345680");
-            Check(results,Main.Settings.Overlay.TextColor.Hex=="#12345680" && Main.Settings.Overlay.ValueColor.Hex=="#FFC939FF" && Main.Saves==1 && OverlayController.Instance.Applied==1,"HEX edits apply only the selected color and request save / overlay refresh");
+            Check(results,Main.Settings.Overlay.ValueColor.Hex=="#12345680" && Main.Settings.Overlay.AttemptsColor.Hex=="#FFFFFFFF" && Main.Saves==1 && OverlayController.Instance.Applied==1,"HEX edits apply only the selected color and request save / overlay refresh");
             Check(results,row.Input.text=="#12345680" && row.Button.Root.Image.color.Hex=="#12345680","HEX input and adjacent swatch refresh together including alpha");
             row.Input.onEndEdit.Invoke("invalid");
-            Check(results,Main.Saves==1 && row.Input.text=="#12345680" && Main.Settings.Overlay.TextColor.Hex=="#12345680","invalid HEX restores the previous display without saving");
+            Check(results,Main.Saves==1 && row.Input.text=="#12345680" && Main.Settings.Overlay.ValueColor.Hex=="#12345680","invalid HEX restores the previous display without saving");
             row.Button.Click();var first=ColorPalettePanel.Last;
             Check(results,first.Draft.Hex=="#12345680" && window.stopCapture==1,"clicking the actual swatch opens its palette with the saved color");
             first.Draft=new UnityEngine.Color("#ABCDEF80");first.Cancel();
-            Check(results,Main.Settings.Overlay.TextColor.Hex=="#12345680" && Main.Saves==1,"palette draft and cancellation do not change or save the color");
+            Check(results,Main.Settings.Overlay.ValueColor.Hex=="#12345680" && Main.Saves==1,"palette draft and cancellation do not change or save the color");
             row.Button.Click();var second=ColorPalettePanel.Last;second.Apply(new UnityEngine.Color("#ABCDEF80"));
-            Check(results,first.Cancelled && !ReferenceEquals(first,second) && Main.Settings.Overlay.TextColor.Hex=="#ABCDEF80" && Main.Saves==2,"opening a new palette closes the previous one and application saves the new color");
+            Check(results,first.Cancelled && !ReferenceEquals(first,second) && Main.Settings.Overlay.ValueColor.Hex=="#ABCDEF80" && Main.Saves==2,"opening a new palette closes the previous one and application saves the new color");
             Check(results,row.Input.text=="#ABCDEF80" && row.Button.Root.Image.color.Hex=="#ABCDEF80","palette application synchronizes HEX and its swatch");
-            window.rows[1].Input.onEndEdit.Invoke("#FF0000FF");window.rows[2].Input.onEndEdit.Invoke("#00FF00FF");window.rows[3].Input.onEndEdit.Invoke("#0000FFFF");
-            Check(results,Main.Settings.Overlay.ValueColor.Hex=="#FF0000FF" && Main.Settings.Overlay.AttemptsColor.Hex=="#00FF00FF" && Main.Settings.Overlay.ProgressBarColor.Hex=="#0000FFFF" && Main.Settings.Overlay.TextColor.Hex=="#ABCDEF80","actual row callbacks keep shared values, attempts and progress bar independent");
+            window.rows[1].Input.onEndEdit.Invoke("#00FF00FF");window.rows[2].Input.onEndEdit.Invoke("#0000FFFF");
+            Check(results,Main.Settings.Overlay.ValueColor.Hex=="#ABCDEF80" && Main.Settings.Overlay.AttemptsColor.Hex=="#00FF00FF" && Main.Settings.Overlay.ProgressBarColor.Hex=="#0000FFFF","actual row callbacks keep shared values, attempts and progress bar independent");
             return results.ToArray();
         }
     }

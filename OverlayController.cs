@@ -449,6 +449,10 @@ namespace DonQuixoteOverlay {
             }
         }
 
+        internal static string FormatPitch(int hundredthsOfPercent) { return (hundredthsOfPercent / 100f).ToString("0.##") + "%"; }
+        internal static string FormatAttempts(int attempt, int practice, int full, int fullPractice) {
+            return "Attempt " + attempt + "\nPrac Attempt " + practice + "\nFull Attempt " + full + "\nFull Prac Attempt " + fullPractice;
+        }
         private void RefreshStatusText(OverlaySettings settings, scrController controller, float progress, float accuracy, float xAccuracy) {
             int flags = (settings.ShowProgress ? 1 : 0) | (settings.ShowAccuracy ? 2 : 0) | (settings.ShowXAccuracy ? 4 : 0)
                 | (settings.ShowMusicTime ? 8 : 0) | (settings.ShowMapTime ? 16 : 0);
@@ -474,7 +478,7 @@ namespace DonQuixoteOverlay {
             int tbpmKey = settings.ShowBpm ? Mathf.RoundToInt(tbpm * 100f) : 0;
             int cbpmKey = settings.ShowBpm ? Mathf.RoundToInt(cbpm * 100f) : 0;
             int kpsKey = settings.ShowTheoreticalKps ? Mathf.RoundToInt(cbpm / 60f * 100f) : 0;
-            int pitchKey = Mathf.RoundToInt(pitch * 100f);
+            int pitchKey = Mathf.RoundToInt(pitch * 10000f);
             int fpsKey = _fps.HasSample ? _fps.Value : -1;
             if (_lastBpmFlags == flags && _lastTbpmKey == tbpmKey && _lastCbpmKey == cbpmKey && _lastKpsKey == kpsKey && _lastPitchKey == pitchKey && _lastFps == fpsKey) return;
             _lastBpmFlags = flags; _lastTbpmKey = tbpmKey; _lastCbpmKey = cbpmKey; _lastKpsKey = kpsKey; _lastPitchKey = pitchKey;
@@ -482,7 +486,7 @@ namespace DonQuixoteOverlay {
             string accent = "<color=" + Hex(settings.ValueColor) + ">";
             _bpm.text = (settings.ShowBpm ? "TBPM | " + accent + (tbpmKey / 100f).ToString("0.##") + "</color>\nCBPM | " + accent + (cbpmKey / 100f).ToString("0.##") + "</color>\n" : "")
                 + (settings.ShowTheoreticalKps ? "KPS | " + accent + (kpsKey / 100f).ToString("0.00") + "</color>\n" : "")
-                + "Pitch | " + accent + (pitchKey / 100f).ToString("0.00") + "x</color>"
+                + "Pitch | " + accent + FormatPitch(pitchKey) + "</color>"
                 + (settings.ShowFps ? "\nFPS | " + accent + (fpsKey < 0 ? "—" : fpsKey.ToString()) + "</color>" : "");
         }
 
@@ -500,7 +504,7 @@ namespace DonQuixoteOverlay {
             int full = AttemptTracker.FullAttempts, fullProgress = AttemptTracker.FullProgressAttempts;
             if (_lastAttempt == attempt && _lastProgressAttempt == progress && _lastFullAttempt == full && _lastFullProgressAttempt == fullProgress) return;
             _lastAttempt = attempt; _lastProgressAttempt = progress; _lastFullAttempt = full; _lastFullProgressAttempt = fullProgress;
-            _attempts.text = "Attempt " + attempt + "\nPrg Attempt " + progress + "\nFull Attempt " + full + "\nFull Prg Attempt " + fullProgress;
+            _attempts.text = FormatAttempts(attempt, progress, full, fullProgress);
         }
 
         private static void GetMusicTimes(out int current, out int total) {
@@ -604,12 +608,12 @@ namespace DonQuixoteOverlay {
         public void ApplySettings() {
             var settings=Main.Settings.Overlay;
             if (_progressFill != null) _progressFill.GetComponent<Image>().color = settings.ProgressBarColor;
-            if(_status!=null)_status.color=settings.TextColor;
-            if(_comboText!=null)_comboText.color=settings.TextColor;
-            if(_bpm!=null)_bpm.color=settings.TextColor;
+            if(_status!=null)_status.color=Color.white;
+            if(_comboText!=null)_comboText.color=Color.white;
+            if(_bpm!=null)_bpm.color=Color.white;
             if(_attempts!=null)_attempts.color=settings.AttemptsColor;
-            if(_songInfo!=null)_songInfo.color=settings.TextColor;
-            if(_timingRanges!=null)_timingRanges.color=settings.TextColor;
+            if(_songInfo!=null)_songInfo.color=Color.white;
+            if(_timingRanges!=null)_timingRanges.color=Color.white;
             _statusText.ValueHex=Hex(settings.ValueColor).TrimStart('#');_statusText.Invalidate();
             _lastCombo=_lastMinus=_lastX=_lastPlus=int.MinValue;_lastBpmFlags=-1;
             _judgmentColorsReady = false;

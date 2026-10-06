@@ -6,7 +6,7 @@ public partial class KeyViewer {
     private void Initialize1KeyViewer() => InitializeHandLayout();
     private void Initialize3KeyViewer() => InitializeHandLayout();
     private void InitializeHandLayout() {
-        var slots=KeyViewerGeometry.Hands(Settings.KeyViewerStyle,Settings.ShowTotalKpsKey16);
+        var slots=KeyViewerGeometry.HandsWithGap(Settings.KeyViewerStyle,Settings.ShowTotalKpsKey16,Settings.KeyGap);
         Kps=Total=null;
         foreach(var slot in slots) {
             var key=CreateKey(slot.Index,slot.X,slot.Y+Settings.YLocation,slot.Width,slot.RainRow,slot.Slim);
@@ -17,6 +17,6 @@ public partial class KeyViewer {
         _pressTimes=Kps!=null?new ConcurrentQueue<long>():null;
     }
     private void InitializeFootKeyViewer(int size) {
-        foreach(var slot in KeyViewerGeometry.Feet(size))Keys[slot.Index]=CreateKey(slot.Index,slot.X,slot.Y,slot.Width,-1,true,false);
+        foreach(var slot in KeyViewerGeometry.FeetWithGap(size,Settings.KeyGap))Keys[slot.Index]=CreateKey(slot.Index,slot.X,slot.Y,slot.Width,-1,true,false);
     }
 }

@@ -8,7 +8,7 @@ Windows 10/11용 단일 EXE입니다. .NET Framework 4.8과 **Unity Mod Manager 
 
 기존 Ghostify 설정·키 색상·배치·누적 기록은 그대로 유지합니다. 변경 전 모드 전체와 Unity Mod Manager 설정은 `%LocalAppData%\GhostifyOverlay\Backups`에 보관합니다. 성공 화면의 **백업 폴더 열기**로 확인할 수 있습니다. 실패하면 이번 설치가 바꾼 파일과 모드 매니저 설정을 복원합니다. 원본 DonQuixote는 삭제하지 않고 중복 실행을 막기 위해 UMM에서 비활성화합니다. 다른 모드 설정은 유지합니다.
 
-UMM ID/기존 설치 폴더 `DonQuixoteOverlay`는 호환을 위해 유지합니다. 게임 파일이나 Unity Mod Manager DLL은 EXE에 포함하지 않습니다. 배포 모드 14개 파일만 묶고 파일마다 SHA256을 확인합니다. 무결성 해시는 다운로드한 `SHA256SUMS.txt`와 비교할 수 있습니다. EXE에는 코드 서명 인증서가 적용되어 있지 않습니다.
+설치 폴더는 `Mods/Ghostify Overlay`입니다. 이전 `DonQuixoteOverlay` 폴더는 전체 백업 후 이름을 변경하며 설정·기록·중첩 백업을 유지합니다. 실패하면 원래 폴더와 UMM 설정을 복원합니다. 두 폴더가 동시에 있으면 어느 쪽도 덮어쓰지 않고 안내합니다. UMM ID `DonQuixoteOverlay`는 기존 활성화·단축키 설정 호환을 위해 유지합니다. 게임 파일이나 Unity Mod Manager DLL은 EXE에 포함하지 않습니다. 배포 모드 14개 파일만 묶고 파일마다 SHA256을 확인합니다. 무결성 해시는 다운로드한 `SHA256SUMS.txt`와 비교할 수 있습니다. EXE에는 코드 서명 인증서가 적용되어 있지 않습니다.
 
 ## 이미지와 아이콘
 
@@ -28,7 +28,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File Installer\Run-InstallerT
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File Installer\Run-InstallerUiTests.ps1
 ```
 
-`dist/GhostifyOverlay-Setup-<버전>.exe`, 모드 ZIP, `SHA256SUMS.txt`를 생성합니다. 검사에서는 실제 InstallerEngine을 컴파일해 새 설치·업데이트·사용자 파일 8개 보존·UMM 보존·두 단계 복원·손상/누락/중복/경로 탈출 ZIP·실행 중 게임 차단 등을 35개 항목으로 확인하고, 배포 EXE 자체의 설치도 별도 임시 게임 폴더에서 실행합니다. 실제 게임 실행과 UAC 사용자 클릭은 이 자동 검사에 포함하지 않습니다.
+`dist/GhostifyOverlay-Setup-<버전>.exe`, 모드 ZIP, `SHA256SUMS.txt`를 생성합니다. 검사에서는 실제 InstallerEngine을 컴파일해 새 설치·업데이트·사용자 파일 보존·UMM 보존·폴더 이전 및 실패 복구·손상/누락/중복/경로 탈출 ZIP·실행 중 게임 차단 등을 55개 항목으로 확인하고, 배포 EXE 자체의 설치도 별도 임시 게임 폴더에서 실행합니다. 실제 게임 실행과 UAC 사용자 클릭은 이 자동 검사에 포함하지 않습니다.
 
 UI 검사 38개는 실제 SetupWindow와 Windows Forms 메시지 루프를 사용합니다. 정상 종료·X·Esc 및 반복 Dispose, 글꼴 초기화 실패, 설치 중 종료 방지, 버튼 상태별 네 모서리, GDI/창 핸들과 글꼴 메모리 해제를 검사합니다. 0.2.10 배포 EXE의 실제 화면에서도 찾기·폴더 선택·취소·키보드 포커스·X·Esc·Alt+F4 종료를 확인했습니다.
 

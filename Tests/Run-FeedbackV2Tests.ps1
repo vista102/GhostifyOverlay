@@ -23,12 +23,12 @@ Check ([Math]::Abs((Call (T 'TileProgress') 'Fraction' @(51,102))-.5) -lt .00001
 foreach($count in @(0,1,2)){Check ((Call (T 'TileProgress') 'Fraction' @(1,$count)) -eq 0) ('empty and degenerate maps have safe progress: '+$count)}
 $fps=[Activator]::CreateInstance((T 'OverlayFpsCounter'),$true)
 Check (!(Call $fps 'Tick' @([double]0))) 'FPS starts without a fabricated sample'
-for($i=1;$i -lt 60;$i++){Check (!(Call $fps 'Tick' @([double]($i/60)))) ('FPS remains unchanged before one second: '+$i)}
-Check (Call $fps 'Tick' @([double]1)) 'FPS publishes after one second'
+for($i=1;$i -lt 6;$i++){Check (!(Call $fps 'Tick' @([double]($i/60)))) ('FPS remains unchanged before 100 milliseconds: '+$i)}
+Check (Call $fps 'Tick' @([double]0.1)) 'FPS publishes after 100 milliseconds'
 Check ($fps.GetType().GetProperty('Value',$taskFlags).GetValue($fps,$null) -eq 60) 'sampled frame count reports 60 FPS'
 Check (!(Call $fps 'Tick' @([double]::NaN))) 'invalid frame clock does not publish FPS'
-for($i=1;$i -lt 120;$i++){Call $fps 'Tick' @([double](1+$i/120))|Out-Null}
-Check ((Call $fps 'Tick' @([double]2)) -and $fps.GetType().GetProperty('Value',$taskFlags).GetValue($fps,$null) -eq 120) 'next second updates independently to 120 FPS'
+for($i=1;$i -lt 12;$i++){Call $fps 'Tick' @([double](.1+$i/120))|Out-Null}
+Check ((Call $fps 'Tick' @([double]0.2)) -and $fps.GetType().GetProperty('Value',$taskFlags).GetValue($fps,$null) -eq 120) 'next 100 milliseconds update independently to 120 FPS'
 $geometry=T 'KeyViewerContents.KeyViewerGeometry'
 foreach($style in [Enum]::GetValues((T 'KeyViewerContents.KeyviewerStyle'))){
     foreach($footer in @($false,$true)){
@@ -57,11 +57,11 @@ Call $tracker 'ObserveLevel' @('path:map-A')|Out-Null
 Check ($tracker.GetProperty('Attempts',$taskFlags).GetValue($null,$null) -eq 0) 'reopening the same map begins with zero session attempts'
 $sessions['path:map-A']=2;Call $tracker 'ObserveLevel' @('path:map-B')|Out-Null;Call $tracker 'ObserveLevel' @('path:map-A')|Out-Null
 Check ($sessions.Count -eq 0) 'switching maps does not retain an old session'
-$settings.Overlay.TextColor=[UnityEngine.Color]::new(1,0,0,128/255);$settings.Overlay.ShowFps=$false
+$settings.Overlay.ValueColor=[UnityEngine.Color]::new(1,0,0,128/255);$settings.Overlay.ShowFps=$false
 Call (T 'OverlayPalette') 'Normalize' @($settings.Overlay)|Out-Null
 Check ($null -eq (T 'OverlaySettings').GetField('JudgmentColors')) 'accumulated judgment custom colors are absent'
-$red=$settings.Overlay.TextColor
-Check ((Call (T 'KeyViewerContents.KeyViewerColorConverter') 'Format' @($red)) -eq '#FF000080') 'shared overlay text color retains opacity'
+$red=$settings.Overlay.ValueColor
+Check ((Call (T 'KeyViewerContents.KeyViewerColorConverter') 'Format' @($red)) -eq '#FF000080') 'numeric color retains opacity'
 Call (T 'OverlayPalette') 'Reset' @($settings.Overlay)|Out-Null
 Check (!$settings.Overlay.ShowFps -and $settings.Overlay.FullAttempts['path:map-A'] -eq 7) 'color reset preserves visibility and full attempt records'
 $fixedX=(T 'DQColors').GetField('XPerfect',$taskFlags).GetValue($null)
@@ -71,7 +71,7 @@ Check ((Call (T 'KeyViewerContents.KeyViewerColorConverter') 'Format' @($palette
 Check (!(Call $palette 'TryHex' @('not-a-color'))) 'invalid palette HEX does not replace draft color'
 Check ((Call $palette 'TryHex' @('#00C8FFFF'))) 'valid sky blue HEX updates palette draft'
 Check ((Call (T 'KeyViewerContents.KeyViewerColorConverter') 'Format' @($palette.GetType().GetProperty('Color',$taskFlags).GetValue($palette,$null))) -eq '#00C8FFFF') 'HEX and HSV palette round-trip saturated sky blue'
-Check ((Call (T 'KeyViewerContents.KeyViewerColorConverter') 'Format' @($settings.Overlay.TextColor)) -eq '#FFFFFFFF') 'draft palette edits leave shared text color unchanged until application'
+Check ((Call (T 'KeyViewerContents.KeyViewerColorConverter') 'Format' @($settings.Overlay.ValueColor)) -eq '#FFC939FF') 'draft palette edits leave numeric color unchanged until application'
 $keySettings=[Activator]::CreateInstance((T 'KeyViewerContents.KeyViewerSetting'))
 Check ((Call (T 'KeyViewerContents.KeyViewerColorConverter') 'Format' @($keySettings.GhostRainColor)) -eq '#0EB4FCFF') 'default ghost rain matches requested auxiliary sky blue'
 $keySettings.SchemaVersion=3;$keySettings.GhostRainColor=[UnityEngine.Color]::white;Call (T 'KeyViewerContents.KeyViewerStore') 'Normalize' @($keySettings)|Out-Null
@@ -80,9 +80,9 @@ $keySettings.SchemaVersion=3;$keySettings.GhostRainColor=$red;Call (T 'KeyViewer
 Check ((Call (T 'KeyViewerContents.KeyViewerColorConverter') 'Format' @($keySettings.GhostRainColor)) -eq '#FF000080') 'custom ghost color survives migration'
 $fixture=Join-Path $PSScriptRoot ('feedback-v2-'+[Guid]::NewGuid().ToString('N'))
 Call (T 'SettingsStore') 'Initialize' @($fixture)|Out-Null
-$settings.Overlay.TextColor=$red;$settings.Overlay.ValueColor=[UnityEngine.Color]::new(0,200/255,1,128/255);Call (T 'SettingsStore') 'Save' @($settings)|Out-Null
+$settings.Overlay.AttemptsColor=$red;$settings.Overlay.ValueColor=[UnityEngine.Color]::new(0,200/255,1,128/255);Call (T 'SettingsStore') 'Save' @($settings)|Out-Null
 $loaded=Call (T 'SettingsStore') 'Load' @()
-Check ((Call (T 'KeyViewerContents.KeyViewerColorConverter') 'Format' @($loaded.Overlay.TextColor)) -eq '#FF000080' -and (Call (T 'KeyViewerContents.KeyViewerColorConverter') 'Format' @($loaded.Overlay.ValueColor)) -eq '#00C8FF80') 'shared text / value colors reload from disk with opacity intact'
+Check ((Call (T 'KeyViewerContents.KeyViewerColorConverter') 'Format' @($loaded.Overlay.AttemptsColor)) -eq '#FF000080' -and (Call (T 'KeyViewerContents.KeyViewerColorConverter') 'Format' @($loaded.Overlay.ValueColor)) -eq '#00C8FF80') 'attempt / value colors reload from disk with opacity intact'
 Call (T 'KeyViewerContents.KeyViewerStore') 'Initialize' @($fixture)|Out-Null
 $keys=(T 'KeyViewerContents.KeyViewerStore').GetField('Settings',$taskFlags).GetValue($null);$keys.footkey4Text[0]='발 별칭';Call (T 'KeyViewerContents.KeyViewerStore') 'Save' @()|Out-Null
 Call (T 'KeyViewerContents.KeyViewerStore') 'Initialize' @($fixture)|Out-Null

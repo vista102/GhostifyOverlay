@@ -37,7 +37,7 @@ $process=Start-Process -FilePath $exe -ArgumentList $arguments -WindowStyle Hidd
 $result=Get-Content -LiteralPath $report -Raw -Encoding UTF8 | ConvertFrom-Json
 if($process.ExitCode -ne 0 -or !$result.Success){throw ('Shipping EXE install failed: '+$result.Message)}
 'PASS shipping EXE installs its embedded payload into a Unicode game fixture'
-$data=Join-Path $game 'Mods\DonQuixoteOverlay\UserData'
+$data=Join-Path $game 'Mods\Ghostify Overlay\UserData'
 New-Item -ItemType Directory -Path $data | Out-Null
 foreach($name in @('settings.json','layout.json','keyviewer.json','keyviewer-counts.json')){
     [IO.File]::WriteAllText((Join-Path $data $name),('saved user settings '+$name))
@@ -53,6 +53,18 @@ foreach($file in $before){
     if((Get-FileHash -LiteralPath (Join-Path $result.Backup ('previous-mod\UserData\'+$file.Name))).Hash -ne $file.Hash){throw 'Shipping EXE backup is incomplete'}
 }
 'PASS shipping EXE updates and backs up all eight user files without changing them'
+$target=Join-Path $game 'Mods\Ghostify Overlay'
+$legacy=Join-Path $game 'Mods\DonQuixoteOverlay'
+$fixtureBoundary=[IO.Path]::GetFullPath($root).TrimEnd('\')+'\'
+foreach($candidate in @($target,$legacy)){if(![IO.Path]::GetFullPath($candidate).StartsWith($fixtureBoundary,[StringComparison]::OrdinalIgnoreCase)){throw 'Folder migration fixture escaped its test root'}}
+if(Test-Path -LiteralPath $legacy){throw 'Legacy fixture destination already exists'}
+Rename-Item -LiteralPath $target -NewName 'DonQuixoteOverlay'
+$migrationReport=Join-Path $root 'EXE-migration-result.json'
+$process=Start-Process -FilePath $exe -ArgumentList ('--install "'+$game+'" "'+$migrationReport+'" "'+$backup+'"') -WindowStyle Hidden -PassThru -Wait
+$result=Get-Content -LiteralPath $migrationReport -Raw -Encoding UTF8|ConvertFrom-Json
+if($process.ExitCode -ne 0 -or !$result.Success -or (Test-Path -LiteralPath $legacy) -or !(Test-Path -LiteralPath $target)){throw 'Shipping EXE legacy folder migration failed'}
+foreach($file in $before){if((Get-FileHash -LiteralPath (Join-Path $data $file.Name)).Hash -ne $file.Hash){throw 'Shipping EXE migration changed user settings'}}
+'PASS shipping EXE migrates the legacy folder and retains all eight user files'
 $failureReport=Join-Path $root 'EXE-invalid-result.json'
 $process=Start-Process -FilePath $exe -ArgumentList ('--install "'+$root+'" "'+$failureReport+'" "'+$backup+'"') -WindowStyle Hidden -PassThru -Wait
 $result=Get-Content -LiteralPath $failureReport -Raw -Encoding UTF8 | ConvertFrom-Json

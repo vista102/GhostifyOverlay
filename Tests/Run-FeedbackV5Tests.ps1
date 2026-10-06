@@ -37,8 +37,8 @@ foreach($taskCaption in @($null,'','Artist Title','Artist - Title',"Artist`nTitl
 }
 Check ((Call (T 'OverlayMetadata') 'SongDisplay' @('','Artist','ScnGame')) -eq 'Artist' -and (Call (T 'OverlayMetadata') 'SongDisplay' @('Title','','ScnGame')) -eq 'Title') 'partial metadata does not add a dangling hyphen or scene fallback'
 $taskOverlayType=T 'OverlaySettings'
-foreach($taskRemoved in @('ComboColor','SongInfoColor','TimingScaleColor','FpsColor','DetailedPlusMinusColor','DetailedXColor','JudgmentColors')){Check ($null -eq $taskOverlayType.GetField($taskRemoved)) ('obsolete custom color field removed: '+$taskRemoved)}
-Check (@($taskOverlayType.GetFields()|Where-Object {$_.FieldType -eq [UnityEngine.Color]}).Count -eq 4) 'only text / values / attempts / progress bar are configurable overlay colors'
+foreach($taskRemoved in @('TextColor','ComboColor','SongInfoColor','TimingScaleColor','FpsColor','DetailedPlusMinusColor','DetailedXColor','JudgmentColors')){Check ($null -eq $taskOverlayType.GetField($taskRemoved)) ('obsolete custom color field removed: '+$taskRemoved)}
+Check (@($taskOverlayType.GetFields()|Where-Object {$_.FieldType -eq [UnityEngine.Color]}).Count -eq 3) 'only values / attempts / progress bar are configurable overlay colors'
 Check ($null -eq (T 'KeyViewerContents.KeyViewerSetting').GetField('RainColor3')) 'third-rain color is absent from settings'
 foreach($taskStyle in [Enum]::GetValues((T 'KeyViewerContents.KeyviewerStyle'))){
     $taskSlots=@(Call (T 'KeyViewerContents.KeyViewerGeometry') 'Hands' @($taskStyle,$true))
@@ -51,11 +51,11 @@ Call (T 'SettingsStore') 'Initialize' @($taskFixture)|Out-Null
 $taskOldJson='{"SchemaVersion":3,"Overlay":{"TextColor":"#12345680","ValueColor":"#ABCDEF80","AttemptsColor":"#887766FF","ProgressBarColor":"#FFC939FF","ComboColor":"#FF0000FF","SongInfoColor":"#FF0000FF","TimingScaleColor":"#FF0000FF","FpsColor":"#FF0000FF","DetailedPlusMinusColor":"#FF0000FF","DetailedXColor":"#FF0000FF","JudgmentColors":["#FF0000FF"],"FullAttempts":{"map":9},"FullProgressAttempts":{"map":3}}}'
 $taskFile=Join-Path $taskFixture 'UserData\settings.json';[IO.File]::WriteAllText($taskFile,$taskOldJson,[Text.UTF8Encoding]::new($false))
 $taskLoaded=Call (T 'SettingsStore') 'Load' @()
-Check ((Hex $taskLoaded.Overlay.TextColor) -eq '#12345680' -and (Hex $taskLoaded.Overlay.ValueColor) -eq '#ABCDEF80' -and (Hex $taskLoaded.Overlay.AttemptsColor) -eq '#887766FF') 'old independent colors are ignored while retained shared colors survive'
+Check ((Hex $taskLoaded.Overlay.ValueColor) -eq '#ABCDEF80' -and (Hex $taskLoaded.Overlay.AttemptsColor) -eq '#887766FF') 'old independent colors are ignored while retained shared colors survive'
 Check ($taskLoaded.Overlay.FullAttempts['map'] -eq 9 -and $taskLoaded.Overlay.FullProgressAttempts['map'] -eq 3) 'removing color features does not erase full attempt history'
 Call (T 'SettingsStore') 'Save' @($taskLoaded)|Out-Null
 $taskSaved=[IO.File]::ReadAllText($taskFile)
-Check ($taskSaved -notmatch 'JudgmentColors|ComboColor|SongInfoColor|TimingScaleColor|FpsColor|DetailedPlusMinusColor|DetailedXColor') 'saved settings no longer contain removed color fields'
+Check ($taskSaved -notmatch 'TextColor|JudgmentColors|ComboColor|SongInfoColor|TimingScaleColor|FpsColor|DetailedPlusMinusColor|DetailedXColor') 'saved settings no longer contain removed color fields'
 $taskKeys=Call (T 'KeyViewerContents.KeyViewerStore') 'Deserialize' @('{"SchemaVersion":5,"RainColor":"#123456FF","RainColor2":"#ABCDEF80","RainColor3":"#FF0000FF","GhostRainColor":"#0EB4FCFF"}')
 Check ((Hex $taskKeys.RainColor) -eq '#123456FF' -and (Hex $taskKeys.RainColor2) -eq '#ABCDEF80' -and (Hex $taskKeys.GhostRainColor) -eq '#0EB4FCFF') 'legacy third-rain settings cannot overwrite retained normal / ghost rain colors'
 $taskCache=[Activator]::CreateInstance((T 'OverlayStatusTextCache'),$true)
@@ -67,7 +67,7 @@ Add-Type -Path (Join-Path $PSScriptRoot 'ILReader.cs')
 $taskInstructions=[LifecycleTests].GetMethod('Instructions',$taskFlags)
 $taskApply=$taskInstructions.Invoke($null,@((T 'OverlayController').GetMethod('ApplySettings',$taskFlags)))
 $taskFields=@($taskApply|ForEach-Object {$_.GetType().GetField('Member',$taskFlags).GetValue($_)}|Where-Object {$_ -is [Reflection.FieldInfo] -and $_.DeclaringType -eq $taskOverlayType})
-Check (@($taskFields|Where-Object {$_.Name -eq 'TextColor'}).Count -eq 5 -and @($taskFields|Where-Object {$_.Name -eq 'AttemptsColor'}).Count -eq 1) 'actual renderer applies shared text to left / right / combo label / song / timing and keeps attempts separate'
+Check (@($taskFields|Where-Object {$_.Name -eq 'TextColor'}).Count -eq 0 -and @($taskFields|Where-Object {$_.Name -eq 'AttemptsColor'}).Count -eq 1) 'actual renderer has no custom label color and keeps attempts separate'
 $taskUpdate=$taskInstructions.Invoke($null,@((T 'OverlayController').GetMethod('Update',$taskFlags)))
 Check (@($taskUpdate|ForEach-Object {$_.GetType().GetField('Member',$taskFlags).GetValue($_)}|Where-Object {$_ -is [Reflection.FieldInfo] -and $_.DeclaringType -eq $taskOverlayType -and $_.Name -eq 'ValueColor'}).Count -eq 1) 'actual combo number reads the shared value color'
 'Feedback v5 assertions passed: '+$taskPassed

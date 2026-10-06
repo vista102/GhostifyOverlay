@@ -119,7 +119,7 @@ namespace DonQuixoteOverlay {
             NewPage("오버레이");
             Heading("플레이 오버레이");
             string[] fields={"Enabled","ShowProgress","ShowAccuracy","ShowXAccuracy","ShowMusicTime","ShowMapTime","ShowProgressBar","ShowCombo","ShowBpm","ShowTheoreticalKps","ShowJudgmentCounts","ShowAttempts","ShowSongInfo","ShowTimingRanges","ShowFps"};
-            string[] names={"오버레이","진행도","Accuracy","XAccuracy","곡 시간","맵 시간","진행 막대","콤보","BPM / Pitch","이론 KPS","누적 / 세부 정확 숫자","Attempt / Prg Attempt / Full","곡명 / 작곡가","타이밍 스케일","FPS · 1초마다 갱신"};
+            string[] names={"오버레이","진행도","Accuracy","XAccuracy","곡 시간","맵 시간","진행 막대","콤보","BPM / Pitch","이론 KPS","누적 / 세부 정확 숫자","Attempt / Prac Attempt / Full","곡명 / 작곡가","타이밍 스케일","FPS · 초당 10회 갱신"};
             for(int i=0;i<fields.Length;i++) { FieldInfo f=typeof(OverlaySettings).GetField(fields[i]);Toggle(names[i],()=> (bool)f.GetValue(Main.Settings.Overlay),v=>f.SetValue(Main.Settings.Overlay,v)); }
             Label("UI / 오버레이 폰트: Gmarket Sans · 판정 텍스트: 게임 기본 폰트",40);
             Label("세부 누적 숫자는 게임의 세부 판정 표시 설정을 따릅니다.",40);
@@ -162,6 +162,7 @@ namespace DonQuixoteOverlay {
             Numeric("위치 X",()=>KeyViewerStore.Settings.XLocation,v=>{KeyViewerStore.Settings.XLocation=v;KeyViewerStore.Normalize(KeyViewerStore.Settings);KeyViewer.Instance?.ApplyPosition();});
             Numeric("위치 Y",()=>KeyViewerStore.Settings.YLocation,v=>{KeyViewerStore.Settings.YLocation=v;ChangedKeyViewer();});
             Numeric("전체 배율 · 0.45~2",()=>KeyViewerStore.Settings.Size,v=>{KeyViewerStore.Settings.Size=v;KeyViewerStore.Normalize(KeyViewerStore.Settings);KeyViewer.Instance?.ApplyPosition();});
+            Numeric("키 간격 · 0~30 (기본 4)",()=>KeyViewerStore.Settings.KeyGap,v=>{KeyViewerStore.Settings.KeyGap=v;ChangedKeyViewer();});
             Heading("레인");
             Toggle("레인 표시",()=>KeyViewerStore.Settings.useRain,v=>{KeyViewerStore.Settings.useRain=v;ChangedKeyViewer();});
             Toggle("고스트 레인 표시",()=>KeyViewerStore.Settings.useGhostRain,v=>{KeyViewerStore.Settings.useGhostRain=v;ChangedKeyViewer();});

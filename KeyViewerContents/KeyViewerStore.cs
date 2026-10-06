@@ -100,6 +100,7 @@ internal static class KeyViewerStore {
         if (!Enum.IsDefined(typeof(KeyviewerStyle), s.KeyViewerStyle)) s.KeyViewerStyle = defaults.KeyViewerStyle;
         if (!Enum.IsDefined(typeof(FootKeyviewerStyle), s.FootKeyViewerStyle)) s.FootKeyViewerStyle = defaults.FootKeyViewerStyle;
         s.Size = SettingsNormalization.Bounded(s.Size, .45f, 2f, 1f);
+        s.KeyGap = SettingsNormalization.Bounded(s.KeyGap, 0, 30, KeyViewerMetrics.Gap);
         s.XLocation = SettingsNormalization.Bounded(s.XLocation, -1800, 1800, 24);
         s.YLocation = SettingsNormalization.Bounded(s.YLocation, 0, 800, 200);
         s.rainSpeed = SettingsNormalization.Bounded(s.rainSpeed, 10, 500, 100);

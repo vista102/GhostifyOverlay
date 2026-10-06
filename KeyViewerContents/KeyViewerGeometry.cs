@@ -11,37 +11,45 @@ internal readonly struct KeyViewerSlot {
     }
 }
 internal static class KeyViewerGeometry {
-    internal static List<KeyViewerSlot> Hands(KeyviewerStyle style, bool footer) {
+    internal static List<KeyViewerSlot> Hands(KeyviewerStyle style, bool footer) => HandsWithGap(style,footer,KeyViewerMetrics.Gap);
+    private static float Gap(float gap) => float.IsNaN(gap)||float.IsInfinity(gap)?KeyViewerMetrics.Gap:System.Math.Max(0,System.Math.Min(30,gap));
+    internal static List<KeyViewerSlot> HandsWithGap(KeyviewerStyle style, bool footer, float gap) {
+        gap=Gap(gap);
+        float step=50+gap, span=400+7*gap, delta=gap-KeyViewerMetrics.Gap;
         var result=new List<KeyViewerSlot>();
-        float top=style==KeyviewerStyle.Key16?(footer?115:85):79;
-        for(int i=0;i<8;i++)result.Add(new KeyViewerSlot(i,54*i,top,50,0));
+        float top=style==KeyviewerStyle.Key16?(footer?115+2*delta:85+delta):79+delta;
+        for(int i=0;i<8;i++)result.Add(new KeyViewerSlot(i,step*i,top,50,0));
         if(style==KeyviewerStyle.Key16) {
             int[] order={12,13,9,8,10,11,14,15};
-            float bottom=footer?61:31;
-            for(int i=0;i<8;i++)result.Add(new KeyViewerSlot(order[i],54*i,bottom,50,1,i));
+            float bottom=footer?61+delta:31;
+            for(int i=0;i<8;i++)result.Add(new KeyViewerSlot(order[i],step*i,bottom,50,1,i));
         }
         if(style==KeyviewerStyle.Key12) {
             int[] order={9,8,10,11};
-            for(int i=0;i<4;i++)result.Add(new KeyViewerSlot(order[i],108+54*i,25,50,1,i+2));
+            for(int i=0;i<4;i++)result.Add(new KeyViewerSlot(order[i],(2+i)*step,25,50,1,i+2));
         } else if(style==KeyviewerStyle.Key10) {
-            result.Add(new KeyViewerSlot(8,162,25,50,1,3));
-            result.Add(new KeyViewerSlot(9,216,25,50,1,4));
+            result.Add(new KeyViewerSlot(8,3*step,25,50,1,3));
+            result.Add(new KeyViewerSlot(9,4*step,25,50,1,4));
         }
         if(style==KeyviewerStyle.Key16) {
-            if(footer) { result.Add(new KeyViewerSlot(-1,0,15,212,-1,-1,true)); result.Add(new KeyViewerSlot(-2,216,15,212,-1,-1,true)); }
+            if(footer) { float half=(span-gap)/2;result.Add(new KeyViewerSlot(-1,0,15,half,-1,-1,true)); result.Add(new KeyViewerSlot(-2,half+gap,15,half,-1,-1,true)); }
         } else {
-            float width=style==KeyviewerStyle.Key10?158:104;
-            result.Add(new KeyViewerSlot(-1,0,25,width,-1)); result.Add(new KeyViewerSlot(-2,428-width,25,width,-1));
+            float width=style==KeyviewerStyle.Key10?150+2*gap:100+gap;
+            result.Add(new KeyViewerSlot(-1,0,25,width,-1)); result.Add(new KeyViewerSlot(-2,span-width,25,width,-1));
         }
         return result;
     }
-    internal static List<KeyViewerSlot> Feet(int count) {
+    internal static List<KeyViewerSlot> Feet(int count) => FeetWithGap(count,KeyViewerMetrics.Gap);
+    internal static List<KeyViewerSlot> FeetWithGap(int count, float gap) {
+        gap=Gap(gap);
         var result=new List<KeyViewerSlot>();
         int width=count>10?count/2:count, rows=count>10?2:1;
         for(int row=0;row<rows;row++) {
             int column=0;
             for(int parity=0;parity<2;parity++)for(int i=parity;i<width;i+=2)
-                result.Add(new KeyViewerSlot(20+row*width+i,432+34*column++,15+30*row,30,-1,-1,true));
+                // The old foot rows touch vertically. Preserve that at the default,
+                // increase their separation with the gap, and never overlap them.
+                result.Add(new KeyViewerSlot(20+row*width+i,400+8*gap+(30+gap)*column++,15+(30+System.Math.Max(0,gap-4))*row,30,-1,-1,true));
         }
         return result;
     }

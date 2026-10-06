@@ -27,8 +27,8 @@ namespace DonQuixoteOverlay {
         }
         private void BuildOverlayColors() {
             Heading("오버레이 색상");
-            string[] fields={"TextColor","ValueColor","AttemptsColor","ProgressBarColor"};
-            string[] labels={"글자 · 좌우 / 곡명 / 타이밍","수치 · 좌우 / 콤보 / FPS","시도 횟수","진행 막대"};
+            string[] fields={"ValueColor","AttemptsColor","ProgressBarColor"};
+            string[] labels={"수치 · 좌우 / 콤보 / FPS","시도 횟수","진행 막대"};
             for(int i=0;i<fields.Length;i++) {
                 var field=typeof(OverlaySettings).GetField(fields[i]);
                 ColorRow(labels[i],()=>(Color)field.GetValue(Main.Settings.Overlay),c=>{field.SetValue(Main.Settings.Overlay,c);OverlayController.Instance?.ApplySettings();});

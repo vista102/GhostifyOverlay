@@ -44,6 +44,7 @@ public class KeyViewerSetting {
 
     public float YLocation = 200;
     public float Size = 1;
+    public float KeyGap = KeyViewerMetrics.Gap;
     public bool useRain = true;
     public bool useGhostRain;
     public bool ShowTotalKpsKey16 = true;
