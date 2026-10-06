@@ -1,0 +1,59 @@
+Tests/Run-LogicTests.ps1
+  s_35cff5aa0e7011::t_f33c058a3c05b0 67,81
+Settings.cs
+  s_35cff5aa0e7011::t_f33c058a3c05b0 10,31,40,43,96-98,112,131-132,207-208
+SettingsWindow.KeyEditor.cs
+  s_35cff5aa0e7011::t_f33c058a3c05b0 59,66
+Tests/Run-PatchTests.ps1
+  s_35cff5aa0e7011::t_f33c058a3c05b0 12,31-32
+Tests/OverlayGroupUiHarness.cs
+  s_35cff5aa0e7011::t_f33c058a3c05b0 3,6-25,27-36,40-42,44,46-53,55-62,65-100
+Info.json
+  s_35cff5aa0e7011::t_f33c058a3c05b0 5
+KeyViewerContents/KeyViewer.Layout.cs
+  s_35cff5aa0e7011::t_f33c058a3c05b0 9
+OverlayConfiguration.cs
+  s_35cff5aa0e7011::t_f33c058a3c05b0 2,4-10,13-22,24-33,36-41,43-44,46-48
+GhostifyOverlay.csproj
+  s_35cff5aa0e7011::t_f33c058a3c05b0 105,130-131
+PatchRegistry.cs
+  s_35cff5aa0e7011::t_f33c058a3c05b0 37
+KeyViewerContents/KeyViewer.cs
+  s_35cff5aa0e7011::t_f33c058a3c05b0 85
+Tests/Run-OverlayGroupTests.ps1
+  s_35cff5aa0e7011::t_f33c058a3c05b0 1,5,8,10-27,29-63
+Main.cs
+  s_35cff5aa0e7011::t_f33c058a3c05b0 70,89
+README.md
+  s_35cff5aa0e7011::t_f33c058a3c05b0 7,13,24-25,35
+SettingsWindow.Overlay.cs
+  s_35cff5aa0e7011::t_f33c058a3c05b0 1-34,36,38-41,43-50,53-63,66
+UiInputBlock.cs
+  s_35cff5aa0e7011::t_f33c058a3c05b0 12
+FEEDBACK_0.4.6_VALIDATION.md
+  s_35cff5aa0e7011::t_f33c058a3c05b0 1-46
+Tests/UiFixHarness.cs
+  s_35cff5aa0e7011::t_f33c058a3c05b0 64,79,105
+Tests/Run-OverlayGroupUiTests.ps1
+  s_35cff5aa0e7011::t_f33c058a3c05b0 3-13,15-21,23
+SettingsWindow.cs
+  s_35cff5aa0e7011::t_f33c058a3c05b0 117,164
+OverlayController.cs
+  s_35cff5aa0e7011::t_f33c058a3c05b0 373,375-376,382-384,390,392-395,398,401,404-405,431-433,437,444,446,459-461,472,480-485,490-493,601
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "28148d84bdc2e5b3bb17cb0819466946cf9723aa",
+  "prompts": {},
+  "sessions": {
+    "s_35cff5aa0e7011": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-0.4.6-groups",
+        "model": "gpt-6"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
