@@ -1,0 +1,59 @@
+Installer/InstallerEngine.cs
+  s_f5c8076b6f8e01::t_1b602a13c6a85a 28,36,116-121,127,182,203,206,213,216-220,265-266
+FEEDBACK_0.4.5_VALIDATION.md
+  s_f5c8076b6f8e01::t_1b602a13c6a85a 1-38
+Installer/README.md
+  s_f5c8076b6f8e01::t_1b602a13c6a85a 11,31
+OverlayController.cs
+  s_f5c8076b6f8e01::t_1b602a13c6a85a 452-455,481,489,507,611-613,615-616
+Tests/ColorRowHarness.cs
+  s_f5c8076b6f8e01::t_1b602a13c6a85a 42,75,80,83,87,89,91-92
+Tests/Run-FeedbackV2Tests.ps1
+  s_f5c8076b6f8e01::t_1b602a13c6a85a 26-27,30-31,60,63-64,74,83,85
+KeyViewerContents/KeyViewerSetting.cs
+  s_f5c8076b6f8e01::t_1b602a13c6a85a 47
+Tests/Run-FeedbackV6Tests.ps1
+  s_f5c8076b6f8e01::t_1b602a13c6a85a 1-46
+KeyViewerContents/KeyViewer.Layout.cs
+  s_f5c8076b6f8e01::t_1b602a13c6a85a 9,20
+KeyViewerContents/KeyViewerGeometry.cs
+  s_f5c8076b6f8e01::t_1b602a13c6a85a 14-18,20-21,24-25,29,31-32,35,37-38,42-44,50-52
+KeyViewerContents/KeyViewerStore.cs
+  s_f5c8076b6f8e01::t_1b602a13c6a85a 103
+OverlayMetrics.cs
+  s_f5c8076b6f8e01::t_1b602a13c6a85a 21
+Info.json
+  s_f5c8076b6f8e01::t_1b602a13c6a85a 5
+Installer/InstallerTests.cs
+  s_f5c8076b6f8e01::t_1b602a13c6a85a 18,113-141
+README.md
+  s_f5c8076b6f8e01::t_1b602a13c6a85a 13,18,24,26
+SettingsWindow.Colors.cs
+  s_f5c8076b6f8e01::t_1b602a13c6a85a 30-31
+SettingsWindow.KeyEditor.cs
+  s_f5c8076b6f8e01::t_1b602a13c6a85a 18,60,62,66-67,69-70
+SettingsWindow.cs
+  s_f5c8076b6f8e01::t_1b602a13c6a85a 122,165
+Installer/Run-InstallerTests.ps1
+  s_f5c8076b6f8e01::t_1b602a13c6a85a 40,56-67
+Tests/Run-FeedbackV5Tests.ps1
+  s_f5c8076b6f8e01::t_1b602a13c6a85a 40-41,54,58,70
+Tests/UiFixHarness.cs
+  s_f5c8076b6f8e01::t_1b602a13c6a85a 64,115-122
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7668817724318386f1aa4e9ed95a723f8132bad4",
+  "prompts": {},
+  "sessions": {
+    "s_f5c8076b6f8e01": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-0.4.5-feedback",
+        "model": "gpt-6"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
