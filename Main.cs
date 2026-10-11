@@ -80,8 +80,7 @@ namespace DonQuixoteOverlay {
         private void Update() {
             if (!Main.Enabled) return;
             scrController c = scrController.instance;
-            AttemptTracker.ObserveContext(c);
-            if (c != null && c.gameworld) AttemptTracker.ValidateCurrentRun(c);
+            AttemptTracker.Tick(c);
         }
         private void SceneChanged(Scene previous, Scene current) {
             LayoutEditorController.CancelActive();

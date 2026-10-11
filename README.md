@@ -10,7 +10,7 @@
 
 **지원 환경:** Windows 10/11, 얼불춤 3.4.0 alpha(build 25590222), Unity Mod Manager 0.33.0 이상, .NET Framework 4.8.
 
-1. 설치 파일 `GhostifyOverlay-Setup-0.4.7.exe`를 준비합니다.
+1. 설치 파일 `GhostifyOverlay-Setup-0.4.8.exe`를 준비합니다.
 2. 게임을 종료한 뒤 EXE를 실행하고, 게임 폴더를 확인해 **설치하기 / 업데이트**를 누릅니다.
 3. 게임을 실행하고 Unity Mod Manager에서 **Ghostify Overlay**를 활성화합니다.
 
@@ -34,5 +34,7 @@
 판정 텍스트 크기·숨기기는 게임 설정에서 변경합니다. 게임에서 세부 판정 표시를 끄면 세부 누적 오버레이도 함께 숨겨집니다.
 
 16키의 KPS / Total은 항상 표시됩니다. 레인 색상은 **상단 레인**과 **하단 레인**에서 지정합니다.
+
+시도 횟수는 자동플레이·맵 전체 무적 플레이를 제외합니다. 자유 이동 구간 무적 옵션은 일반 시도 집계를 막지 않습니다. Attempt / Prac Attempt는 맵을 나가면 초기화하고 Full 누적은 유지합니다.
 
 [출처·라이선스](THIRD-PARTY-NOTICES.md) · [AI 생성 코드 기록](AI_ATTRIBUTION.md)

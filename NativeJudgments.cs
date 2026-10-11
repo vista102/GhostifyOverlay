@@ -105,7 +105,8 @@ namespace DonQuixoteOverlay {
             if (!Main.Enabled) return;
             OverlayController.ResetRun();
             KeyViewerContents.KeyViewer.Instance?.BeginGameplayRun();
-            if (__instance != null && __instance.gameworld) AttemptTracker.BeginRun(__instance, __0);
+            // Editor Play / WaitForStartCo set checkpoint state after Start_Rewind.
+            AttemptTracker.PrepareRun(__instance, __0);
         }
     }
     [HarmonyPatch(typeof(scrController), "QuitToMainMenu")]

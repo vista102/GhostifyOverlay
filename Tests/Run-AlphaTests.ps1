@@ -13,8 +13,8 @@ function Call($type,[string]$name,[object[]]$values){
 }
 function Check($ok,[string]$name){if(!$ok){throw ('FAIL '+$name)};$script:passed++;'PASS '+$name}
 $native=T 'NativeJudgments'
-foreach($case in @(@($true,$false,$false,$false,$false,$true),@($false,$false,$false,$false,$false,$false),@($true,$true,$false,$false,$false,$false),@($true,$false,$true,$false,$false,$false),@($true,$false,$false,$true,$false,$false),@($true,$false,$false,$false,$true,$false))){
-    Check ((Call (T 'AttemptTracker') 'CountsAttempts' @([bool]$case[0],[bool]$case[1],[bool]$case[2],[bool]$case[3],[bool]$case[4])) -eq $case[5]) ('attempt eligibility: '+([string]::Join(',', $case)))
+foreach($case in @(@($true,$false,$false,$false,$true),@($false,$false,$false,$false,$false),@($true,$true,$false,$false,$false),@($true,$false,$true,$false,$false),@($true,$false,$false,$true,$false))){
+    Check ((Call (T 'AttemptTracker') 'CountsAttempts' @([bool]$case[0],[bool]$case[1],[bool]$case[2],[bool]$case[3])) -eq $case[4]) ('attempt eligibility: '+([string]::Join(',', $case)))
 }
 Check ([Enum]::GetValues([HitMargin]).Count -eq 16 -and [int][HitMargin]::XPerfect -eq 4 -and [int][HitMargin]::PerfectPlus -eq 5) 'installed alpha has the expected native judgment model'
 foreach($removed in @('XPerfectModule','DetailedJudge','JudgmentSettings','InputSettings','InputController','KeyLimiterPatch','XPerfectCalculatePatch')){

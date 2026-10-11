@@ -75,6 +75,8 @@ namespace DonQuixoteOverlay {
         private static bool _invalidatedCurrentRun;
         private static bool _startedMidMap;
         private static float _startProgress;
+        private static scrController _pendingController;
+        private static int _pendingFloor, _pendingFrame;
 
         public static int Attempts { get { return GetByKey(SessionAttempts, _levelKey); } }
         public static int ProgressAttempts { get { return GetByKey(SessionProgressAttempts, _levelKey); } }
@@ -95,6 +97,24 @@ namespace DonQuixoteOverlay {
             }
         }
 
+        internal static void PrepareRun(scrController controller, int startFloor) {
+            if (controller == null || Main.Settings == null) return;
+            _pendingController = controller; _pendingFloor = startFloor; _pendingFrame = Time.frameCount;
+            _countedCurrentRun = _fullCurrentRun = _progressCurrentRun = _invalidatedCurrentRun = false;
+        }
+
+        internal static void Tick(scrController controller) {
+            if (controller == null) return; // A restart may briefly have no controller.
+            if (ReferenceEquals(_pendingController, controller)) {
+                // Do not let context observation clear a newly prepared first run.
+                if (!controller.gameworld || Time.frameCount <= _pendingFrame) return;
+                int floor = _pendingFloor; _pendingController = null;
+                BeginRun(controller, floor);
+            }
+            ObserveContext(controller);
+            if (controller.gameworld) ValidateCurrentRun(controller);
+        }
+
         public static void BeginRun(scrController controller, int startFloor) {
             if (controller == null || !controller.gameworld || Main.Settings == null) return;
             string key = CurrentLevelKey(controller);
@@ -105,7 +125,7 @@ namespace DonQuixoteOverlay {
             _invalidatedCurrentRun = false;
             _startedMidMap = IsProgressStart(startFloor, controller.startedFromCheckpoint);
             _startProgress = _startedMidMap ? OverlayController.FloorProgress(startFloor) : 0f;
-            if (!IsEligible(controller)) return;
+            if (!IsEligible(controller)) { ReportRun(EligibilityReason(controller)); return; }
             _countedCurrentRun = true;
             _fullCurrentRun = !_startedMidMap;
             if (_fullCurrentRun) {
@@ -119,6 +139,8 @@ namespace DonQuixoteOverlay {
                 Main.Settings.Overlay.FullProgressAttempts[_levelKey] = FullProgressAttempts + 1;
             }
             Main.Save();
+            ReportRun((_startedMidMap ? "Prac Attempt " + ProgressAttempts + " / Full Prac Attempt " + FullProgressAttempts
+                : "Attempt " + Attempts + " / Full Attempt " + FullAttempts));
         }
 
         public static void ValidateCurrentRun(scrController controller) {
@@ -134,16 +156,26 @@ namespace DonQuixoteOverlay {
                 Main.Settings.Overlay.FullProgressAttempts[_levelKey] = Math.Max(0, FullProgressAttempts - 1);
             }
             Main.Save();
+            ReportRun(EligibilityReason(controller) + " · 이번 시도 제외");
         }
 
         private static bool IsEligible(scrController controller) {
             if (controller == null) return false;
             bool auto = false;
             try { auto = RDC.auto; } catch { }
-            return CountsAttempts(controller.gameworld, auto, controller.noFail, controller.noFailInfiniteMargin, controller.freeroamInvulnerability);
+            // Freeroam safety is a per-tile preference, not whole-map no-fail.
+            return CountsAttempts(controller.gameworld, auto, controller.noFail, controller.noFailInfiniteMargin);
         }
-        internal static bool CountsAttempts(bool gameworld, bool auto, bool noFail, bool infiniteMargin, bool invulnerable) {
-            return gameworld && !auto && !noFail && !infiniteMargin && !invulnerable;
+        internal static bool CountsAttempts(bool gameworld, bool auto, bool noFail, bool infiniteMargin) {
+            return gameworld && !auto && !noFail && !infiniteMargin;
+        }
+        private static string EligibilityReason(scrController controller) {
+            bool auto = false; try { auto = RDC.auto; } catch { }
+            return auto ? "자동플레이로 집계 제외" : "무적 플레이로 집계 제외";
+        }
+        private static void ReportRun(string message) {
+            RuntimeStatus.Set("attempts.run", "시도 횟수", message);
+            Main.Log("Attempts: " + message);
         }
 
         public static bool IsProgressStart(int startFloor, bool startedFromCheckpoint) {
@@ -159,6 +191,7 @@ namespace DonQuixoteOverlay {
             EndSession(); _levelKey = key ?? string.Empty;
         }
         internal static void EndSession() {
+            _pendingController = null;
             SessionAttempts.Clear(); SessionProgressAttempts.Clear(); _levelKey = string.Empty;
             _countedCurrentRun = _fullCurrentRun = _progressCurrentRun = _invalidatedCurrentRun = _startedMidMap = false;
             _startProgress = 0f;
