@@ -1,0 +1,36 @@
+Tests/Run-AttemptTrackerTests.ps1
+  s_7d1a1851b1aca8::t_d6d8d749fe5416 1-18
+FEEDBACK_0.4.8_VALIDATION.md
+  s_7d1a1851b1aca8::t_d6d8d749fe5416 1-35
+Tests/AttemptTrackerHarness.cs
+  s_7d1a1851b1aca8::t_d6d8d749fe5416 1-89
+Tests/Run-AlphaTests.ps1
+  s_7d1a1851b1aca8::t_d6d8d749fe5416 16-17
+Main.cs
+  s_7d1a1851b1aca8::t_d6d8d749fe5416 83
+Info.json
+  s_7d1a1851b1aca8::t_d6d8d749fe5416 5
+NativeJudgments.cs
+  s_7d1a1851b1aca8::t_d6d8d749fe5416 108-109
+README.md
+  s_7d1a1851b1aca8::t_d6d8d749fe5416 13,38
+  s_7d1a1851b1aca8::t_688540873d2056 39
+OverlayController.cs
+  s_7d1a1851b1aca8::t_d6d8d749fe5416 78-79,100-117,128,142-143,159,166-174,176-178,194
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ff622792f75424f1bbada1196830abb34145d6f2",
+  "prompts": {},
+  "sessions": {
+    "s_7d1a1851b1aca8": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-0.4.8-attempts",
+        "model": "gpt-6"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
