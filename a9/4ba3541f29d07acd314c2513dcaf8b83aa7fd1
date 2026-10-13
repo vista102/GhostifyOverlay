@@ -1,0 +1,27 @@
+Tests/AttemptTrackerHarness.cs
+  s_b1155fa5951421::t_0b5bf1b508c49e 52,69-70,72-74
+README.md
+  s_b1155fa5951421::t_0b5bf1b508c49e 13,38
+FEEDBACK_0.4.9_VALIDATION.md
+  s_b1155fa5951421::t_0b5bf1b508c49e 1-11
+Info.json
+  s_b1155fa5951421::t_0b5bf1b508c49e 5
+OverlayController.cs
+  s_b1155fa5951421::t_0b5bf1b508c49e 119,167
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a94ba3541f29d07acd314c2513dcaf8b83aa7fd1",
+  "prompts": {},
+  "sessions": {
+    "s_b1155fa5951421": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-0.4.9-attempt-policy",
+        "model": "gpt-6"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
