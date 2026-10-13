@@ -49,7 +49,7 @@ namespace DonQuixoteOverlay {
             // scnGame.Play resets this flag only after Start_Rewind on a return to tile zero.
             AttemptTracker.PrepareRun(c,0);c.startedFromCheckpoint=false;Next(c);
             Check(AttemptTracker.Attempts==3 && AttemptTracker.ProgressAttempts==1,"return to tile zero cannot inherit the previous practice flag");
-            c.freeroamInvulnerability=false;AttemptTracker.ValidateCurrentRun(c);c.freeroamInvulnerability=true;AttemptTracker.ValidateCurrentRun(c);
+            c.freeroamInvulnerability=false;Next(c);c.freeroamInvulnerability=true;Next(c);
             Check(AttemptTracker.Attempts==3 && AttemptTracker.FullAttempts==3,"changing freeroam safety does not undo a valid normal attempt");
             AttemptTracker.PrepareRun(c,0);AttemptTracker.Tick(null);
             Check(AttemptTracker.Attempts==3,"temporary missing controller does not erase current counters");Next(c);
@@ -66,10 +66,12 @@ namespace DonQuixoteOverlay {
             AttemptTracker.PrepareRun(c,0);c.noFailInfiniteMargin=false;Next(c);
             Check(AttemptTracker.Attempts==5,"eligibility is evaluated after setup instead of a stale previous-run flag");
             RDC.auto=true;Next(c);Next(c);
-            Check(AttemptTracker.Attempts==4 && AttemptTracker.FullAttempts==4,"autoplay enabled mid-run rolls back that run exactly once");
-            RDC.auto=false;Next(c);Check(AttemptTracker.Attempts==4,"turning autoplay back off does not recount an invalidated run");
+            Check(AttemptTracker.Attempts==5 && AttemptTracker.FullAttempts==5,"autoplay enabled mid-run preserves the counted attempt");
+            RDC.auto=false;Next(c);Check(AttemptTracker.Attempts==5,"turning autoplay back off does not recount the attempt");
             AttemptTracker.PrepareRun(c,10);c.startedFromCheckpoint=true;Next(c);c.noFail=true;Next(c);Next(c);
-            Check(AttemptTracker.ProgressAttempts==2 && AttemptTracker.FullProgressAttempts==2,"mid-run no-fail invalidates only the current practice attempt once");
+            Check(AttemptTracker.ProgressAttempts==3 && AttemptTracker.FullProgressAttempts==3,"mid-run no-fail preserves the counted practice attempt");
+            int saves=Main.Saves;c.noFail=false;Next(c);c.noFail=true;for(int i=0;i<20;i++)Next(c);
+            Check(AttemptTracker.ProgressAttempts==3 && Main.Saves==saves,"mode switches after a completed run cannot subtract or rewrite history");
             int full=AttemptTracker.FullAttempts,fullPractice=AttemptTracker.FullProgressAttempts;
             AttemptTracker.EndSession();
             Check(AttemptTracker.Attempts==0 && AttemptTracker.ProgressAttempts==0,"leaving the map clears both session counters");

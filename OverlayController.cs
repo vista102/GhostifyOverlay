@@ -69,10 +69,6 @@ namespace DonQuixoteOverlay {
         private static string _levelKey = string.Empty;
         private static readonly System.Collections.Generic.Dictionary<string, int> SessionAttempts = new System.Collections.Generic.Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         private static readonly System.Collections.Generic.Dictionary<string, int> SessionProgressAttempts = new System.Collections.Generic.Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-        private static bool _countedCurrentRun;
-        private static bool _fullCurrentRun;
-        private static bool _progressCurrentRun;
-        private static bool _invalidatedCurrentRun;
         private static bool _startedMidMap;
         private static float _startProgress;
         private static scrController _pendingController;
@@ -100,7 +96,6 @@ namespace DonQuixoteOverlay {
         internal static void PrepareRun(scrController controller, int startFloor) {
             if (controller == null || Main.Settings == null) return;
             _pendingController = controller; _pendingFloor = startFloor; _pendingFrame = Time.frameCount;
-            _countedCurrentRun = _fullCurrentRun = _progressCurrentRun = _invalidatedCurrentRun = false;
         }
 
         internal static void Tick(scrController controller) {
@@ -112,28 +107,20 @@ namespace DonQuixoteOverlay {
                 BeginRun(controller, floor);
             }
             ObserveContext(controller);
-            if (controller.gameworld) ValidateCurrentRun(controller);
         }
 
         public static void BeginRun(scrController controller, int startFloor) {
             if (controller == null || !controller.gameworld || Main.Settings == null) return;
             string key = CurrentLevelKey(controller);
             ObserveLevel(key);
-            _countedCurrentRun = false;
-            _fullCurrentRun = false;
-            _progressCurrentRun = false;
-            _invalidatedCurrentRun = false;
             _startedMidMap = IsProgressStart(startFloor, controller.startedFromCheckpoint);
             _startProgress = _startedMidMap ? OverlayController.FloorProgress(startFloor) : 0f;
             if (!IsEligible(controller)) { ReportRun(EligibilityReason(controller)); return; }
-            _countedCurrentRun = true;
-            _fullCurrentRun = !_startedMidMap;
-            if (_fullCurrentRun) {
+            if (!_startedMidMap) {
                 Increment(SessionAttempts, _levelKey, 1);
                 EnsureStore();
                 Main.Settings.Overlay.FullAttempts[_levelKey] = FullAttempts + 1;
             } else {
-                _progressCurrentRun = true;
                 Increment(SessionProgressAttempts, _levelKey, 1);
                 EnsureStore();
                 Main.Settings.Overlay.FullProgressAttempts[_levelKey] = FullProgressAttempts + 1;
@@ -141,22 +128,6 @@ namespace DonQuixoteOverlay {
             Main.Save();
             ReportRun((_startedMidMap ? "Prac Attempt " + ProgressAttempts + " / Full Prac Attempt " + FullProgressAttempts
                 : "Attempt " + Attempts + " / Full Attempt " + FullAttempts));
-        }
-
-        public static void ValidateCurrentRun(scrController controller) {
-            if (!_countedCurrentRun || _invalidatedCurrentRun || IsEligible(controller)) return;
-            _invalidatedCurrentRun = true;
-            if (_fullCurrentRun) {
-                Increment(SessionAttempts, _levelKey, -1);
-                EnsureStore();
-                Main.Settings.Overlay.FullAttempts[_levelKey] = Math.Max(0, FullAttempts - 1);
-            } else if (_progressCurrentRun) {
-                Increment(SessionProgressAttempts, _levelKey, -1);
-                EnsureStore();
-                Main.Settings.Overlay.FullProgressAttempts[_levelKey] = Math.Max(0, FullProgressAttempts - 1);
-            }
-            Main.Save();
-            ReportRun(EligibilityReason(controller) + " · 이번 시도 제외");
         }
 
         private static bool IsEligible(scrController controller) {
@@ -193,7 +164,7 @@ namespace DonQuixoteOverlay {
         internal static void EndSession() {
             _pendingController = null;
             SessionAttempts.Clear(); SessionProgressAttempts.Clear(); _levelKey = string.Empty;
-            _countedCurrentRun = _fullCurrentRun = _progressCurrentRun = _invalidatedCurrentRun = _startedMidMap = false;
+            _startedMidMap = false;
             _startProgress = 0f;
         }
         internal static void ObserveContext(scrController controller) {
