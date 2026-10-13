@@ -70,6 +70,6 @@ Invoke-Test (T 'KeyCountData') 'Load' @($fixture)|Out-Null
 $restored=(T 'KeyCountData').GetField('Instance',$flags).GetValue($null)
 Assert ($restored.Count[0] -eq 2147483648 -and @(Get-ChildItem -LiteralPath $fixture -Filter 'keyviewer-counts.json.corrupt-*').Count -eq 1) 'corrupt cumulative counts recover from the atomic backup'
 $references=$mod.GetReferencedAssemblies().Name
-Assert (!($references -contains 'JALib') -and !($references -contains 'UnityEngine.IMGUIModule') -and !($references -contains 'DOTween')) 'Release does not require JALib, IMGUI or DOTween'
+Assert (!($references -contains 'JALib') -and !($references -contains 'DOTween') -and ($references -contains 'UnityEngine.IMGUIModule')) 'Release uses the UMM image bridge without JALib or DOTween; controls remain uGUI'
 Assert (Test-Path -LiteralPath (Join-Path $project 'bin\Release\GhostifyOverlay\Licenses\JipperResourcePack-BSD-3-Clause.txt')) 'upstream BSD license ships with Release'
 "Key viewer assertions passed: $passed"

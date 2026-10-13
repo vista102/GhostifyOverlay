@@ -19,6 +19,8 @@ namespace DonQuixoteOverlay {
             Entry = entry; SettingsStore.Initialize(entry.Path); Settings = SettingsStore.Load();
             entry.OnToggle = Toggle; entry.OnUnload = e => Toggle(e, false);
             entry.OnSaveGUI = e => Save(); entry.OnUpdate = Update;
+            entry.OnGUI = e => SettingsWindow.Instance?.DrawUmm();
+            entry.OnHideGUI = e => SettingsWindow.Instance?.HideEmbedded();
             return true;
         }
         private static bool Toggle(UnityModManager.ModEntry entry, bool value) {

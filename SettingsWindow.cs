@@ -35,15 +35,16 @@ namespace DonQuixoteOverlay {
         private void OnEnable() { SceneManager.activeSceneChanged += SceneChanged; }
         private void OnDisable() { SceneManager.activeSceneChanged -= SceneChanged; SetVisible(false); }
         private void SceneChanged(Scene a, Scene b) { SetVisible(false); }
-        private void OnDestroy() { _captureUi.Dispose(); if (Instance == this) Instance = null; if (_ownedEventSystem != null) Destroy(_ownedEventSystem); }
+        private void OnDestroy() { _captureUi.Dispose(); if (_umm!=null)_umm.Dispose(); if (Instance == this) Instance = null; if (_ownedEventSystem != null) Destroy(_ownedEventSystem); }
         private void Start() {
-            try { Build(); _canvas.SetActive(false); }
+            try { if(_canvas==null){Build();_canvas.SetActive(false);} }
             catch (Exception ex) { Main.Log("Settings UI: " + ex); SetVisible(false); if (_canvas != null) _canvas.SetActive(false); }
         }
-        public void Toggle() { SetVisible(!Visible); }
+        public void Toggle() { UmmSettingsHost.ToggleFor(Main.Entry); }
         private void SetVisible(bool value) {
             if (value && _canvas == null) return;
             if (value == Visible) return;
+            if(!value && Embedded){_umm.Close();return;}
             if (value) {
                 LayoutEditorController.CancelActive();
                 if (EventSystem.current == null) {
@@ -62,12 +63,13 @@ namespace DonQuixoteOverlay {
             Visible = value; if (_canvas != null) _canvas.SetActive(value);
         }
         private void Update() {
+            TickUmm();
             if (!Visible) return;
             if (_statusRevision != RuntimeStatus.Revision) {
                 _statusRevision = RuntimeStatus.Revision;
                 _status.text = RuntimeStatus.ErrorCount > 0 ? RuntimeStatus.Details() : RuntimeStatus.Summary;
             }
-            if (Input.GetKeyDown(KeyCode.Escape)) { if (_palette!=null) ClosePalette(); else if (_capturing) StopCapture(); else SetVisible(false); return; }
+            if (Input.GetKeyDown(KeyCode.Escape)) { if (_palette!=null){ConsumeEscape();ClosePalette();} else if (_capturing){ConsumeEscape();StopCapture();} else SetVisible(false); return; }
             if (_palette!=null) return;
             if (!_capturing || Time.frameCount <= _captureFrame + 1) return;
             if (_keyViewerCapture >= 0 && KeyViewer.Instance != null && KeyViewer.Instance.CapturedKeyCode != 0) {
@@ -75,7 +77,7 @@ namespace DonQuixoteOverlay {
             }
             foreach (KeyCode code in _codes) {
                 if (!Input.GetKeyDown(code)) continue;
-                if (code == KeyCode.Mouse0 && RectTransformUtility.RectangleContainsScreenPoint(_panel, Input.mousePosition)) continue;
+                if (code == KeyCode.Mouse0 && PointerOverPanel()) continue;
                 if (_keyViewerCapture >= 0) { AssignViewerKey(code); return; }
             }
         }

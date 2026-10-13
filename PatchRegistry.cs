@@ -34,7 +34,8 @@ namespace DonQuixoteOverlay {
                     typeof(AttemptLeaveMapPatch), typeof(AttemptOpenMapPatch), typeof(AttemptOpenWorldPatch) }),
                 new PatchGroup("judgmentColors", "세부 판정 색상", false, new[] { typeof(NativeJudgmentColorPatch), typeof(NativeJudgmentColorResetPatch) }),
                 new PatchGroup("resultsOrder", "세부 결과 표시 순서", false, new[] { typeof(NativeResultsOrderPatch) }),
-                new PatchGroup("ghostInput", "고스트 레인 입력 호환", false, new[] { typeof(KeyViewerContents.RawGhostInputPatch) })
+                new PatchGroup("ghostInput", "고스트 레인 입력 호환", false, new[] { typeof(KeyViewerContents.RawGhostInputPatch) }),
+                new PatchGroup("ummSettings", "UMM 설정 입력", false, new[] { typeof(UmmEscapeClosePatch) })
             };
         }
         internal static void Apply(Harmony harmony, Assembly assembly) {

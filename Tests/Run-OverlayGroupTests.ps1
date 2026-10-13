@@ -57,7 +57,7 @@ $keys=Call (T 'KeyViewerContents.KeyViewerStore') 'Deserialize' @('{"SchemaVersi
 Check ($null -eq $keys.GetType().GetField('ShowTotalKpsKey16') -and $keys.KeyGap -eq 12) 'old footer OFF value is ignored without resetting key spacing'
 foreach($name in @('EffectsSettings','EffectGate','EffectLifetime','EffectRestoration','DisableBloomPatch','DisableInitialFiltersPatch','LimitMoveTrackPatch')){Check ($null -eq $mod.GetType('DonQuixoteOverlay.'+$name)) ('removed runtime type '+$name)}
 Check ($null -ne $mod.GetType('DonQuixoteOverlay.LayoutEditorController')) 'screen layout editing is restored'
-Check (@(Call (T 'PatchRegistry') 'Catalog' @()).Count -eq 5) 'only required overlay and input patch groups remain'
+Check (@(Call (T 'PatchRegistry') 'Catalog' @()).Count -eq 6) 'overlay, input and UMM escape patch groups are registered'
 $typedCatalog=(T 'PatchRegistry').GetMethod('Catalog',$flags).Invoke($null,@())
 Call (T 'PatchRegistry') 'ValidateCatalog' @($mod,$typedCatalog)|Out-Null
 Check ($true) 'every remaining Harmony class is classified'
