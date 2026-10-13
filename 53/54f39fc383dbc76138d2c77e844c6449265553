@@ -1,0 +1,35 @@
+SettingsWindow.cs
+  s_c43aa92a2e3354::t_f9d818ee52fc4b 115-116
+Tests/Run-UmmSettingsTests.ps1
+  s_c43aa92a2e3354::t_f9d818ee52fc4b 27-28
+UiComponents.cs
+  s_c43aa92a2e3354::t_d0e40745625be3 321-326,342,344-345
+UiTheme.cs
+  s_c43aa92a2e3354::t_d0e40745625be3 72
+Installer/README.md
+  s_c43aa92a2e3354::t_f9d818ee52fc4b 15
+FEEDBACK_0.5.1_VALIDATION.md
+  s_c43aa92a2e3354::t_d0e40745625be3 1-33
+README.md
+  s_c43aa92a2e3354::t_f9d818ee52fc4b 13
+Info.json
+  s_c43aa92a2e3354::t_f9d818ee52fc4b 5
+Tests/Run-WindowSurfaceTests.ps1
+  s_c43aa92a2e3354::t_d0e40745625be3 1-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5354f39fc383dbc76138d2c77e844c6449265553",
+  "prompts": {},
+  "sessions": {
+    "s_c43aa92a2e3354": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-0.5.1-scroll-mascot",
+        "model": "gpt-6"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
