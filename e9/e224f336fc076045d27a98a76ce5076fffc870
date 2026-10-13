@@ -1,0 +1,51 @@
+Tests/Run-PatchTests.ps1
+  s_fa5b17ee05c86c::t_427f774e60ea53 12,31-32
+Main.cs
+  s_fa5b17ee05c86c::t_427f774e60ea53 22-23
+UmmSettingsGeometry.cs
+  s_fa5b17ee05c86c::t_427f774e60ea53 1-19
+Info.json
+  s_fa5b17ee05c86c::t_427f774e60ea53 5
+GhostifyOverlay.csproj
+  s_fa5b17ee05c86c::t_427f774e60ea53 82-85,136-139
+Tests/Run-OverlayGroupTests.ps1
+  s_fa5b17ee05c86c::t_427f774e60ea53 60
+Tests/Run-UmmSettingsTests.ps1
+  s_fa5b17ee05c86c::t_427f774e60ea53 1-29
+Tests/Run-UmmHostTests.ps1
+  s_fa5b17ee05c86c::t_427f774e60ea53 1-13
+README.md
+  s_fa5b17ee05c86c::t_427f774e60ea53 13,22
+UmmSettingsHost.cs
+  s_fa5b17ee05c86c::t_427f774e60ea53 1-116
+Tests/UmmHostHarness.cs
+  s_fa5b17ee05c86c::t_427f774e60ea53 1-138
+PatchRegistry.cs
+  s_fa5b17ee05c86c::t_427f774e60ea53 37-38
+Tests/Run-KeyViewerTests.ps1
+  s_fa5b17ee05c86c::t_427f774e60ea53 73
+FEEDBACK_0.5.0_VALIDATION.md
+  s_fa5b17ee05c86c::t_427f774e60ea53 1-44
+UmmSettingsInput.cs
+  s_fa5b17ee05c86c::t_427f774e60ea53 1-33
+SettingsWindow.cs
+  s_fa5b17ee05c86c::t_427f774e60ea53 38,40,43,47,66,72,80
+SettingsWindow.Umm.cs
+  s_fa5b17ee05c86c::t_427f774e60ea53 1-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e9e224f336fc076045d27a98a76ce5076fffc870",
+  "prompts": {},
+  "sessions": {
+    "s_fa5b17ee05c86c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-0.5.0-umm-ugui",
+        "model": "gpt-6"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
