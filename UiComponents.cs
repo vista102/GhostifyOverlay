@@ -318,6 +318,12 @@ namespace DonQuixoteOverlay {
 
         private static Color[] RoundedPixels(int size, float r, bool borderOnly) {
             Color[] pixels = new Color[size * size];
+            if (r <= 0f) {
+                for (int y = 0; y < size; y++) for (int x = 0; x < size; x++)
+                    pixels[y * size + x] = new Color(1f, 1f, 1f,
+                        !borderOnly || x == 0 || y == 0 || x == size - 1 || y == size - 1 ? 1f : 0f);
+                return pixels;
+            }
             for (int y = 0; y < size; y++) for (int x = 0; x < size; x++) {
                 float dx = Mathf.Max(r - x - .5f, x + .5f - (size - r));
                 float dy = Mathf.Max(r - y - .5f, y + .5f - (size - r));
@@ -333,9 +339,10 @@ namespace DonQuixoteOverlay {
             const int size = 64;
             Texture2D texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
             texture.name = "GhostifyOverlay." + (borderOnly ? "Border." : "Rounded.") + radius; texture.wrapMode = TextureWrapMode.Clamp; texture.filterMode = FilterMode.Bilinear;
-            float r = Mathf.Clamp(radius, 1, size / 2 - 1);
+            float r = Mathf.Clamp(radius, 0, size / 2 - 1);
             texture.SetPixels(RoundedPixels(size, r, borderOnly)); texture.Apply(false, true);
-            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(.5f, .5f), 100f, 0u, SpriteMeshType.FullRect, new Vector4(r, r, r, r));
+            float inset = Mathf.Max(1f, r);
+            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(.5f, .5f), 100f, 0u, SpriteMeshType.FullRect, new Vector4(inset, inset, inset, inset));
             sprite.name = texture.name; return sprite;
         }
     }

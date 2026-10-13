@@ -24,6 +24,6 @@ Check ($null -ne $taskUI.GetField('mModFilter',$taskFlags)) 'installed UMM expos
 Check ($null -ne ([UnityEngine.GUI].Assembly.GetType('UnityEngine.GUIClip',$true)).GetProperty('visibleRect',$taskFlags)) 'installed Unity exposes current IMGUI scroll clip'
 Check ($taskMod.GetType('DonQuixoteOverlay.UmmSettingsInput',$true).IsSubclassOf([UnityEngine.EventSystems.BaseInput])) 'pointer adapter remains a uGUI BaseInput'
 Check ($taskMod.GetType('DonQuixoteOverlay.UmmSettingsRaycaster',$true).IsSubclassOf([UnityEngine.UI.GraphicRaycaster])) 'embedded controls use the actual uGUI raycaster'
-Check ($taskMod.GetType('DonQuixoteOverlay.AttemptTracker',$true).GetMethod('ValidateCurrentRun',$taskFlags) -eq $null) '0.5.0 includes the 0.4.9 no-subtraction fix'
-Check ((Get-Content (Join-Path $taskProject 'Info.json') -Raw|ConvertFrom-Json).Version -eq '0.5.0') 'new UI build carries its separate version'
+Check ($taskMod.GetType('DonQuixoteOverlay.AttemptTracker',$true).GetMethod('ValidateCurrentRun',$taskFlags) -eq $null) 'UMM UI build includes the 0.4.9 no-subtraction fix'
+Check ([version](Get-Content (Join-Path $taskProject 'Info.json') -Raw|ConvertFrom-Json).Version -ge [version]'0.5.0') 'UMM UI build carries version 0.5.0 or later'
 'UMM SDK assertions passed: '+$taskPassed

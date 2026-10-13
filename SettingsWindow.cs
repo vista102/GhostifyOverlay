@@ -112,6 +112,8 @@ namespace DonQuixoteOverlay {
             _status = DarkNeonUi.Text("",panel.transform,new Vector2(.03f,.01f),new Vector2(.97f,.05f),13,DQColors.TextSecondary,TextAlignmentOptions.Left,false);
             GameObject scrollRoot = DarkNeonUi.Rect("Scroll",panel.transform,new Vector2(.03f,.06f),new Vector2(.97f,.84f));
             ScrollRect scroll = _scroll = scrollRoot.AddComponent<ScrollRect>(); scroll.horizontal = false;
+            // Wheel steps should move a useful amount through the settings rows.
+            scroll.scrollSensitivity = 80f;
             GameObject viewport = DarkNeonUi.Rect("Viewport",scrollRoot.transform,Vector2.zero,Vector2.one);
             viewport.AddComponent<RectMask2D>(); scroll.viewport=viewport.GetComponent<RectTransform>();
             // A raycast surface lets mouse wheel scrolling work between controls.

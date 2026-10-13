@@ -69,7 +69,7 @@ namespace DonQuixoteOverlay {
     }
 
     internal static class DQRadii {
-        public const int Window = 18;
+        public const int Window = 0;
         public const int Panel = 15;
         public const int Card = 11;
         public const int Control = 9;
