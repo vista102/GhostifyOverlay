@@ -1,9 +1,9 @@
 {
   "GameVersion": "3.4.0",
   "Branch": "alpha",
-  "SteamBuild": "25590222",
+  "SteamBuild": "26044349",
   "Revision": "r150",
-  "UnityVersion": "6000.3.21f1",
-  "AssemblySha256": "6BA2CFB8D260962D3C8A3E4409F60E8E98293CA9B2D2ECA4875096BD02D40230",
+  "UnityVersion": "6000.3.25f1",
+  "AssemblySha256": "F692210F9A342F7EED4BE40AAD463286AB40BF046599959823942EA02F4CA3FF",
   "MinimumModManager": "0.33.0"
 }

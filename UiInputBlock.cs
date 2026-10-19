@@ -57,10 +57,11 @@ namespace DonQuixoteOverlay {
     internal static class MenuBlockGetMainPatch {
         private static void Postfix(ref int __result) { if (MenuInputBlock.IsActive) __result = 0; }
     }
-    [HarmonyPatch(typeof(RDInput), "GetStateKeys")]
+    [HarmonyPatch(typeof(RDInput), "GetStateKeys", new[] { typeof(System.Collections.Generic.List<AnyKeyCode>), typeof(ButtonState) })]
     internal static class MenuBlockGetStateKeysPatch {
-        private static void Postfix(System.Collections.Generic.List<AnyKeyCode> __result) {
-            if (MenuInputBlock.IsActive && __result != null) __result.Clear();
+        // Alpha 26044349 fills a caller-owned buffer and no longer returns it.
+        private static void Postfix(System.Collections.Generic.List<AnyKeyCode> __0) {
+            if (MenuInputBlock.IsActive && __0 != null) __0.Clear();
         }
     }
 }

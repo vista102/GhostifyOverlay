@@ -1,8 +1,8 @@
 ﻿param(
-    [string]$Before=(Join-Path $PSScriptRoot 'GameApi-public-24397494.json'),
-    [string]$After=(Join-Path $PSScriptRoot 'GameApi-alpha-25590222.json'),
-    [string]$OutputFile=(Join-Path $PSScriptRoot 'ApiDiff-current-patches-to-alpha-25590222.json'),
-    [string[]]$SourceFiles=@('UiInputBlock.cs','NativeJudgments.cs','GameplayPatches.cs')
+    [string]$Before=(Join-Path $PSScriptRoot 'GameApi-alpha-25590222.json'),
+    [string]$After=(Join-Path $PSScriptRoot 'GameApi-alpha-26044349.json'),
+    [string]$OutputFile=(Join-Path $PSScriptRoot 'ApiDiff-alpha-25590222-to-26044349.json'),
+    [string[]]$SourceFiles=@('UiInputBlock.cs','NativeJudgments.cs','OverlayController.cs','KeyViewerContents\AsyncInputHook.cs')
 )
 $ErrorActionPreference='Stop'
 $taskBefore=Get-Content -LiteralPath $Before -Raw|ConvertFrom-Json
@@ -36,7 +36,7 @@ $taskPatchTargets=@(foreach($taskSource in $SourceFiles){
         [pscustomobject]@{
             Source=$taskSource;Type=$taskTypeName;Method=$taskMethodName
             OldSignatures=$taskOldMethods;AlphaSignatures=$taskNewMethods
-            Status=if(!$taskNewMethods.Count){'Removed'}elseif(($taskOldMethods -join '|') -eq ($taskNewMethods -join '|')){'SignatureUnchanged'}else{'SignatureChanged'}
+            Status=if(!$taskOldType -or !$taskNewType){'NotCaptured'}elseif(!$taskNewMethods.Count){'Removed'}elseif(($taskOldMethods -join '|') -eq ($taskNewMethods -join '|')){'SignatureUnchanged'}else{'SignatureChanged'}
         }
     }
 })

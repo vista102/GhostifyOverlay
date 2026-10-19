@@ -79,10 +79,6 @@
       <HintPath>$(ManagedDir)\UnityEngine.UI.dll</HintPath>
       <Private>false</Private>
     </Reference>
-    <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>$(ManagedDir)\UnityEngine.IMGUIModule.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
     <Reference Include="UnityEngine.UIModule">
       <HintPath>$(ManagedDir)\UnityEngine.UIModule.dll</HintPath>
       <Private>false</Private>
@@ -133,10 +129,6 @@
     <Compile Include="RuntimeStatus.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="SettingsWindow.cs" />
-    <Compile Include="SettingsWindow.Umm.cs" />
-    <Compile Include="UmmSettingsHost.cs" />
-    <Compile Include="UmmSettingsInput.cs" />
-    <Compile Include="UmmSettingsGeometry.cs" />
     <Compile Include="SettingsWindow.Overlay.cs" />
     <Compile Include="SettingsWindow.Sliders.cs" />
     <Compile Include="SettingsWindow.KeyEditor.cs" />

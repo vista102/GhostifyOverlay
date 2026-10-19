@@ -1,6 +1,6 @@
 # Ghostify Overlay 설치 프로그램
 
-Windows 10/11용 단일 EXE입니다. .NET Framework 4.8과 **Unity Mod Manager 0.33.0 이상이 설치된 얼불춤**을 사용합니다. 개발 대상은 **3.4.0 alpha build 25590222**입니다. 설치 창은 게임 DLL의 SHA256과 검증 SDK 지문을 비교해 일치/미검증 상태를 표시합니다. 별도 설치 프로그램 패키지나 추가 실행 DLL이 필요하지 않습니다.
+Windows 10/11용 단일 EXE입니다. .NET Framework 4.8과 **Unity Mod Manager 0.33.0 이상이 설치된 얼불춤**을 사용합니다. 개발 대상은 **3.4.0 alpha build 26044349**입니다. 설치 창은 게임 DLL의 SHA256과 검증 SDK 지문을 비교해 일치/미검증 상태를 표시합니다. 별도 설치 프로그램 패키지나 추가 실행 DLL이 필요하지 않습니다.
 
 ![설치 화면](Assets/InstallerPreview.png)
 
