@@ -1,0 +1,47 @@
+UiInputBlock.cs
+  s_522652fa81d244::t_400c5fa35a54d4 60,62-64
+Installer/README.md
+  s_522652fa81d244::t_400c5fa35a54d4 3
+Research/Compare-AlphaApi.ps1
+  s_522652fa81d244::t_400c5fa35a54d4 2-5,39
+README.md
+  s_522652fa81d244::t_400c5fa35a54d4 11,13,22
+PatchRegistry.cs
+  s_522652fa81d244::t_400c5fa35a54d4 37
+SettingsWindow.cs
+  s_522652fa81d244::t_400c5fa35a54d4 38,40,43,70,78
+GameCompatibility.json
+  s_522652fa81d244::t_400c5fa35a54d4 4,6-7
+Tests/Run-StandaloneAlphaTests.ps1
+  s_522652fa81d244::t_400c5fa35a54d4 9-33
+FEEDBACK_0.4.10_VALIDATION.md
+  s_522652fa81d244::t_400c5fa35a54d4 1-44
+Info.json
+  s_522652fa81d244::t_400c5fa35a54d4 5
+Tests/UiInputBlockHarness.cs
+  s_522652fa81d244::t_400c5fa35a54d4 2,4,6-24,26-58
+Tests/Run-KeyViewerTests.ps1
+  s_522652fa81d244::t_400c5fa35a54d4 73
+Tests/Run-OverlayGroupTests.ps1
+  s_522652fa81d244::t_400c5fa35a54d4 60
+Tests/Run-PatchTests.ps1
+  s_522652fa81d244::t_400c5fa35a54d4 12,31
+Research/ALPHA_26044349_COMPATIBILITY.md
+  s_522652fa81d244::t_400c5fa35a54d4 1-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "181b366878ab5657e7d5399473c9588f343fc078",
+  "prompts": {},
+  "sessions": {
+    "s_522652fa81d244": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-0.4.10-alpha-26044349",
+        "model": "gpt-6"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
