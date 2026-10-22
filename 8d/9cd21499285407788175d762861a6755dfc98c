@@ -1,0 +1,395 @@
+src/Mod/Features/Overlay/OverlayController.cs
+  s_4637c991375b02::t_647689fa5199f3 1-365
+src/Mod/Integration/Adofai/Judgments/NativeTrackerResetPatch.cs
+  s_4637c991375b02::t_647689fa5199f3 1-19
+src/Mod/Integration/Adofai/Metadata/OverlayMetadata.cs
+  s_4637c991375b02::t_647689fa5199f3 7-10,15-18,21-23,27-29,32,34-37,39-40,43,46-47,50-51,53,56-58,62-71
+src/Mod/Presentation/Controls/DQControlBorder.cs
+  s_4637c991375b02::t_647689fa5199f3 1-31
+Installer/Run-InstallerTests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1,4,19
+src/Mod/Domain/Configuration/SettingsNormalization.cs
+  s_4637c991375b02::t_647689fa5199f3 7-18,21-24,30-33,37-45,47-54,56-77,81-83,92
+src/Mod/Features/Overlay/OverlayJudgmentLayout.cs
+  s_4637c991375b02::t_647689fa5199f3 1-63
+src/Mod/Presentation/Controls/UiButtonKind.cs
+  s_4637c991375b02::t_647689fa5199f3 1-18
+src/Mod/Integration/Unity/UnityModRuntime.cs
+  s_4637c991375b02::t_647689fa5199f3 1-46
+AI_ATTRIBUTION.md
+  s_4637c991375b02::t_647689fa5199f3 11-12,20
+src/Mod/Features/KeyViewer/Input/KeyEventClock.cs
+  s_4637c991375b02::t_647689fa5199f3 2,4-30,32-33
+src/Mod/Integration/Adofai/Judgments/NativeComboRevertPatch.cs
+  s_4637c991375b02::t_647689fa5199f3 1-19
+src/Mod/Features/KeyViewer/Layout/KeyviewerStyle.cs
+  s_4637c991375b02::t_647689fa5199f3 1-10
+src/Mod/Presentation/Theme/DQColors.cs
+  s_4637c991375b02::t_647689fa5199f3 1-56
+src/Mod/Integration/Adofai/Input/NativeInputSync.cs
+  s_4637c991375b02::t_647689fa5199f3 10-13,17-18,20-23,25-34,37-44,51-55,57-58,61-64,68-72,75-76,79,81-84,86-89,93-97
+Research/Compare-AlphaApi.ps1
+  s_4637c991375b02::t_647689fa5199f3 5,8-11
+src/Mod/Integration/Adofai/Judgments/NativeJudgmentColorResetPatch.cs
+  s_4637c991375b02::t_647689fa5199f3 1-18
+Research/Probe-SignedJudgments.ps1
+  s_4637c991375b02::t_647689fa5199f3 1
+src/Mod/Presentation/Settings/SettingsWindow.Colors.cs
+  s_4637c991375b02::t_647689fa5199f3 8-11,13-38,40-53,55-66,68-70,72-91,93-101
+src/Mod/Integration/Adofai/Input/MenuBlockKeyboardPatch.cs
+  s_4637c991375b02::t_647689fa5199f3 1-15
+Tests/Run-FeedbackV2Tests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1
+Tests/Run-FeedbackV5Tests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1
+src/Mod/Features/KeyViewer/Presentation/KeyViewer.cs
+  s_4637c991375b02::t_647689fa5199f3 10-46,48-52,54-59,61-65,67-395
+src/Mod/Features/KeyViewer/Rain/RainManager.cs
+  s_4637c991375b02::t_647689fa5199f3 1-184
+GhostifyOverlay.csproj
+  s_4637c991375b02::t_647689fa5199f3 99
+src/Mod/Features/LayoutEditing/LayoutEditSnapshot.cs
+  s_4637c991375b02::t_647689fa5199f3 1-30
+Research/Capture-GameApi.ps1
+  s_4637c991375b02::t_647689fa5199f3 1
+src/Installer/Domain/InstallResult.cs
+  s_4637c991375b02::t_647689fa5199f3 1-22
+src/Installer/Application/IInstallationService.cs
+  s_4637c991375b02::t_647689fa5199f3 1-11
+src/Mod/Integration/Adofai/Judgments/NativeResultsPresentation.cs
+  s_4637c991375b02::t_647689fa5199f3 1-57
+Tests/Run-ArchitectureTests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1-22
+src/Mod/Features/Overlay/OverlayController.Build.cs
+  s_4637c991375b02::t_647689fa5199f3 1-124
+src/Mod/Integration/Adofai/Input/AsyncInputHook.cs
+  s_4637c991375b02::t_647689fa5199f3 1-164
+src/Mod/Features/Overlay/OverlayTransforms.cs
+  s_4637c991375b02::t_647689fa5199f3 1-39
+src/Mod/Bootstrap/Main.cs
+  s_4637c991375b02::t_647689fa5199f3 1-2,6-10,16-28,31-33,36,40-43
+src/Mod/Features/Overlay/OverlayFpsCounter.cs
+  s_4637c991375b02::t_647689fa5199f3 3-6,11-22,25-26,28-30
+src/Mod/Integration/Adofai/Judgments/NativeResultsOrderPatch.cs
+  s_4637c991375b02::t_647689fa5199f3 1-20
+Tests/Run-OverlayGroupUiTests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1,3-9,17-19
+src/Installer/Application/IInstallationRunner.cs
+  s_4637c991375b02::t_647689fa5199f3 1-9
+Tests/Run-RainRegressionTests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1,6-7,14
+src/Mod/Integration/Adofai/Input/MenuBlockIsDownPatch.cs
+  s_4637c991375b02::t_647689fa5199f3 1-16
+src/Mod/Integration/Adofai/Judgments/AttemptOpenWorldPatch.cs
+  s_4637c991375b02::t_647689fa5199f3 1-19
+src/Mod/Features/Overlay/OverlayVisibility.cs
+  s_4637c991375b02::t_647689fa5199f3 1-33
+Tests/Run-StandaloneAlphaTests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1,28-29
+.editorconfig
+  s_4637c991375b02::t_647689fa5199f3 1-17
+src/Installer/Application/IPackageAssets.cs
+  s_4637c991375b02::t_647689fa5199f3 1-7
+Tests/Run-UiFixTests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1,5-7
+src/Mod/Features/LayoutEditing/LayoutKeyRepeat.cs
+  s_4637c991375b02::t_647689fa5199f3 5-6,8-9,12-15,17-40
+src/Mod/Presentation/Theme/DQControlMetrics.cs
+  s_4637c991375b02::t_647689fa5199f3 1-19
+src/Mod/Infrastructure/Fonts/FontAssetProvider.cs
+  s_4637c991375b02::t_647689fa5199f3 1-112
+Tests/Run-FontTests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1,3-4,7
+docs/README.md
+  s_4637c991375b02::t_647689fa5199f3 1-11
+Research/Inspect-AlphaMetadata.ps1
+  s_4637c991375b02::t_647689fa5199f3 1
+src/Mod/Infrastructure/Persistence/AtomicJsonStorage.cs
+  s_4637c991375b02::t_647689fa5199f3 1-50
+src/Mod/Presentation/Theme/DarkNeonTheme.cs
+  s_4637c991375b02::t_647689fa5199f3 5-6,8-9,52-53
+Tests/Run-FeedbackV4Tests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1
+src/Mod/Integration/Adofai/Input/KeyCaptureUiLease.cs
+  s_4637c991375b02::t_647689fa5199f3 4-5,7-8,11-12,15-16,24-27
+src/Mod/Infrastructure/Patching/PatchGroup.cs
+  s_4637c991375b02::t_647689fa5199f3 1-24
+src/Mod/Integration/Adofai/Judgments/NativeComboHitPatch.cs
+  s_4637c991375b02::t_647689fa5199f3 1-19
+src/Mod/Integration/Adofai/Input/MenuInputBlock.cs
+  s_4637c991375b02::t_647689fa5199f3 5-6,8-9,12-25,28-37,39-40,42-51
+Installer/Verify-Notices.ps1
+  s_4637c991375b02::t_647689fa5199f3 1
+src/Mod/Integration/Adofai/Judgments/AttemptLeaveMapPatch.cs
+  s_4637c991375b02::t_647689fa5199f3 1-19
+Tests/Run-OverlayGroupTests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1
+Build.ps1
+  s_4637c991375b02::t_647689fa5199f3 1
+src/Mod/Integration/Adofai/Input/MenuBlockGetStatePatch.cs
+  s_4637c991375b02::t_647689fa5199f3 1-16
+src/Mod/Presentation/Settings/ColorPaletteState.cs
+  s_4637c991375b02::t_647689fa5199f3 1-43
+Tests/Run-AttemptTrackerTests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1,3-4,8
+src/Mod/Presentation/Theme/DQTypography.cs
+  s_4637c991375b02::t_647689fa5199f3 1-18
+src/Mod/Infrastructure/Persistence/DelegateSaveParticipant.cs
+  s_4637c991375b02::t_647689fa5199f3 1-12
+src/Mod/Integration/Adofai/Judgments/NativeJudgments.cs
+  s_4637c991375b02::t_647689fa5199f3 8-15,20-22,25-27,31-39,41-46,49-73,76-78,81-97,99-102,104-106,109,111-121,123-127,130-132,134-137,139-142,146
+src/Mod/Presentation/Controls/DQToggleVisual.cs
+  s_4637c991375b02::t_647689fa5199f3 1-50
+src/Installer/Domain/GameState.cs
+  s_4637c991375b02::t_647689fa5199f3 1-22
+src/Installer/Presentation/BrandFonts.cs
+  s_4637c991375b02::t_647689fa5199f3 1-100
+src/Mod/Integration/Adofai/Judgments/NativeJudgmentColors.cs
+  s_4637c991375b02::t_647689fa5199f3 1-94
+src/Mod/Application/Lifecycle/IModRuntime.cs
+  s_4637c991375b02::t_647689fa5199f3 1-8
+src/Mod/Presentation/Controls/OverlayTextShadow.cs
+  s_4637c991375b02::t_647689fa5199f3 5-6,8-9,12-13,15-16,19-24,36-40,47-50
+src/Mod/Integration/Adofai/Input/MenuBlockAsyncKeyboardPatch.cs
+  s_4637c991375b02::t_647689fa5199f3 1-15
+src/Mod/Features/KeyViewer/Presentation/Key.cs
+  s_4637c991375b02::t_647689fa5199f3 6-41,43
+Installer/Build-Setup.ps1
+  s_4637c991375b02::t_647689fa5199f3 1,4,80
+src/Mod/Domain/Configuration/DonQuixoteSettings.cs
+  s_4637c991375b02::t_647689fa5199f3 1-31
+Previews/Render-ControlPreview.ps1
+  s_4637c991375b02::t_647689fa5199f3 1,4
+src/Mod/Domain/Configuration/LayoutData.cs
+  s_4637c991375b02::t_647689fa5199f3 1-40
+README.md
+  s_4637c991375b02::t_647689fa5199f3 13,41-42
+src/Mod/Domain/Configuration/OverlaySettings.cs
+  s_4637c991375b02::t_647689fa5199f3 1-40
+src/Mod/Infrastructure/Persistence/JsonSettingsRepository.cs
+  s_4637c991375b02::t_647689fa5199f3 1-62
+Installer/Get-Sources.ps1
+  s_4637c991375b02::t_647689fa5199f3 1-2
+src/Mod/Presentation/Theme/DQRadii.cs
+  s_4637c991375b02::t_647689fa5199f3 1-15
+src/Mod/Presentation/Theme/DQSpacing.cs
+  s_4637c991375b02::t_647689fa5199f3 1-17
+Tests/Run-AlphaTests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1
+.gitignore
+  s_4637c991375b02::t_647689fa5199f3 48-50
+src/Mod/Features/KeyViewer/Input/KeyViewer.Input.cs
+  s_4637c991375b02::t_647689fa5199f3 8-72,75-159,161-187,190-222,225-233,235-256,258-315,318-321,323-326,328-337,339-444
+src/Installer/Domain/GameCompatibility.cs
+  s_4637c991375b02::t_647689fa5199f3 1-23
+src/Installer/Presentation/Controls/BrandButton.cs
+  s_4637c991375b02::t_647689fa5199f3 1-136
+src/Mod/Features/KeyViewer/Layout/KeyViewerSlot.cs
+  s_4637c991375b02::t_647689fa5199f3 1-23
+src/Mod/Features/Overlay/TileProgress.cs
+  s_4637c991375b02::t_647689fa5199f3 1-15
+docs/architecture/ARCHITECTURE.md
+  s_4637c991375b02::t_647689fa5199f3 1-60
+src/Installer/Bootstrap/Program.cs
+  s_4637c991375b02::t_647689fa5199f3 1-92
+src/Mod/Features/KeyViewer/Configuration/KeyViewerCounterPalette.cs
+  s_4637c991375b02::t_647689fa5199f3 1-37
+src/Mod/Infrastructure/Diagnostics/RuntimeStatus.cs
+  s_4637c991375b02::t_647689fa5199f3 5-6,8-11,15,18-34,36-39,45-46,48-55,58-60,65-72,74-76,78-82,84-97,99-101,103-104,108
+src/Installer/Presentation/SetupWindow.cs
+  s_4637c991375b02::t_647689fa5199f3 14-19,29-197,199-209,211-217,222-231,233-239,241-242,245-253,258-274,276-298,300-321,323-331,335-336,338-349
+src/Mod/Integration/Adofai/Input/RawGhostInputPatch.cs
+  s_4637c991375b02::t_647689fa5199f3 9-21
+src/Mod/Features/LayoutEditing/LayoutEditorController.cs
+  s_4637c991375b02::t_647689fa5199f3 8-11,13-39,41,46-77,79-88,90-143,146-156,158-163,166-180,182-190,192-199,201-230
+src/Mod/Presentation/Controls/DarkNeonUi.cs
+  s_4637c991375b02::t_647689fa5199f3 7-10,19-20,24-27,31-32,34-38,42-43,45-46,51-54,57,61-62,64-66,70-71,74-84,88-89,94-99,106-110,116-117,120-121,127-137,139-145,147-148,152-153,156-157,164,173-174,178-179,186-198,201-202,205-206,219-227,231-236,240-244,247-252,255-258,262-273,277-286,290-299,301-308,315-322,326-329,333-337,341-342,345-353,357-358,364-367,373-374,377-388,392-393,396-400,402-403,406-407,409-413,416-417,419-423,426-427,429-433,436-448,452-453,456-458,460-461,464-465
+src/Mod/Infrastructure/Persistence/JsonFileStore.cs
+  s_4637c991375b02::t_647689fa5199f3 1-12
+Tests/Run-EnterMapTests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1
+Install.ps1
+  s_4637c991375b02::t_647689fa5199f3 1
+src/Mod/Features/Overlay/OverlayPart.cs
+  s_4637c991375b02::t_647689fa5199f3 1-18
+src/Mod/Infrastructure/Lifecycle/OwnedStateRegistry.cs
+  s_4637c991375b02::t_647689fa5199f3 8-23,25,27-38,41-48,52-55,57-62,64-65,69-71,74
+src/Mod/Infrastructure/Persistence/KeyViewerColorConverter.cs
+  s_4637c991375b02::t_647689fa5199f3 1-46
+Tests/Run-FeedbackV6Tests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1
+src/Mod/Features/KeyViewer/Rain/Rain.cs
+  s_4637c991375b02::t_647689fa5199f3 1-31
+Previews/Render-TogglePreview.ps1
+  s_4637c991375b02::t_647689fa5199f3 1,3
+src/Mod/Features/KeyViewer/Layout/FootKeyviewerStyle.cs
+  s_4637c991375b02::t_647689fa5199f3 1-12
+src/Mod/Integration/Adofai/Input/MenuBlockGetMainPatch.cs
+  s_4637c991375b02::t_647689fa5199f3 1-16
+src/Mod/Presentation/Settings/SettingsWindow.KeyEditor.cs
+  s_4637c991375b02::t_647689fa5199f3 8-11,14,19-22,24-40,43-46,48,50-56,59-64,67-83,85-114,117-150,152-153
+src/Mod/Integration/Adofai/Input/MenuBlockGetStateKeysPatch.cs
+  s_4637c991375b02::t_647689fa5199f3 1-17
+src/Installer/Domain/PackageFile.cs
+  s_4637c991375b02::t_647689fa5199f3 1-21
+src/Mod/Features/Overlay/OverlayPalette.cs
+  s_4637c991375b02::t_647689fa5199f3 5-19,21-27,29-31,34-44,47-71,74
+src/Mod/Infrastructure/Patching/PatchRegistry.cs
+  s_4637c991375b02::t_647689fa5199f3 7-12,16,18-22,24-29,34-37,41-42,44-46,50-51,53-55,57-62,64-65,68-70,72-73,75-78,82-84,87-97,101-103,107-109,112-114,117-123
+src/Mod/Infrastructure/Persistence/KeyCountData.cs
+  s_4637c991375b02::t_647689fa5199f3 1-69
+src/Mod/Infrastructure/Persistence/LayoutStore.cs
+  s_4637c991375b02::t_647689fa5199f3 1-32
+src/Mod/Presentation/Settings/ColorPalettePointer.cs
+  s_4637c991375b02::t_647689fa5199f3 1-23
+Tests/Inspect-FontApi.ps1
+  s_4637c991375b02::t_647689fa5199f3 1
+src/Mod/Features/KeyViewer/Configuration/KeyViewerSetting.cs
+  s_4637c991375b02::t_647689fa5199f3 1-64
+Tests/Run-WindowSurfaceTests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1
+Update-Installed.ps1
+  s_4637c991375b02::t_647689fa5199f3 1
+src/Mod/Infrastructure/Persistence/ReportingJsonStorage.cs
+  s_4637c991375b02::t_647689fa5199f3 1-23
+Tests/Run-FeedbackV3Tests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1
+src/Mod/Presentation/Settings/SettingsWindow.Sliders.cs
+  s_4637c991375b02::t_647689fa5199f3 6-12,27-31,34-35,38-42,45-46,48-49,51-55,57,60-65
+src/Mod/Features/KeyViewer/Configuration/KeyViewerColors.cs
+  s_4637c991375b02::t_647689fa5199f3 1-26
+src/Mod/Features/KeyViewer/Input/KeyKpsWindow.cs
+  s_4637c991375b02::t_647689fa5199f3 1-20
+src/Mod/Infrastructure/Persistence/IJsonStorage.cs
+  s_4637c991375b02::t_647689fa5199f3 1-10
+Tests/Run-ColorRowTests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1,6
+src/Mod/Integration/Adofai/Judgments/NativeJudgmentColorPatch.cs
+  s_4637c991375b02::t_647689fa5199f3 1-23
+src/Mod/Application/Persistence/ISettingsRepository.cs
+  s_4637c991375b02::t_647689fa5199f3 1-8
+docs/development/BUILD_AND_TEST.md
+  s_4637c991375b02::t_647689fa5199f3 1-24
+src/Mod/Application/Lifecycle/ModLifecycle.cs
+  s_4637c991375b02::t_647689fa5199f3 1-58
+src/Mod/Integration/Adofai/Metadata/OverlayPlacement.cs
+  s_4637c991375b02::t_647689fa5199f3 1-15
+src/Mod/Integration/Adofai/Input/KeyViewerVisibility.cs
+  s_4637c991375b02::t_647689fa5199f3 1-21
+Research/Inspect-GameMethodBody.ps1
+  s_4637c991375b02::t_647689fa5199f3 1
+src/Mod/Integration/Adofai/Metadata/AdofaiOverlayDataSource.cs
+  s_4637c991375b02::t_647689fa5199f3 1-51
+Installer/Run-InstallerUiTests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1,3,10
+Tests/Run-LayoutEditorTests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1,54
+docs/plans/ALPHA_MIGRATION_PLAN.md
+  s_4637c991375b02::t_647689fa5199f3 1
+src/Mod/Features/KeyViewer/Rain/RainPool.cs
+  s_4637c991375b02::t_647689fa5199f3 1-81
+src/Mod/Application/Overlay/OverlayTimes.cs
+  s_4637c991375b02::t_647689fa5199f3 1-8
+Tests/Run-PatchTests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1
+src/Mod/Application/Persistence/ISaveParticipant.cs
+  s_4637c991375b02::t_647689fa5199f3 1-7
+src/Mod/Bootstrap/OverlayRuntime.cs
+  s_4637c991375b02::t_647689fa5199f3 1-50
+Info.json
+  s_4637c991375b02::t_647689fa5199f3 5
+src/Mod/Features/Overlay/OverlayStatusTextCache.cs
+  s_4637c991375b02::t_647689fa5199f3 1-87
+src/Mod/Integration/Adofai/Input/MenuBlockWentDownPatch.cs
+  s_4637c991375b02::t_647689fa5199f3 1-16
+src/Mod/Application/Overlay/OverlayTempo.cs
+  s_4637c991375b02::t_647689fa5199f3 1-9
+src/Mod/Features/KeyViewer/Input/KeyTransitionState.cs
+  s_4637c991375b02::t_647689fa5199f3 1-51
+src/Mod/Application/Overlay/IOverlayMetricsSource.cs
+  s_4637c991375b02::t_647689fa5199f3 1-9
+src/Mod/Infrastructure/Persistence/KeyViewerStore.cs
+  s_4637c991375b02::t_647689fa5199f3 8-21,23-36,38-42,44-53,56-140,143-149,151-152
+Tests/ArchitectureServiceTests.cs
+  s_4637c991375b02::t_647689fa5199f3 1-132
+Tests/Run-AllTests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1-15
+src/Mod/Application/Lifecycle/IModPatches.cs
+  s_4637c991375b02::t_647689fa5199f3 1-8
+src/Mod/Application/Persistence/SaveCoordinator.cs
+  s_4637c991375b02::t_647689fa5199f3 1-42
+src/Mod/Features/KeyViewer/Presentation/KeyViewer.Layout.cs
+  s_4637c991375b02::t_647689fa5199f3 1-39
+Tests/Run-FeedbackTests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1
+src/Installer/Application/InstallerEngine.cs
+  s_4637c991375b02::t_647689fa5199f3 13,15-18,26-36,38-40,43-44,46-47,49-50,52,55-66,69-78,81-88,91-95,97-98,101-108,110-111,113-133,135-137,139-140,142-143,146,150-152,154-155,158-160,163-168,170-171,175-183,186-188,190-191,193-195,197-201,203-204,206-309,311-350,352-360,362-363,365-369,373-386,388-389,391-392,394-398,401-403,405-406,408
+src/Installer/Infrastructure/InstallerFileSystem.cs
+  s_4637c991375b02::t_647689fa5199f3 1-149
+src/Mod/Features/Overlay/OverlayGroup.cs
+  s_4637c991375b02::t_647689fa5199f3 3-7,11-18
+src/Mod/Application/Overlay/IOverlayMetadataSource.cs
+  s_4637c991375b02::t_647689fa5199f3 1-8
+src/Mod/Features/Attempts/AttemptTracker.cs
+  s_4637c991375b02::t_647689fa5199f3 1-278
+src/Mod/Features/KeyViewer/Layout/KeyViewerGeometry.cs
+  s_4637c991375b02::t_647689fa5199f3 4-70,72-89
+src/Mod/Bootstrap/ModComposition.cs
+  s_4637c991375b02::t_647689fa5199f3 1-20
+src/Mod/Features/KeyViewer/Layout/KeyViewerMetrics.cs
+  s_4637c991375b02::t_647689fa5199f3 1-13
+Tests/Run-RepositoryTests.ps1
+  s_4637c991375b02::t_647689fa5199f3 1-26
+src/Mod/Integration/Adofai/Input/MenuBlockWentUpPatch.cs
+  s_4637c991375b02::t_647689fa5199f3 1-16
+docs/research/ALPHA_26044349_COMPATIBILITY.md
+  s_4637c991375b02::t_647689fa5199f3 41
+src/Mod/Features/Overlay/OverlayController.Text.cs
+  s_4637c991375b02::t_647689fa5199f3 1-186
+src/Mod/Presentation/Settings/ColorPalettePanel.cs
+  s_4637c991375b02::t_647689fa5199f3 8-11,21-29,31-121,123-137,140-152,155-174
+docs/validation/FEEDBACK_0.4.10_VALIDATION.md
+  s_4637c991375b02::t_647689fa5199f3 10
+src/Installer/Domain/PackageManifest.cs
+  s_4637c991375b02::t_647689fa5199f3 1-22
+src/Mod/Presentation/Settings/SettingsWindow.cs
+  s_4637c991375b02::t_647689fa5199f3 12-15,18,37-95,97-98,102-111,114-115,118-121,123-129,133-152,154-165,168-170,173-178,185-187,189-198,200-202,205-222,225-227,229,233-239,241,243-289,291-323,325-344,346,348-380,382-434,436-457,459-555
+src/Installer/Presentation/Controls/RoundedPanel.cs
+  s_4637c991375b02::t_647689fa5199f3 1-49
+docs/validation/REFACTOR_0.4.11_VALIDATION.md
+  s_4637c991375b02::t_647689fa5199f3 1-48
+src/Installer/Infrastructure/ElevatedInstallationRunner.cs
+  s_4637c991375b02::t_647689fa5199f3 1-33
+src/Mod/Features/Overlay/OverlayGroups.cs
+  s_4637c991375b02::t_647689fa5199f3 1-19
+src/Mod/Integration/Adofai/Judgments/AttemptOpenMapPatch.cs
+  s_4637c991375b02::t_647689fa5199f3 1-19
+src/Mod/Infrastructure/Patching/HarmonyPatchService.cs
+  s_4637c991375b02::t_647689fa5199f3 1-23
+src/Mod/Features/KeyViewer/Rain/RawRain.cs
+  s_4637c991375b02::t_647689fa5199f3 1-62
+src/Mod/Features/Overlay/OverlayAccuracy.cs
+  s_4637c991375b02::t_647689fa5199f3 1-18
+src/Mod/Integration/Adofai/Judgments/OverlayBeginRunPatch.cs
+  s_4637c991375b02::t_647689fa5199f3 1-23
+src/Mod/Presentation/Settings/SettingsWindow.Overlay.cs
+  s_4637c991375b02::t_647689fa5199f3 6-12,14-33,35,38-46,48-57,59-78
+src/Mod/Infrastructure/Persistence/SettingsStore.cs
+  s_4637c991375b02::t_647689fa5199f3 1-32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8d9cd21499285407788175d762861a6755dfc98c",
+  "prompts": {},
+  "sessions": {
+    "s_4637c991375b02": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-solid-refactor-0.4.11",
+        "model": "gpt-6"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
