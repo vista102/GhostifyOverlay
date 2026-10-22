@@ -1,4 +1,4 @@
-# Run in pwsh: the native SkyHook mapper needs CollectionExtensions.
+﻿# Run in pwsh: the native SkyHook mapper needs CollectionExtensions.
 param([string]$GameDir='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice',[switch]$CompatibilityOnly)
 $ErrorActionPreference='Stop'
 $taskProject=Split-Path $PSScriptRoot

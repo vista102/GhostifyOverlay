@@ -1,4 +1,4 @@
-param([string]$Root=(Split-Path $PSScriptRoot))
+﻿param([string]$Root=(Split-Path $PSScriptRoot))
 $ErrorActionPreference='Stop'
 
 # Reviewed license texts. Normalize line endings so a Windows/Linux checkout

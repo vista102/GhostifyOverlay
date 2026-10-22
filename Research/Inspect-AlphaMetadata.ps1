@@ -1,4 +1,4 @@
-param(
+﻿param(
     [string]$GameDir='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice',
     [string[]]$TypeNames,
     [string]$NamePattern='HitMargin|Judgment|Gameplay|SavedSettings|XPerfect|ErrorMeterTick|^Difficulty$'

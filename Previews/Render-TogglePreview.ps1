@@ -1,6 +1,6 @@
-$ErrorActionPreference='Stop'
+﻿$ErrorActionPreference='Stop'
 Add-Type -AssemblyName System.Drawing
-$source=Get-Content -LiteralPath (Join-Path (Split-Path $PSScriptRoot) 'UiComponents.cs') -Raw -Encoding UTF8
+$source=Get-Content -LiteralPath (Join-Path (Split-Path $PSScriptRoot) 'src/Mod/Presentation/Controls/UiButtonKind.cs') -Raw -Encoding UTF8
 # Preview the actual production pixel generator and dimensions without starting Unity.
 $method=[regex]::Match($source,'private static Color\[\] SwitchPixels\(int width, int height\) \{[\s\S]*?return pixels;\s*\}').Value
 $constants=[regex]::Match($source,'private const int SwitchWidth[^;]+;').Value+[regex]::Match($source,'private const float SwitchInset[^;]+;').Value+[regex]::Match($source,'internal const float SwitchTravel[^;]+;').Value

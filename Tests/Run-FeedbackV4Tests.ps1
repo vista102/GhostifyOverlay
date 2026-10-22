@@ -1,4 +1,4 @@
-# Run in pwsh against the shipping mod assembly; never writes to the real game.
+﻿# Run in pwsh against the shipping mod assembly; never writes to the real game.
 param([string]$GameDir='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice')
 $ErrorActionPreference='Stop'
 $taskProject=Split-Path $PSScriptRoot

@@ -1,4 +1,4 @@
-param([string]$GameDir='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice')
+﻿param([string]$GameDir='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice')
 $ErrorActionPreference='Stop'
 $taskProject=Split-Path $PSScriptRoot
 $taskManaged=Join-Path $GameDir 'A Dance of Fire and Ice_Data\Managed'
@@ -51,7 +51,7 @@ Check ($taskWidth -eq 46 -and $taskHeight -eq 26 -and $taskThumb -eq 20) 'compil
 Check ((44-$taskHeight)/2 -eq 9) '44px cards have nine pixel vertical margins around switch'
 Check (($taskHeight-$taskThumb)/2 -eq $taskInset) 'circular thumb has equal vertical insets'
 Check ($taskTravel+$taskThumb/2 -eq $taskWidth/2-$taskInset) 'thumb stays inside track at both toggle positions'
-$taskSource=[IO.File]::ReadAllText((Join-Path $taskProject 'SettingsWindow.cs'))
+$taskSource=[IO.File]::ReadAllText((Join-Path $taskProject 'src/Mod/Presentation/Settings/SettingsWindow.cs'))
 Check ($taskSource -notmatch 'Numeric\("위치 [XY]"|Numeric\("전체 배율') 'settings window has no remaining placement numeric controls'
 Check ($taskSource -match 'LayoutEditorController>\(\)\.Begin\(6\)') 'keyviewer page opens editing with keyviewer selected'
 'Layout editor assertions passed: '+$taskPassed

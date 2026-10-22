@@ -1,6 +1,7 @@
-param([switch]$SkipShippingInstall)
+﻿param([switch]$SkipShippingInstall)
 $ErrorActionPreference='Stop'
 $project=Split-Path $PSScriptRoot
+. (Join-Path $PSScriptRoot 'Get-Sources.ps1')
 $root=Join-Path $PSScriptRoot ('test-fixture-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $root | Out-Null
 $csc='C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\Roslyn\csc.exe'
@@ -15,7 +16,7 @@ $sleeper=Join-Path $root 'Sleeper.exe'
 & $csc /nologo /target:exe "/out:$sleeper" $sleeperSource
 if($LASTEXITCODE -ne 0){throw 'Process fixture compilation failed'}
 $harness=Join-Path $root 'InstallerHarness.dll'
-& $csc /nologo /target:library /langversion:latest "/out:$harness" /r:System.Core.dll /r:System.Web.Extensions.dll /r:System.Xml.dll /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll (Join-Path $PSScriptRoot 'InstallerEngine.cs') (Join-Path $PSScriptRoot 'InstallerTests.cs')
+& $csc /nologo /target:library /langversion:latest "/out:$harness" /r:System.Core.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll /r:System.Web.Extensions.dll /r:System.Xml.dll /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll $installerSources (Join-Path $project 'Tests/Installer/InstallerTests.cs')
 if($LASTEXITCODE -ne 0){throw 'Installer test compilation failed'}
 $assembly=[Reflection.Assembly]::LoadFrom($harness)
 $info=Get-Content -LiteralPath (Join-Path $project 'Info.json') -Raw -Encoding UTF8 | ConvertFrom-Json

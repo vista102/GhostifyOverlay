@@ -1,7 +1,7 @@
-$ErrorActionPreference='Stop'
+﻿$ErrorActionPreference='Stop'
 Add-Type -AssemblyName System.Drawing
 $project=Split-Path $PSScriptRoot
-$source=Get-Content -LiteralPath (Join-Path $project 'UiComponents.cs') -Raw -Encoding UTF8
+$source=Get-Content -LiteralPath (Join-Path $project 'src/Mod/Presentation/Controls/UiButtonKind.cs') -Raw -Encoding UTF8
 # Render production alpha masks, including the fill and border's shared contour.
 $methods=''
 foreach($name in @('RoundedPixels','ClosePixels','SwitchPixels')){

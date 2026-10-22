@@ -1,6 +1,7 @@
-param([string]$GameDir='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice',[switch]$SkipModBuild)
+﻿param([string]$GameDir='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice',[switch]$SkipModBuild)
 $ErrorActionPreference='Stop'
 $project=Split-Path $PSScriptRoot
+. (Join-Path $PSScriptRoot 'Get-Sources.ps1')
 if(!$SkipModBuild){& (Join-Path $project 'Build.ps1') -GameDir $GameDir}
 $info=Get-Content -LiteralPath (Join-Path $project 'Info.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 $release=(Resolve-Path -LiteralPath (Join-Path $project 'bin\Release\GhostifyOverlay')).Path
@@ -76,7 +77,7 @@ $manifestSource=[IO.File]::ReadAllText((Join-Path $PSScriptRoot 'app.manifest'))
 $arguments=@('/nologo','/target:winexe','/platform:anycpu','/optimize+','/deterministic+','/langversion:latest',('/out:'+$exe),('/win32icon:'+$icon),('/win32manifest:'+$appManifest),
  '/r:System.dll','/r:System.Core.dll','/r:System.Drawing.dll','/r:System.Windows.Forms.dll','/r:System.Xml.dll','/r:System.Web.Extensions.dll','/r:System.IO.Compression.dll','/r:System.IO.Compression.FileSystem.dll',
  ('/resource:'+$payload+',Payload.zip'),('/resource:'+$manifestPath+',Payload.json'),('/resource:'+$mascot+',Mascot.png'),('/resource:'+$icon+',Brand.ico'),
- $assemblyInfo,(Join-Path $PSScriptRoot 'InstallerEngine.cs'),(Join-Path $PSScriptRoot 'Program.cs'))
+ $assemblyInfo)+$installerSources
 & $csc $arguments
 if($LASTEXITCODE -ne 0){throw 'Installer compilation failed'}
 $zip=Join-Path $output ('GhostifyOverlay-'+$info.Version+'.zip')

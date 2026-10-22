@@ -1,4 +1,4 @@
-param([string]$GameDir='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice',[string]$SteamManifest='C:\Program Files (x86)\Steam\steamapps\appmanifest_977950.acf',[string]$OutputFile)
+﻿param([string]$GameDir='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice',[string]$SteamManifest='C:\Program Files (x86)\Steam\steamapps\appmanifest_977950.acf',[string]$OutputFile)
 $ErrorActionPreference='Stop'
 $game=$GameDir
 $managed=Join-Path $game 'A Dance of Fire and Ice_Data\Managed'

@@ -1,4 +1,4 @@
-# Run in pwsh: native SkyHook's mapper requires .NET CollectionExtensions.
+﻿# Run in pwsh: native SkyHook's mapper requires .NET CollectionExtensions.
 param([string]$GameDir='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice')
 $ErrorActionPreference='Stop'
 $taskProject=Split-Path $PSScriptRoot

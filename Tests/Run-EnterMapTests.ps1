@@ -1,4 +1,4 @@
-# Use pwsh (.NET Core): the game's mapper calls CollectionExtensions, absent from Windows .NET Framework.
+﻿# Use pwsh (.NET Core): the game's mapper calls CollectionExtensions, absent from Windows .NET Framework.
 param([string]$GameDir='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice')
 $ErrorActionPreference='Stop'
 $managed=Join-Path $GameDir 'A Dance of Fire and Ice_Data\Managed'

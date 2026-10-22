@@ -2,9 +2,13 @@
     [string]$Before=(Join-Path $PSScriptRoot 'GameApi-alpha-25590222.json'),
     [string]$After=(Join-Path $PSScriptRoot 'GameApi-alpha-26044349.json'),
     [string]$OutputFile=(Join-Path $PSScriptRoot 'ApiDiff-alpha-25590222-to-26044349.json'),
-    [string[]]$SourceFiles=@('UiInputBlock.cs','NativeJudgments.cs','OverlayController.cs','KeyViewerContents\AsyncInputHook.cs')
+    [string[]]$SourceFiles
 )
 $ErrorActionPreference='Stop'
+if(!$SourceFiles){
+    $taskProject=Split-Path $PSScriptRoot
+    $SourceFiles=@(Get-ChildItem -LiteralPath (Join-Path $taskProject 'src/Mod') -Filter *.cs -Recurse -File|ForEach-Object {$_.FullName.Substring($taskProject.Length+1)})
+}
 $taskBefore=Get-Content -LiteralPath $Before -Raw|ConvertFrom-Json
 $taskAfter=Get-Content -LiteralPath $After -Raw|ConvertFrom-Json
 $taskChanges=@(foreach($taskOldType in $taskBefore.Types){

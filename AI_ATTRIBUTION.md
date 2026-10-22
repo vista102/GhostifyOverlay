@@ -8,6 +8,8 @@ git-ai 1.7.5를 0.4.3 공개 배포 준비 중에 도입했습니다. 이전 커
 
 공개 배포를 위한 문서 수정은 별도 Codex checkpoint로 기록합니다. 원본 키뷰어의 출처와 BSD-3-Clause 라이선스는 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md), 폰트의 라이선스는 `Assets`의 OFL 문서를 따릅니다. 이 기록은 원본 코드·글꼴·이미지의 저작권 표시를 대체하지 않습니다.
 
+0.4.11 구조 정리에서는 Codex가 수행한 파일 이동·타입 분리·형식 정리도 편집 기록에 포함됩니다. 이 표시는 해당 리팩터링을 수행한 도구를 나타내며, 기존 코드의 원저작자가 바뀌거나 원본 코드를 새로 창작했다는 의미가 아닙니다.
+
 ## 확인 방법
 
 git-ai를 설치한 뒤 저장소에서 실행합니다. 일반 clone은 Git Notes를 자동으로 가져오지 않으므로 먼저 notes ref를 가져옵니다.
@@ -15,7 +17,7 @@ git-ai를 설치한 뒤 저장소에서 실행합니다. 일반 clone은 Git Not
 ```sh
 git fetch origin refs/notes/ai:refs/notes/ai
 git-ai stats HEAD
-git-ai blame NativeJudgments.cs
+git-ai blame src/Mod/Integration/Adofai/Judgments/NativeJudgments.cs
 git log -1 --show-notes=ai
 ```
 

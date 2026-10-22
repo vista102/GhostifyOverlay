@@ -1,4 +1,4 @@
-$ErrorActionPreference='Stop'
+﻿$ErrorActionPreference='Stop'
 $taskProject=Split-Path $PSScriptRoot
 $taskManaged='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice\A Dance of Fire and Ice_Data\Managed'
 foreach($taskDir in @($taskManaged,(Join-Path $taskManaged 'UnityModManager'))){foreach($taskFile in Get-ChildItem -LiteralPath $taskDir -Filter *.dll){try{[Reflection.Assembly]::LoadFrom($taskFile.FullName)|Out-Null}catch{}}}
@@ -25,7 +25,8 @@ $taskFixture=Join-Path $taskProject ('Backups\Feedback-0.4.10\Input-'+[Guid]::Ne
 New-Item -ItemType Directory -Path $taskFixture -Force|Out-Null
 $taskHarness=Join-Path $taskFixture 'UiInputBlockHarness.dll'
 $taskCsc='C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\Roslyn\csc.exe'
-& $taskCsc /nologo /target:library /langversion:latest /r:System.Core.dll ('/r:'+(Join-Path $taskManaged 'UnityModManager\0Harmony.dll')) "/out:$taskHarness" (Join-Path $taskProject 'UiInputBlock.cs') (Join-Path $PSScriptRoot 'UiInputBlockHarness.cs')
+$taskInputSources=Get-ChildItem -LiteralPath (Join-Path $taskProject 'src/Mod/Integration/Adofai/Input') -Filter 'Menu*.cs'|ForEach-Object FullName
+& $taskCsc /nologo /target:library /langversion:latest /r:System.Core.dll ('/r:'+(Join-Path $taskManaged 'UnityModManager\0Harmony.dll')) "/out:$taskHarness" $taskInputSources (Join-Path $PSScriptRoot 'UiInputBlockHarness.cs')
 if($LASTEXITCODE -ne 0){throw 'Standalone input harness compilation failed'}
 $taskAssembly=[Reflection.Assembly]::LoadFrom($taskHarness)
 $taskResults=$taskAssembly.GetType('DonQuixoteOverlay.UiInputBlockHarness',$true).GetMethod('Run').Invoke($null,@())

@@ -1,0 +1,22 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
+using System.Web.Script.Serialization;
+using System.Xml;
+using Microsoft.Win32;
+
+namespace GhostifySetup
+{
+    public sealed class PackageManifest
+    {
+        public string Version { get; set; }
+        public PackageFile[] Files { get; set; }
+        public GameCompatibility GameCompatibility { get; set; }
+    }
+}

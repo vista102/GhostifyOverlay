@@ -45,3 +45,6 @@
 /Assets/GoogleSans-OFL.txt
 /Research/GmarketOfficial/
 Tests/FeedbackV3Harness-*.dll
+
+# Private historical machine reports remain local after document organization.
+/docs/local/

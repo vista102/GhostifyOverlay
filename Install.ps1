@@ -1,4 +1,4 @@
-param([string]$GameDir = 'C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice')
+﻿param([string]$GameDir = 'C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice')
 $ErrorActionPreference = 'Stop'
 $projectDir = $PSScriptRoot
 $sourceDir = (Resolve-Path -LiteralPath (Join-Path $projectDir 'bin\Release\GhostifyOverlay')).Path

@@ -1,4 +1,4 @@
-param(
+﻿param(
     [string]$GameDir='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice',
     [Parameter(Mandatory=$true)][string]$TypeName,
     [Parameter(Mandatory=$true)][string]$MethodNames
