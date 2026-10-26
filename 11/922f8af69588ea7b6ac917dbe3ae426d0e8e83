@@ -1,0 +1,21 @@
+Tests/Run-RepositoryTests.ps1
+  s_3f56fca1033a0b::t_798534c518731c 12
+AGENTS.md
+  s_3f56fca1033a0b::t_798534c518731c 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "11922f8af69588ea7b6ac917dbe3ae426d0e8e83",
+  "prompts": {},
+  "sessions": {
+    "s_3f56fca1033a0b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-agent-completion-policy",
+        "model": "unknown"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
