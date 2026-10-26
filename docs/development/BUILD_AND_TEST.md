@@ -15,6 +15,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File Tests\Run-AllTests.ps1 -
 
 주요 검사:
 
+- `Run-FeatureIntegrationTests.ps1`: 실제 입력 패치·곡 정보 가시성 어댑터·행간·설정 콜백을 통제된 런타임과 Harmony에 연결해 채터링·고스트 레인·외부 모드 공존을 검사합니다.
 - `Run-ModManagerCompatibilityTests.ps1`: 실제 UMM 0.32.5에서 배포 DLL의 관리자·Harmony 참조, 진입점, 모든 UMM 멤버 참조를 해석합니다.
 - `Run-FactoryDefaultsTests.ps1`: 승인된 설정 자료와 새 설치·초기화 값을 대조하고, 기존 설정·키 지정·레이아웃·어템·키 입력 횟수가 보존되는지 검사합니다. 자료에는 개인 누적 기록이 포함되지 않습니다.
 - `Run-ArchitectureTests.ps1`: 실제 서비스와 파일 저장 구현을 사용해 복구·원자 저장·동시 저장·시작 실패·종료 실패·지연 저장·재시도 계약을 검사합니다. Application 서비스를 Unity·Harmony·WinForms 없이 컴파일합니다.

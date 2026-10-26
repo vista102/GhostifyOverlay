@@ -117,6 +117,7 @@ namespace DonQuixoteOverlay
             tmp.alignment = alignment;
             tmp.raycastTarget = false;
             tmp.textWrappingMode = TextWrappingModes.NoWrap;
+            tmp.overflowMode = TextOverflowModes.Overflow;
             _overlayTexts.Add(tmp);
             return tmp;
         }

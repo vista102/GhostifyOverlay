@@ -9,7 +9,7 @@ $owner='qkddn.DonQuixoteOverlay.offline-test'
 $harmony=New-Object HarmonyLib.Harmony($owner)
 try {
     $patchTypes=@($assembly.GetTypes()|Where-Object {$_.GetCustomAttributes([HarmonyLib.HarmonyPatch],$false).Count -gt 0})
-    if($patchTypes.Count -ne 19) {throw "Unexpected patch class count: $($patchTypes.Count)"}
+    if($patchTypes.Count -ne 21) {throw "Unexpected patch class count: $($patchTypes.Count)"}
     $targetNames=New-Object 'System.Collections.Generic.HashSet[string]'
     $created=0; $unavailable=0
     foreach($type in $patchTypes) {
@@ -28,7 +28,7 @@ try {
 
         }
     }
-    if($targetNames.Count -ne 19) {throw "Unexpected unique target count: $($targetNames.Count)"}
+    if($targetNames.Count -ne 20) {throw "Unexpected unique target count: $($targetNames.Count)"}
     "Target metadata passed: $($patchTypes.Count) classes / $($targetNames.Count) targets; patch creation passed: $created; unavailable outside Unity: $unavailable"
     # Exercise the manual hook lease prefixes without invoking any native hook/game method.
     $flags=[Reflection.BindingFlags]'Public,NonPublic,Static,Instance'

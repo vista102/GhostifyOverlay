@@ -41,7 +41,7 @@ namespace GhostifySetup
             _gameRunning = gameRunning ?? GameRunning;
             _payload = payload;
             _manifest = new JavaScriptSerializer().Deserialize<PackageManifest>(manifest);
-            if (_manifest == null || _manifest.Files == null || _manifest.Files.Length != 14 || string.IsNullOrEmpty(_manifest.Version) || _manifest.GameCompatibility == null || string.IsNullOrWhiteSpace(_manifest.GameCompatibility.GameVersion) || string.IsNullOrWhiteSpace(_manifest.GameCompatibility.Branch) || _manifest.GameCompatibility.AssemblySha256 == null || _manifest.GameCompatibility.AssemblySha256.Length != 64)
+            if (_manifest == null || _manifest.Files == null || _manifest.Files.Length != 15 || string.IsNullOrEmpty(_manifest.Version) || _manifest.GameCompatibility == null || string.IsNullOrWhiteSpace(_manifest.GameCompatibility.GameVersion) || string.IsNullOrWhiteSpace(_manifest.GameCompatibility.Branch) || _manifest.GameCompatibility.AssemblySha256 == null || _manifest.GameCompatibility.AssemblySha256.Length != 64)
                 throw new InvalidDataException("설치 파일 정보가 올바르지 않습니다.");
             if (!System.Version.TryParse(_manifest.GameCompatibility.MinimumModManager, out _minimumModManager))
                 throw new InvalidDataException("Unity Mod Manager 최소 버전 정보가 올바르지 않습니다.");

@@ -11,7 +11,7 @@ $output=Join-Path $project 'dist'
 $work=Join-Path $PSScriptRoot 'obj'
 New-Item -ItemType Directory -Path $output,$work -Force | Out-Null
 $files=@(Get-ChildItem -LiteralPath $release -Recurse -File)
-if($files.Count -ne 14){throw 'Unexpected mod Release files'}
+if($files.Count -ne 15){throw 'Unexpected mod Release files'}
 $compatibility=Get-Content -LiteralPath (Join-Path $release 'GameCompatibility.json') -Raw -Encoding UTF8|ConvertFrom-Json
 if($compatibility.MinimumModManager -ne $info.ManagerVersion){throw 'Mod and installer UMM requirements differ'}
 $releaseInfo=Get-Content -LiteralPath (Join-Path $release 'Info.json') -Raw -Encoding UTF8|ConvertFrom-Json

@@ -17,7 +17,7 @@ function Read-Resource([string]$name){
 }
 function Hash-Bytes([byte[]]$bytes){$taskSha=[Security.Cryptography.SHA256]::Create();try{[BitConverter]::ToString($taskSha.ComputeHash($bytes)).Replace('-','')}finally{$taskSha.Dispose()}}
 $taskManifest=[Text.Encoding]::UTF8.GetString((Read-Resource 'Payload.json'))|ConvertFrom-Json
-if($taskManifest.Version -ne $taskInfo.Version -or $taskManifest.Files.Count -ne 14){throw 'Shipping manifest version or file count differs'}
+if($taskManifest.Version -ne $taskInfo.Version -or $taskManifest.Files.Count -ne 15){throw 'Shipping manifest version or file count differs'}
 $taskEmbedded=Read-Resource 'Payload.zip'
 if((Hash-Bytes $taskEmbedded) -ne (Get-FileHash -LiteralPath $taskZip).Hash){throw 'Standalone ZIP differs from the embedded EXE payload'}
 $taskMemory=New-Object IO.MemoryStream(,$taskEmbedded)

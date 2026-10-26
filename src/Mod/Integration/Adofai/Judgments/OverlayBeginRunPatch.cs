@@ -15,6 +15,7 @@ namespace DonQuixoteOverlay
             if (!Main.Enabled)
                 return;
             OverlayController.ResetRun();
+            ChatterRuntime.Reset();
             KeyViewerContents.KeyViewer.Instance?.BeginGameplayRun();
             // Editor Play / WaitForStartCo set checkpoint state after Start_Rewind.
             AttemptTracker.PrepareRun(__instance, __0);

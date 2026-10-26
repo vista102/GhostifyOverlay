@@ -11,6 +11,7 @@ namespace DonQuixoteOverlay
     {
         public int SchemaVersion = 4;
         public OverlaySettings Overlay = new OverlaySettings();
+        public ChatterSettings Chatter = new ChatterSettings();
         public static DonQuixoteSettings CreateDefault()
         {
             return new DonQuixoteSettings();

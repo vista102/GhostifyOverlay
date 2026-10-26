@@ -29,7 +29,8 @@ namespace DonQuixoteOverlay
                 new PatchGroup("statistics", "콤보·시도 횟수", false, new[] { typeof(NativeComboHitPatch), typeof(NativeTrackerResetPatch), typeof(NativeComboRevertPatch), typeof(OverlayBeginRunPatch), typeof(AttemptLeaveMapPatch), typeof(AttemptOpenMapPatch), typeof(AttemptOpenWorldPatch) }),
                 new PatchGroup("judgmentColors", "세부 판정 색상", false, new[] { typeof(NativeJudgmentColorPatch), typeof(NativeJudgmentColorResetPatch) }),
                 new PatchGroup("resultsOrder", "세부 결과 표시 순서", false, new[] { typeof(NativeResultsOrderPatch) }),
-                new PatchGroup("ghostInput", "고스트 레인 입력 호환", false, new[] { typeof(KeyViewerContents.RawGhostInputPatch) })
+                new PatchGroup("ghostInput", "고스트 레인 입력 호환", false, new[] { typeof(KeyViewerContents.RawGhostInputPatch) }),
+                new PatchGroup("chatter", "채터링 차단", false, new[] { typeof(ChatterAsyncInputPatch), typeof(ChatterSyncInputPatch) })
             };
         }
 

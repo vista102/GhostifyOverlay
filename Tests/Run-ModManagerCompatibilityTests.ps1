@@ -31,4 +31,18 @@ try{
         Check ($resolved.DeclaringType.Assembly.GetName().Version -eq $ummName.Version) ('real UMM 0.32.5 member resolves: '+$member.FullName)
     }
 }finally{$metadata.Dispose()}
+$tweaksPath=Join-Path $GameDir 'Mods/AdofaiTweaks/AdofaiTweaks.dll'
+if(Test-Path -LiteralPath $tweaksPath){
+    $tweaks=[Reflection.Assembly]::LoadFrom($tweaksPath)
+    $flags=[Reflection.BindingFlags]'Public,NonPublic,Static,Instance'
+    $patches=$tweaks.GetType('AdofaiTweaks.Tweaks.HideUiElements.HideUiElementsPatches',$true)
+    $settingsProperty=$patches.GetProperty('Settings',$flags)
+    Check ($settingsProperty -ne $null -and $settingsProperty.GetGetMethod($true).IsStatic) 'installed Tweaks exposes the optional static UI settings adapter'
+    $settingsType=$settingsProperty.PropertyType
+    foreach($name in @('IsEnabled','RecordingMode','PlayingProfile','RecordingProfile')){
+        Check ($null -ne $settingsType.GetProperty($name,$flags)) ('installed Tweaks UI option is readable: '+$name)
+    }
+    $profile=$settingsType.GetProperty('PlayingProfile',$flags).PropertyType
+    foreach($name in @('HideEverything','HideTitle')){Check ($null -ne $profile.GetProperty($name,$flags)) ('installed Tweaks hide profile supports '+$name)}
+}else{'Optional Tweaks metadata check skipped: standalone integration remains available.'}
 'Mod manager compatibility assertions passed: '+$passed

@@ -12,6 +12,9 @@ namespace DonQuixoteOverlay
         {
             if (value.Overlay == null)
                 value.Overlay = new OverlaySettings();
+            if (value.Chatter == null) value.Chatter = new ChatterSettings();
+            value.Chatter.IntervalMilliseconds = Math.Max(0, Math.Min(500, value.Chatter.IntervalMilliseconds));
+            value.Overlay.LineSpacing = Bounded(value.Overlay.LineSpacing, -20, 60, 0);
             if (value.SchemaVersion < 4)
             {
                 value.Overlay.ShowDetailedJudgments = value.Overlay.ShowJudgmentCounts;

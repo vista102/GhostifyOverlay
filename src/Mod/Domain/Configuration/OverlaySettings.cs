@@ -28,6 +28,7 @@ namespace DonQuixoteOverlay
         public bool ShowTimingRanges = true;
         public bool ShowFps = true;
         public string Font = "Gmarket Sans";
+        public float LineSpacing;
         [JsonConverter(typeof(KeyViewerContents.KeyViewerColorConverter))]
         public Color ValueColor = Color.white;
         [JsonConverter(typeof(KeyViewerContents.KeyViewerColorConverter))]

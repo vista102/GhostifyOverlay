@@ -60,7 +60,7 @@ namespace GhostifySetup {
             byte[] oldConfig = File.ReadAllBytes(Config(fresh));
             var install = engine.Install(fresh);
             Check(install.Success && Directory.Exists(Target(fresh)), "fresh install succeeds in a Unicode path");
-            Check(Directory.GetFiles(Target(fresh), "*", SearchOption.AllDirectories).Length == 14, "exactly fourteen mod files including game compatibility are installed");
+            Check(Directory.GetFiles(Target(fresh), "*", SearchOption.AllDirectories).Length == 15, "exactly fifteen mod files including the upstream MIT notice are installed");
             Check(!engine.Inspect(fresh).VerifiedGameBuild && engine.Inspect(fresh).Compatibility.Contains("3.4.0 alpha"), "installer identifies an unverified build and its target game version");
             string gameAssembly = Path.Combine(fresh, InstallerEngine.GameName + "_Data", "Managed", "Assembly-CSharp.dll");
             File.WriteAllText(gameAssembly, "controlled compatible SDK fingerprint");

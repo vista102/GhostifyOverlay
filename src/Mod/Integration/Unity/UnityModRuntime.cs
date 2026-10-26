@@ -16,6 +16,7 @@ namespace GhostifyOverlay.Integration.Unity
             Main.Root.AddComponent<OverlayRuntime>();
             var overlayData = new AdofaiOverlayDataSource();
             Main.Root.AddComponent<OverlayController>().Initialize(overlayData, overlayData);
+            Main.Root.AddComponent<NativeSongTitleVisibility>();
             Main.Root.AddComponent<SettingsWindow>();
             Main.Root.AddComponent<LayoutEditorController>();
             Main.Root.AddComponent<KeyViewer>();
@@ -24,7 +25,7 @@ namespace GhostifyOverlay.Integration.Unity
         {
             Exception failure = null;
             Action[] cleanup = {
-                LayoutEditorController.CancelActive, AsyncInputHook.Reset, NativeJudgmentColors.RestoreAll,
+                LayoutEditorController.CancelActive, ChatterRuntime.Reset, AsyncInputHook.Reset, NativeJudgmentColors.RestoreAll,
                 DestroyRoot, DarkNeonUi.DisposeAssets, FontAssetProvider.Dispose, OverlayController.ResetRun,
                 () => { if (Main.Settings != null) Main.Save(); }, AttemptTracker.EndSession
             };

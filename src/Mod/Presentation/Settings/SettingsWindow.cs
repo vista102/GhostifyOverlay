@@ -229,6 +229,7 @@ namespace DonQuixoteOverlay
             viewport.AddComponent<Image>().color = new Color(0, 0, 0, .001f);
             NewPage("오버레이");
             BuildOverlayGroups();
+            BuildOverlayTypography();
             BuildOverlayColors();
             NewPage("키뷰어");
             BuildKeyViewerPage();
@@ -316,11 +317,12 @@ namespace DonQuixoteOverlay
                 SetVisible(false);
                 Main.Root.GetComponent<LayoutEditorController>().Begin(6);
             });
-            Numeric("키 간격 · 0~30 (기본 4)", () => KeyViewerStore.Settings.KeyGap, v =>
+            Numeric("키 간격 · 0~30 (기본 3)", () => KeyViewerStore.Settings.KeyGap, v =>
             {
                 KeyViewerStore.Settings.KeyGap = v;
                 ChangedKeyViewer();
             });
+            BuildChatterSettings();
             Heading("레인");
             Toggle("레인 표시", () => KeyViewerStore.Settings.useRain, v =>
             {

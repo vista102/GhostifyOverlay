@@ -24,6 +24,7 @@ namespace DonQuixoteOverlay
             if (!Main.Enabled)
                 return;
             scrController c = scrController.instance;
+            ChatterRuntime.Tick();
             AttemptTracker.Tick(c);
         }
 
@@ -31,6 +32,7 @@ namespace DonQuixoteOverlay
         {
             LayoutEditorController.CancelActive();
             MenuInputBlock.Reset();
+            ChatterRuntime.Reset();
             try
             {
                 NativeJudgmentColors.RestoreOldScene(current);

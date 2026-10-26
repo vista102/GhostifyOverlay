@@ -35,6 +35,8 @@ namespace DonQuixoteOverlay
         private float _metadataNextUpdate;
         private string _songMeasuredText;
         private float _songMeasuredWidth = -1f;
+        private float _appliedLineSpacing = float.NaN;
+        internal bool SongInfoVisible => Main.Enabled && _songInfo != null && _songInfo.gameObject.activeInHierarchy && !string.IsNullOrEmpty(_songInfo.text);
         private readonly int[] _lastJudgmentCounts = new int[9];
         private readonly string[] _judgmentColors = new string[9];
         private readonly Vector3[] _meterCorners = new Vector3[4];
@@ -136,6 +138,7 @@ namespace DonQuixoteOverlay
 
             if (!active)
                 return;
+            ApplyTypography();
             if (c == null || !c.gameworld)
             {
                 SetTexts(false);
@@ -324,6 +327,7 @@ namespace DonQuixoteOverlay
 
         public void ApplySettings()
         {
+            ApplyTypography();
             var settings = Main.Settings.Overlay;
             if (_progressFill != null)
                 _progressFill.GetComponent<Image>().color = settings.ProgressBarColor;

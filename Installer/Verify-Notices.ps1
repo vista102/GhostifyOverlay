@@ -7,6 +7,7 @@ $ErrorActionPreference='Stop'
 # Noto: google/fonts 4efc2774c63917927efe769ca845def6bd6debae/ofl/notosanskr/OFL.txt.
 # Gmarket: the vendor license retained with the original Light/Medium fonts.
 $notices=@{
+    'Licenses/AdofaiTweaks-MIT.txt'='79C9F334F4F0C9AF6087FE57889DF20E4FFF7CBBE28841A355315C2C61A2A85A'
     'Licenses/JipperResourcePack-BSD-3-Clause.txt'='B85C066B532EA07471B8575D0495DB987C811186805DE2266062529CF0A81226'
     'Assets/GmarketSans-OFL.txt'='730DB2B2DD4C86E67F8EB48E293979448976A6E4709AA6A0FB4608B004CA8C39'
     'Assets/NotoSansKR-OFL.txt'='1C05C68C34F9708415AADA51F17E1B0092D2CEA709BF4A94CD38114F9E73D7D9'

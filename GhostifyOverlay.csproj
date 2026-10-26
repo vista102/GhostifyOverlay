@@ -101,6 +101,7 @@
     <Content Include="THIRD-PARTY-NOTICES.md"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
     <Content Include="Licenses\JipperResourcePack-BSD-3-Clause.txt"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
     <Content Include="Licenses\JipperResourcePack-source.json"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
+    <Content Include="Licenses\AdofaiTweaks-MIT.txt"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
     <Content Include="Info.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

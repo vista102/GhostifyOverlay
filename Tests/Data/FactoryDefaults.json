@@ -29,7 +29,12 @@
       "ProgressBarColor": "#FFC939FF",
       "AttemptsColor": "#FFFFFFFF",
       "FullAttempts": {},
-      "FullProgressAttempts": {}
+      "FullProgressAttempts": {},
+      "LineSpacing": 0
+    },
+    "Chatter": {
+      "Enabled": false,
+      "IntervalMilliseconds": 100
     }
   },
   "KeyViewer": {

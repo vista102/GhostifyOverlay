@@ -12,7 +12,8 @@ function Check($okay,[string]$name){if(!$okay){throw ('FAIL '+$name)};$script:pa
 function T([string]$name){$mod.GetType('DonQuixoteOverlay.'+$name,$true)}
 function Call([Type]$type,[string]$name,[object[]]$values){
     for($i=0;$i -lt $values.Count;$i++){if($null -ne $values[$i]){$values[$i]=$values[$i].PSObject.BaseObject}}
-    $type.GetMethod($name,$flags).Invoke($null,$values)
+    $parameterTypes=[type[]]@($values|ForEach-Object {$_.GetType()})
+    $type.GetMethod($name,$flags,$null,$parameterTypes,$null).Invoke($null,$values)
 }
 function Json($value){,([Newtonsoft.Json.Linq.JObject]::FromObject($value.PSObject.BaseObject))}
 function Compare-Profile($expected,$actual,[string]$path){
@@ -51,6 +52,9 @@ $settings.Overlay.ShowTheoreticalKps=$true
 $settings.Overlay.ValueColor=[UnityEngine.Color]::new(.2,.3,.4,1)
 $settings.Overlay.FullAttempts['test-record']=17
 $settings.Overlay.FullProgressAttempts['test-record']=23
+$settings.Overlay.LineSpacing=14
+$settings.Chatter.Enabled=$true
+$settings.Chatter.IntervalMilliseconds=35
 $keys.KeyGap=11
 $keys.XLocation=77
 $keys.Background=[UnityEngine.Color]::new(.2,.4,.6,1)
@@ -75,6 +79,7 @@ $layout=(T 'LayoutStore').GetField('Current',$flags).GetValue($null)
 $counts=(T 'KeyViewerContents.KeyCountData').GetField('Instance',$flags).GetValue($null)
 foreach($file in $before){Check ((Get-FileHash -LiteralPath $file.Path).Hash -eq $file.Hash) ('existing saved file unchanged: '+[IO.Path]::GetFileName($file.Path))}
 Check ($settings.Overlay.ShowAccuracy -and $settings.Overlay.ShowTheoreticalKps -and [Math]::Abs($settings.Overlay.ValueColor.r-.2) -lt .00001) 'existing overlay choices and color survive'
+Check ($settings.Overlay.LineSpacing -eq 14 -and $settings.Chatter.Enabled -and $settings.Chatter.IntervalMilliseconds -eq 35) 'line spacing and chatter enable/interval survive saving and reloading'
 Check ($keys.KeyGap -eq 11 -and $keys.XLocation -eq 77 -and [Math]::Abs($keys.Background.r-.2) -lt .00001 -and $keys.key10[0] -eq [UnityEngine.KeyCode]::Return -and $keys.key10Text[0] -eq 'saved alias') 'existing key colors, gap, position, bindings and aliases survive'
 Check ($layout.TopLeftY -eq 123 -and [Math]::Abs($layout.ComboScale-1.4) -lt .00001) 'existing overlay layout survives'
 Check ($settings.Overlay.FullAttempts['test-record'] -eq 17 -and $settings.Overlay.FullProgressAttempts['test-record'] -eq 23 -and $counts.Count[0] -eq 42 -and $counts.TotalCount -eq 77) 'existing attempts and key counts survive'
@@ -93,4 +98,19 @@ $newKeys.key10[0]=[UnityEngine.KeyCode]::Escape
 $freshKeys=[Activator]::CreateInstance((T 'KeyViewerContents.KeyViewerSetting'))
 Check ($freshKeys.key10[0] -eq [UnityEngine.KeyCode]::Tab) 'default binding arrays are independent between instances'
 Check ($counts.Count[0] -eq 42 -and $counts.TotalCount -eq 77) 'appearance reset leaves existing key counts untouched'
+$legacy=Call (T 'SettingsStore') 'Deserialize' @('{"SchemaVersion":4,"Overlay":{"ShowAccuracy":true,"ValueColor":"#123456FF"}}')
+Check (!$legacy.Chatter.Enabled -and $legacy.Chatter.IntervalMilliseconds -eq 100 -and $legacy.Overlay.LineSpacing -eq 0 -and $legacy.Overlay.ShowAccuracy) 'old settings gain disabled chatter and unchanged spacing while preserving existing choices'
+$legacy.Chatter=$null
+$legacy.Overlay.LineSpacing=[float]::NaN
+Call (T 'SettingsNormalization') 'Normalize' @($legacy)|Out-Null
+Check ($legacy.Chatter -ne $null -and $legacy.Overlay.LineSpacing -eq 0) 'null chatter and nonfinite line spacing safely recover'
+$legacy.Chatter.Enabled=$true
+$legacy.Chatter.IntervalMilliseconds=999
+$legacy.Overlay.LineSpacing=999
+Call (T 'SettingsNormalization') 'Normalize' @($legacy)|Out-Null
+Check ($legacy.Chatter.Enabled -and $legacy.Chatter.IntervalMilliseconds -eq 500 -and $legacy.Overlay.LineSpacing -eq 60) 'chatter and spacing upper bounds preserve the enable choice'
+$legacy.Chatter.IntervalMilliseconds=-99
+$legacy.Overlay.LineSpacing=-99
+Call (T 'SettingsNormalization') 'Normalize' @($legacy)|Out-Null
+Check ($legacy.Chatter.IntervalMilliseconds -eq 0 -and $legacy.Overlay.LineSpacing -eq -20) 'chatter and spacing lower bounds are enforced'
 'Factory default / existing-user preservation assertions passed: '+$passed
