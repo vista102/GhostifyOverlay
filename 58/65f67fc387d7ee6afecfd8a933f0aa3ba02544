@@ -1,0 +1,99 @@
+src/Mod/Integration/Adofai/Input/ChatterRuntime.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 1-61
+src/Mod/Presentation/Settings/SettingsWindow.Typography.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 1-30
+Tests/Run-AllTests.ps1
+  s_9425f77f4abd2d::t_ebc3690d286cd9 7
+Installer/Build-Setup.ps1
+  s_9425f77f4abd2d::t_ebc3690d286cd9 14
+src/Mod/Domain/Configuration/SettingsNormalization.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 15-17
+Tests/Installer/InstallerTests.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 63
+Tests/Run-FactoryDefaultsTests.ps1
+  s_9425f77f4abd2d::t_ebc3690d286cd9 15-16,55-57,82,101-115
+Installer/Verify-Notices.ps1
+  s_9425f77f4abd2d::t_ebc3690d286cd9 10
+Tests/FeatureIntegrationHarness.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 1-153
+src/Mod/Features/Overlay/OverlayController.Build.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 120
+src/Mod/Domain/Configuration/OverlaySettings.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 31
+README.md
+  s_9425f77f4abd2d::t_ebc3690d286cd9 13,25-26,31
+src/Mod/Integration/Adofai/Input/ChatterSyncInputPatch.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 1-16
+Tests/Data/FactoryDefaults.json
+  s_9425f77f4abd2d::t_ebc3690d286cd9 32-37
+src/Mod/Domain/Configuration/ChatterSettings.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 1-10
+Installer/Verify-Shipping.ps1
+  s_9425f77f4abd2d::t_ebc3690d286cd9 20
+src/Mod/Features/Overlay/OverlayController.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 38-39,141,330
+Tests/Run-OverlayGroupTests.ps1
+  s_9425f77f4abd2d::t_ebc3690d286cd9 60
+src/Mod/Infrastructure/Patching/PatchRegistry.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 32-33
+docs/development/BUILD_AND_TEST.md
+  s_9425f77f4abd2d::t_ebc3690d286cd9 18
+src/Mod/Integration/Adofai/Judgments/OverlayBeginRunPatch.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 18
+src/Mod/Integration/Adofai/Input/ChatterAsyncInputPatch.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 1-11
+src/Mod/Presentation/Settings/SettingsWindow.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 232,320,325
+docs/validation/FEATURES_0.4.14_VALIDATION.md
+  s_9425f77f4abd2d::t_ebc3690d286cd9 1-47
+src/Mod/Domain/Configuration/DonQuixoteSettings.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 14
+src/Mod/Features/Overlay/OverlayController.Typography.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 1-18
+Tests/Run-FeatureIntegrationTests.ps1
+  s_9425f77f4abd2d::t_ebc3690d286cd9 1-16
+THIRD-PARTY-NOTICES.md
+  s_9425f77f4abd2d::t_ebc3690d286cd9 6,13-14
+Tests/Run-PatchTests.ps1
+  s_9425f77f4abd2d::t_ebc3690d286cd9 12,31
+docs/README.md
+  s_9425f77f4abd2d::t_ebc3690d286cd9 5
+Licenses/AdofaiTweaks-MIT.txt
+  s_9425f77f4abd2d::t_ebc3690d286cd9 1-19
+src/Mod/Application/Input/ChatterFilter.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 1-39
+GhostifyOverlay.csproj
+  s_9425f77f4abd2d::t_ebc3690d286cd9 104
+src/Mod/Integration/Unity/UnityModRuntime.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 19,28
+Tests/Run-ModManagerCompatibilityTests.ps1
+  s_9425f77f4abd2d::t_ebc3690d286cd9 34-47
+src/Mod/Bootstrap/OverlayRuntime.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 27,35
+src/Mod/Integration/Unity/NativeSongTitleVisibility.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 1-38
+src/Installer/Application/InstallerEngine.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 44
+src/Mod/Application/Visibility/VisibilityLease.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 1-29
+Info.json
+  s_9425f77f4abd2d::t_ebc3690d286cd9 5
+src/Mod/Integration/Interop/ModInterop.cs
+  s_9425f77f4abd2d::t_ebc3690d286cd9 1-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5865f67fc387d7ee6afecfd8a933f0aa3ba02544",
+  "prompts": {},
+  "sessions": {
+    "s_9425f77f4abd2d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-features-0.4.14",
+        "model": "unknown"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
