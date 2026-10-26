@@ -1,0 +1,49 @@
+docs/README.md
+  s_93163e619ca7b1::t_6589211ba9122f 5
+GhostifyOverlay.csproj
+  s_93163e619ca7b1::t_6589211ba9122f 15,24,88
+Build.ps1
+  s_93163e619ca7b1::t_6589211ba9122f 1,3-8,10
+Installer/Build-Setup.ps1
+  s_93163e619ca7b1::t_6589211ba9122f 1,5,16-18
+Tests/Installer/InstallerTests.cs
+  s_93163e619ca7b1::t_6589211ba9122f 47-59
+Info.json
+  s_93163e619ca7b1::t_6589211ba9122f 5-6
+docs/development/BUILD_AND_TEST.md
+  s_93163e619ca7b1::t_6589211ba9122f 5-6,18
+src/Installer/Domain/GameCompatibility.cs
+  s_93163e619ca7b1::t_6589211ba9122f 22
+src/Installer/Application/InstallerEngine.cs
+  s_93163e619ca7b1::t_6589211ba9122f 24,46-47,113-114
+GameCompatibility.json
+  s_93163e619ca7b1::t_6589211ba9122f 8
+Tests/Run-ModManagerCompatibilityTests.ps1
+  s_93163e619ca7b1::t_6589211ba9122f 1-34
+Installer/README.md
+  s_93163e619ca7b1::t_6589211ba9122f 3
+Tests/Run-AllTests.ps1
+  s_93163e619ca7b1::t_6589211ba9122f 7
+Installer/Run-InstallerTests.ps1
+  s_93163e619ca7b1::t_6589211ba9122f 9-15
+README.md
+  s_93163e619ca7b1::t_6589211ba9122f 11,13
+docs/validation/UMM_0.32.5_0.4.12_VALIDATION.md
+  s_93163e619ca7b1::t_6589211ba9122f 1-42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "27e851695982a47d6b7d91ce584af6c0e068e064",
+  "prompts": {},
+  "sessions": {
+    "s_93163e619ca7b1": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-umm-0.32.5-0.4.12",
+        "model": "unknown"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
