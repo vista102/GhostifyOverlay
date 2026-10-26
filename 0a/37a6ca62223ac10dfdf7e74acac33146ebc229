@@ -1,0 +1,49 @@
+Tests/Data/FactoryDefaults.json
+  s_b6f7e0de6c334a::t_cd5bad4007761e 1-310
+src/Mod/Domain/Configuration/LayoutData.cs
+  s_b6f7e0de6c334a::t_cd5bad4007761e 16,18-20,22,24,27-28,31,37
+src/Mod/Domain/Configuration/OverlaySettings.cs
+  s_b6f7e0de6c334a::t_cd5bad4007761e 15,23,32
+docs/validation/FACTORY_DEFAULTS_0.4.13_VALIDATION.md
+  s_b6f7e0de6c334a::t_cd5bad4007761e 1-37
+src/Mod/Features/KeyViewer/Configuration/KeyViewerSetting.cs
+  s_b6f7e0de6c334a::t_cd5bad4007761e 10-11,14,16-17,19-24,26,32-33,35,40,42,44,46,52,54
+src/Mod/Infrastructure/Persistence/KeyViewerStore.cs
+  s_b6f7e0de6c334a::t_cd5bad4007761e 108-113
+Tests/OverlayGroupUiHarness.cs
+  s_b6f7e0de6c334a::t_cd5bad4007761e 90-91
+docs/development/BUILD_AND_TEST.md
+  s_b6f7e0de6c334a::t_cd5bad4007761e 19
+README.md
+  s_b6f7e0de6c334a::t_cd5bad4007761e 13,17,28
+Tests/Run-KeyViewerTests.ps1
+  s_b6f7e0de6c334a::t_cd5bad4007761e 17,19-20
+docs/README.md
+  s_b6f7e0de6c334a::t_cd5bad4007761e 5
+Info.json
+  s_b6f7e0de6c334a::t_cd5bad4007761e 5
+Tests/Run-AllTests.ps1
+  s_b6f7e0de6c334a::t_cd5bad4007761e 7
+Tests/Run-FactoryDefaultsTests.ps1
+  s_b6f7e0de6c334a::t_cd5bad4007761e 1-96
+src/Mod/Features/KeyViewer/Configuration/KeyViewerCounterPalette.cs
+  s_b6f7e0de6c334a::t_cd5bad4007761e 10,14,16
+Tests/Run-FeedbackV6Tests.ps1
+  s_b6f7e0de6c334a::t_cd5bad4007761e 36-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0a37a6ca62223ac10dfdf7e74acac33146ebc229",
+  "prompts": {},
+  "sessions": {
+    "s_b6f7e0de6c334a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-defaults-0.4.13",
+        "model": "unknown"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
