@@ -105,12 +105,12 @@ namespace DonQuixoteOverlay.KeyViewerContents
                 s.KeyViewerStyle = defaults.KeyViewerStyle;
             if (!Enum.IsDefined(typeof(FootKeyviewerStyle), s.FootKeyViewerStyle))
                 s.FootKeyViewerStyle = defaults.FootKeyViewerStyle;
-            s.Size = SettingsNormalization.Bounded(s.Size, .45f, 2f, 1f);
-            s.KeyGap = SettingsNormalization.Bounded(s.KeyGap, 0, 30, KeyViewerMetrics.Gap);
-            s.XLocation = SettingsNormalization.Bounded(s.XLocation, -1800, 1800, 24);
-            s.YLocation = SettingsNormalization.Bounded(s.YLocation, 0, 800, 200);
-            s.rainSpeed = SettingsNormalization.Bounded(s.rainSpeed, 10, 500, 100);
-            s.rainHeight = SettingsNormalization.Bounded(s.rainHeight, 20, 800, 200);
+            s.Size = SettingsNormalization.Bounded(s.Size, .45f, 2f, defaults.Size);
+            s.KeyGap = SettingsNormalization.Bounded(s.KeyGap, 0, 30, defaults.KeyGap);
+            s.XLocation = SettingsNormalization.Bounded(s.XLocation, -1800, 1800, defaults.XLocation);
+            s.YLocation = SettingsNormalization.Bounded(s.YLocation, 0, 800, defaults.YLocation);
+            s.rainSpeed = SettingsNormalization.Bounded(s.rainSpeed, 10, 500, defaults.rainSpeed);
+            s.rainHeight = SettingsNormalization.Bounded(s.rainHeight, 20, 800, defaults.rainHeight);
             foreach (var field in typeof(KeyViewerSetting).GetFields())
             {
                 if (field.FieldType == typeof(KeyCode[]))

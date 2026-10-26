@@ -7,13 +7,13 @@ namespace DonQuixoteOverlay.KeyViewerContents
     public sealed class KeyViewerCounterPalette
     {
         [Newtonsoft.Json.JsonConverter(typeof(KeyViewerColorConverter))]
-        public Color Background = Color.white;
+        public Color Background = Color.black;
         [Newtonsoft.Json.JsonConverter(typeof(KeyViewerColorConverter))]
         public Color Outline = DQColors.KeyAccent;
         [Newtonsoft.Json.JsonConverter(typeof(KeyViewerColorConverter))]
-        public Color Text = DQColors.Text;
+        public Color Text = Color.white;
         [Newtonsoft.Json.JsonConverter(typeof(KeyViewerColorConverter))]
-        public Color Value = DQColors.Text;
+        public Color Value = Color.white;
         internal static KeyViewerCounterPalette FromKeys(KeyViewerSetting s) => new()
         {
             Background = s.Background,

@@ -12,7 +12,7 @@ namespace DonQuixoteOverlay
         public bool Enabled = true;
         public bool Group1Enabled = true, Group2Enabled = true, Group3Enabled = true, Group4Enabled = true, Group5Enabled = true;
         public bool ShowProgress = true;
-        public bool ShowAccuracy = true;
+        public bool ShowAccuracy;
         public bool ShowXAccuracy = true;
         public bool ShowMusicTime = true;
         public bool ShowMapTime;
@@ -20,7 +20,7 @@ namespace DonQuixoteOverlay
         public bool ShowCombo = true;
         public bool ShowBpm = true;
         public bool ShowPitch = true;
-        public bool ShowTheoreticalKps = true;
+        public bool ShowTheoreticalKps;
         public bool ShowJudgmentCounts = true;
         public bool ShowDetailedJudgments = true;
         public bool ShowAttempts = true;
@@ -29,7 +29,7 @@ namespace DonQuixoteOverlay
         public bool ShowFps = true;
         public string Font = "Gmarket Sans";
         [JsonConverter(typeof(KeyViewerContents.KeyViewerColorConverter))]
-        public Color ValueColor = DQColors.KeyAccent;
+        public Color ValueColor = Color.white;
         [JsonConverter(typeof(KeyViewerContents.KeyViewerColorConverter))]
         public Color ProgressBarColor = DQColors.KeyAccent;
         [JsonConverter(typeof(KeyViewerContents.KeyViewerColorConverter))]

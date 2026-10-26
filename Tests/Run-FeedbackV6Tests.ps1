@@ -33,8 +33,8 @@ foreach($count in @(2,4,8,16)){foreach($gap in @([float]0,[float]4,[float]12,[fl
 }}
 Check ((Call (T 'KeyViewerContents.KeyViewerMetrics') 'RainWidth' @(1)) -eq 50 -and (Call (T 'KeyViewerContents.KeyViewerMetrics') 'RainWidth' @(2)) -eq 40) 'normal and secondary rain widths remain unchanged'
 $keys=Call (T 'KeyViewerContents.KeyViewerStore') 'Deserialize' @('{"SchemaVersion":5,"rainHeight":333,"rainSpeed":155,"key16Text":["saved name"]}')
-Check ($keys.KeyGap -eq 4 -and $keys.rainHeight -eq 333 -and $keys.rainSpeed -eq 155 -and $keys.key16Text[0] -eq 'saved name') 'old keyviewer files receive only the default gap and retain rain settings and aliases'
-foreach($item in @(@([float]::NaN,[float]4),@([float]::PositiveInfinity,[float]4),@([float]-1,[float]0),@([float]90,[float]30))){$keys.KeyGap=$item[0];Call (T 'KeyViewerContents.KeyViewerStore') 'Normalize' @($keys)|Out-Null;Check ($keys.KeyGap -eq $item[1]) ('gap safely normalizes '+$item[0])}
+Check ($keys.KeyGap -eq 3 -and $keys.rainHeight -eq 333 -and $keys.rainSpeed -eq 155 -and $keys.key16Text[0] -eq 'saved name') 'old keyviewer files receive only the default gap and retain rain settings and aliases'
+foreach($item in @(@([float]::NaN,[float]3),@([float]::PositiveInfinity,[float]3),@([float]-1,[float]0),@([float]90,[float]30))){$keys.KeyGap=$item[0];Call (T 'KeyViewerContents.KeyViewerStore') 'Normalize' @($keys)|Out-Null;Check ($keys.KeyGap -eq $item[1]) ('gap safely normalizes '+$item[0])}
 $keys.KeyGap=12.5
 $json=[Newtonsoft.Json.JsonConvert]::SerializeObject($keys)
 Check ((Call (T 'KeyViewerContents.KeyViewerStore') 'Deserialize' @($json)).KeyGap -eq 12.5) 'fractional key gap survives JSON save and reload'

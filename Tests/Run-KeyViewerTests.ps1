@@ -14,13 +14,10 @@ $flags=[Reflection.BindingFlags]'Public,NonPublic,Static,Instance'
 function T($name) {$mod.GetType('DonQuixoteOverlay.KeyViewerContents.'+$name,$true)}
 function Invoke-Test($type,$name,[object[]]$arguments) {for($i=0;$i -lt $arguments.Count;$i++){$arguments[$i]=$arguments[$i].PSObject.BaseObject};try {$type.GetMethod($name,$flags).Invoke($null,$arguments)} catch {throw $_.Exception.ToString()}}
 function Assert($value,$name) {if(!$value){throw "FAIL $name"};$script:passed++;"PASS $name"}
-$savedColors=Get-Content -LiteralPath (Join-Path $PSScriptRoot 'UserSavedKeyColors-20261003.json') -Raw|ConvertFrom-Json
-$savedColors.Background='#FFFFFFFF';$savedColors.Text='#292929FF'
-foreach($name in @('BackgroundClicked','Outline','OutlineClicked','RainColor')){$savedColors.$name='#FFC939FF'}
-$savedColors.PSObject.Properties.Remove('RainColor3')
+$savedColors=(Get-Content -LiteralPath (Join-Path $PSScriptRoot 'Data/FactoryDefaults.json') -Raw -Encoding UTF8|ConvertFrom-Json).KeyViewer
 $defaults=[Activator]::CreateInstance((T 'KeyViewerSetting'))
-foreach($field in $savedColors.PSObject.Properties) {
-    Assert ((Invoke-Test (T 'KeyViewerColorConverter') 'Format' @($defaults.GetType().GetField($field.Name).GetValue($defaults))) -eq $field.Value) ('new/reset key color matches saved in-game '+$field.Name)
+foreach($name in @('Background','BackgroundClicked','Outline','OutlineClicked','Text','TextClicked','RainColor','RainColor2','GhostRainColor')) {
+    Assert ((Invoke-Test (T 'KeyViewerColorConverter') 'Format' @($defaults.GetType().GetField($name).GetValue($defaults))) -eq $savedColors.$name) ('new/reset key color matches approved profile '+$name)
 }
 $custom=[Activator]::CreateInstance((T 'KeyViewerSetting'))
 $custom.SchemaVersion=2

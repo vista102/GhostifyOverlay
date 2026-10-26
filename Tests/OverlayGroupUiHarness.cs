@@ -87,6 +87,8 @@ namespace DonQuixoteOverlay {
         private static void Check(List<string> result,bool okay,string text){if(!okay)throw new Exception("FAIL "+text);result.Add("PASS "+text);}
         public static string[] Run(){
             var result=new List<string>();DarkNeonUi.Nodes.Clear();Main.Settings=new DonQuixoteSettings();Main.Saves=0;LayoutStore.Current=new LayoutData();LayoutStore.Current.TopLeftX=45.5f;
+            Main.Settings.Overlay.ShowAccuracy=true;
+            LayoutStore.Current.TopLeftY=0;LayoutStore.Current.TimingRangesY=0;
             var window=new SettingsWindow();var original=window._page;window.BuildOverlayGroups();
             Check(result,window._page==original && window._overlayGroupPages.Count==5 && window._overlayGroupPages.Count(g=>g.activeSelf)==1,"production page has five group views and only one selected detail view");
             Check(result,Main.Saves==0 && LayoutStore.Current.TopLeftX==45.5f,"opening and refreshing the group page does not overwrite saved placement");
