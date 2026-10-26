@@ -21,6 +21,7 @@ namespace GhostifySetup
         public const string GameName = "A Dance of Fire and Ice";
         private readonly byte[] _payload;
         private readonly PackageManifest _manifest;
+        private readonly Version _minimumModManager;
         private readonly string _backupRoot;
         private readonly Func<bool> _gameRunning;
         public string Version
@@ -42,6 +43,8 @@ namespace GhostifySetup
             _manifest = new JavaScriptSerializer().Deserialize<PackageManifest>(manifest);
             if (_manifest == null || _manifest.Files == null || _manifest.Files.Length != 14 || string.IsNullOrEmpty(_manifest.Version) || _manifest.GameCompatibility == null || string.IsNullOrWhiteSpace(_manifest.GameCompatibility.GameVersion) || string.IsNullOrWhiteSpace(_manifest.GameCompatibility.Branch) || _manifest.GameCompatibility.AssemblySha256 == null || _manifest.GameCompatibility.AssemblySha256.Length != 64)
                 throw new InvalidDataException("설치 파일 정보가 올바르지 않습니다.");
+            if (!System.Version.TryParse(_manifest.GameCompatibility.MinimumModManager, out _minimumModManager))
+                throw new InvalidDataException("Unity Mod Manager 최소 버전 정보가 올바르지 않습니다.");
             var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var file in _manifest.Files)
             {
@@ -107,8 +110,8 @@ namespace GhostifySetup
             if (!File.Exists(ummDll))
                 throw new FileNotFoundException("Unity Mod Manager를 먼저 설치해 주세요.");
             Version ummVersion = AssemblyName.GetAssemblyName(ummDll).Version;
-            if (ummVersion < new Version(0, 33, 0))
-                throw new InvalidDataException("Unity Mod Manager 0.33.0 이상이 필요합니다.");
+            if (ummVersion < _minimumModManager)
+                throw new InvalidDataException("Unity Mod Manager " + _minimumModManager + " 이상이 필요합니다.");
             string mods = Child(root, "Mods"), target = Child(mods, ModFolder), legacy = Child(mods, ModId), config = Child(umm, "Params.xml");
             NoRedirect(mods);
             SafeTree(target);

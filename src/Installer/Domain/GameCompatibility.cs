@@ -19,5 +19,6 @@ namespace GhostifySetup
         public string Branch { get; set; }
         public string SteamBuild { get; set; }
         public string AssemblySha256 { get; set; }
+        public string MinimumModManager { get; set; }
     }
 }

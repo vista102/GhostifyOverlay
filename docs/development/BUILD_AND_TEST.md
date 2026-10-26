@@ -2,6 +2,8 @@
 
 Windows .NET Framework 4.8, Visual Studio 2022 Build Tools, 로컬 얼불춤 SDK가 필요합니다. 지원 SDK의 식별 정보는 루트 `GameCompatibility.json`에 있습니다.
 
+UMM 참조 기준은 **0.32.5**입니다. 빌드 스크립트는 다른 UMM 버전을 참조하면 중단합니다. 게임에 다른 버전이 설치돼 있다면 UMM 0.32.5의 `UnityModManager.dll`과 `0Harmony.dll`이 있는 폴더를 `Build.ps1 -ModManagerDir <폴더>` 또는 `Installer/Build-Setup.ps1 -ModManagerDir <폴더>`로 지정합니다. 게임의 관리자 파일을 교체할 필요는 없습니다.
+
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File Build.ps1
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File Tests\Run-AllTests.ps1
@@ -13,6 +15,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File Tests\Run-AllTests.ps1 -
 
 주요 검사:
 
+- `Run-ModManagerCompatibilityTests.ps1`: 실제 UMM 0.32.5에서 배포 DLL의 관리자·Harmony 참조, 진입점, 모든 UMM 멤버 참조를 해석합니다.
 - `Run-ArchitectureTests.ps1`: 실제 서비스와 파일 저장 구현을 사용해 복구·원자 저장·동시 저장·시작 실패·종료 실패·지연 저장·재시도 계약을 검사합니다. Application 서비스를 Unity·Harmony·WinForms 없이 컴파일합니다.
 - `Run-StandaloneAlphaTests.ps1`, `Run-PatchTests.ps1`: 실제 게임 SDK의 입력 서명, 독립형 설정창과 Harmony 대상을 검사합니다.
 - `Run-LogicTests.ps1`, `Run-KeyViewerTests.ps1`, `Run-AlphaTests.ps1`: 저장 형식·배치·입력·누적·판정·문자열 표시 회귀를 검사합니다.

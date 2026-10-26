@@ -1,8 +1,8 @@
-﻿param([string]$GameDir='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice',[switch]$SkipModBuild)
+﻿param([string]$GameDir='C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice',[switch]$SkipModBuild,[string]$ModManagerDir='')
 $ErrorActionPreference='Stop'
 $project=Split-Path $PSScriptRoot
 . (Join-Path $PSScriptRoot 'Get-Sources.ps1')
-if(!$SkipModBuild){& (Join-Path $project 'Build.ps1') -GameDir $GameDir}
+if(!$SkipModBuild){& (Join-Path $project 'Build.ps1') -GameDir $GameDir -ModManagerDir $ModManagerDir}
 $info=Get-Content -LiteralPath (Join-Path $project 'Info.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 $release=(Resolve-Path -LiteralPath (Join-Path $project 'bin\Release\GhostifyOverlay')).Path
 & (Join-Path $PSScriptRoot 'Verify-Notices.ps1') -Root $project
@@ -13,6 +13,9 @@ New-Item -ItemType Directory -Path $output,$work -Force | Out-Null
 $files=@(Get-ChildItem -LiteralPath $release -Recurse -File)
 if($files.Count -ne 14){throw 'Unexpected mod Release files'}
 $compatibility=Get-Content -LiteralPath (Join-Path $release 'GameCompatibility.json') -Raw -Encoding UTF8|ConvertFrom-Json
+if($compatibility.MinimumModManager -ne $info.ManagerVersion){throw 'Mod and installer UMM requirements differ'}
+$releaseInfo=Get-Content -LiteralPath (Join-Path $release 'Info.json') -Raw -Encoding UTF8|ConvertFrom-Json
+if($releaseInfo.Version -ne $info.Version -or $releaseInfo.ManagerVersion -ne $info.ManagerVersion){throw 'Rebuild the mod before packaging this installer'}
 $manifest=@{Version=$info.Version;GameCompatibility=$compatibility;Files=@($files | ForEach-Object {
     $relative=$_.FullName.Substring($release.Length).TrimStart('\','/').Replace('\','/')
     if($relative.StartsWith('UserData',[StringComparison]::OrdinalIgnoreCase)){throw 'UserData cannot be packaged'}

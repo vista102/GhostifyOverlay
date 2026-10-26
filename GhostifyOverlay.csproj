@@ -12,6 +12,7 @@
     <LangVersion>latest</LangVersion>
     <GameDir Condition=" '$(GameDir)' == '' ">C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice</GameDir>
     <ManagedDir>$(GameDir)\A Dance of Fire and Ice_Data\Managed</ManagedDir>
+    <ModManagerDir Condition=" '$(ModManagerDir)' == '' ">$(ManagedDir)\UnityModManager</ModManagerDir>
     <OutputPath>bin\$(Configuration)\GhostifyOverlay\</OutputPath>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
@@ -20,7 +21,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
-      <HintPath>$(ManagedDir)\UnityModManager\0Harmony.dll</HintPath>
+      <HintPath>$(ModManagerDir)\0Harmony.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
@@ -84,7 +85,7 @@
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityModManager">
-      <HintPath>$(ManagedDir)\UnityModManager\UnityModManager.dll</HintPath>
+      <HintPath>$(ModManagerDir)\UnityModManager.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="netstandard">

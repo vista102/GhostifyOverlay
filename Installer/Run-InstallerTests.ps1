@@ -5,11 +5,14 @@ $project=Split-Path $PSScriptRoot
 $root=Join-Path $PSScriptRoot ('test-fixture-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $root | Out-Null
 $csc='C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\Roslyn\csc.exe'
-$ummSource=Join-Path $root 'FakeUmm.cs'
-[IO.File]::WriteAllText($ummSource,'[assembly:System.Reflection.AssemblyVersion("0.33.0.0")] public class FakeUmm {}')
 $umm=Join-Path $root 'FakeUmm.dll'
-& $csc /nologo /target:library "/out:$umm" $ummSource
-if($LASTEXITCODE -ne 0){throw 'UMM fixture compilation failed'}
+foreach($version in @('0.32.5','0.32.4','0.33.0')){
+    $ummSource=Join-Path $root ('Umm-'+$version+'.cs')
+    $ummOutput=if($version -eq '0.32.5'){$umm}else{Join-Path $root ('Umm-'+$version+'.dll')}
+    [IO.File]::WriteAllText($ummSource,('[assembly:System.Reflection.AssemblyVersion("'+$version+'.0")] public class FakeUmm {}'))
+    & $csc /nologo /target:library "/out:$ummOutput" $ummSource
+    if($LASTEXITCODE -ne 0){throw 'UMM fixture compilation failed'}
+}
 $sleeperSource=Join-Path $root 'Sleeper.cs'
 [IO.File]::WriteAllText($sleeperSource,'public static class Sleeper { public static void Main(){System.Threading.Thread.Sleep(3500);} }')
 $sleeper=Join-Path $root 'Sleeper.exe'

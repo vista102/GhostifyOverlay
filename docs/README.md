@@ -2,6 +2,7 @@
 
 - [코드 구조와 의존성](architecture/ARCHITECTURE.md)
 - [빌드·테스트 방법](development/BUILD_AND_TEST.md)
+- [0.4.12 UMM 0.32.5 호환성 검증](validation/UMM_0.32.5_0.4.12_VALIDATION.md)
 - [0.4.11 리팩터링 검증](validation/REFACTOR_0.4.11_VALIDATION.md)
 - [알파 26044349 호환성 조사](research/ALPHA_26044349_COMPATIBILITY.md)
 - [알파 전환 계획](plans/ALPHA_MIGRATION_PLAN.md)
