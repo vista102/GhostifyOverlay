@@ -1,0 +1,83 @@
+Tests/SettingsUxPreview.cs
+  s_58cf3eec91066f::t_a2e50214f8ecdc 1-52
+src/Mod/Presentation/Settings/SettingsWindow.Navigation.cs
+  s_58cf3eec91066f::t_a2e50214f8ecdc 1-119
+Tests/Installer/InstallerTests.cs
+  s_58cf3eec91066f::t_a2e50214f8ecdc 78,84
+Tests/Run-ArchitectureTests.ps1
+  s_58cf3eec91066f::t_a2e50214f8ecdc 9
+Tests/KeyPresetTests.cs
+  s_58cf3eec91066f::t_a2e50214f8ecdc 1-110
+Tests/Run-LayoutEditorTests.ps1
+  s_58cf3eec91066f::t_a2e50214f8ecdc 56
+Tests/SettingsUxHarness.cs
+  s_58cf3eec91066f::t_a2e50214f8ecdc 3,6-11,13-14,16-22,25-26,28-39,41-43,45-56,59-64,67-81,84-95,98-106,109-129,131-178
+src/Mod/Presentation/Settings/SettingsWindow.Overlay.cs
+  s_58cf3eec91066f::t_a2e50214f8ecdc 11,13-21,30,32,34,36
+Tests/Run-AllTests.ps1
+  s_58cf3eec91066f::t_a2e50214f8ecdc 7
+src/Mod/Presentation/Settings/SettingsWindow.Dialogs.cs
+  s_58cf3eec91066f::t_a2e50214f8ecdc 1-85
+src/Mod/Presentation/Settings/SettingsWindow.KeyViewer.cs
+  s_58cf3eec91066f::t_a2e50214f8ecdc 1-127
+src/Mod/Presentation/Settings/SettingsWindow.cs
+  s_58cf3eec91066f::t_a2e50214f8ecdc 111,114,129-130,134,139-141,150-155,213,215-218,222-225,341-344
+src/Mod/Infrastructure/Persistence/KeyPresetStore.cs
+  s_58cf3eec91066f::t_a2e50214f8ecdc 1-89
+Tests/Run-OverlayGroupUiTests.ps1
+  s_58cf3eec91066f::t_a2e50214f8ecdc 3-12,14-15,17
+src/Mod/Features/LayoutEditing/LayoutEditorController.cs
+  s_58cf3eec91066f::t_a2e50214f8ecdc 45,47,52,63,68,73,93-98,191,199-201,204,210,219
+src/Mod/Presentation/Settings/SettingsWindow.KeyEditor.cs
+  s_58cf3eec91066f::t_a2e50214f8ecdc 23,46,90
+src/Mod/Domain/Presets/KeyBindingPreset.cs
+  s_58cf3eec91066f::t_a2e50214f8ecdc 1-56
+docs/architecture/ARCHITECTURE.md
+  s_58cf3eec91066f::t_a2e50214f8ecdc 11,62-67
+src/Mod/Bootstrap/ModComposition.cs
+  s_58cf3eec91066f::t_a2e50214f8ecdc 17-18
+src/Mod/Infrastructure/Persistence/KeyViewerStore.cs
+  s_58cf3eec91066f::t_a2e50214f8ecdc 22
+src/Mod/Presentation/Settings/SettingsWindow.Presets.cs
+  s_58cf3eec91066f::t_a2e50214f8ecdc 1-121
+docs/validation/UX_PRESETS_0.5.0_VALIDATION.md
+  s_58cf3eec91066f::t_a2e50214f8ecdc 1-36
+src/Mod/Features/Overlay/OverlayController.Editing.cs
+  s_58cf3eec91066f::t_a2e50214f8ecdc 1-23
+README.md
+  s_58cf3eec91066f::t_a2e50214f8ecdc 8,14,23,27-28,30-35
+src/Mod/Bootstrap/Main.cs
+  s_58cf3eec91066f::t_a2e50214f8ecdc 42-46
+Info.json
+  s_58cf3eec91066f::t_a2e50214f8ecdc 5
+Installer/Run-InstallerTests.ps1
+  s_58cf3eec91066f::t_a2e50214f8ecdc 46,59,71
+Tests/Run-KeyPresetTests.ps1
+  s_58cf3eec91066f::t_a2e50214f8ecdc 1-16
+Tests/Render-SettingsPreview.ps1
+  s_58cf3eec91066f::t_a2e50214f8ecdc 1-44
+docs/development/BUILD_AND_TEST.md
+  s_58cf3eec91066f::t_a2e50214f8ecdc 30-31
+docs/README.md
+  s_58cf3eec91066f::t_a2e50214f8ecdc 5
+src/Mod/Features/LayoutEditing/LayoutSelectionFrame.cs
+  s_58cf3eec91066f::t_a2e50214f8ecdc 1-49
+src/Mod/Application/Presets/KeyPresetService.cs
+  s_58cf3eec91066f::t_a2e50214f8ecdc 1-99
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d9db0c876529ce16d1a2180749c7f25cdc33f9bf",
+  "prompts": {},
+  "sessions": {
+    "s_58cf3eec91066f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-ux-presets-0.5.0",
+        "model": "unknown"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
