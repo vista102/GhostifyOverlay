@@ -27,3 +27,5 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File Tests\Run-AllTests.ps1 -
 설치 엔진 검사는 실제 사용자 게임 폴더에 쓰지 않습니다. 실제 게임이 실행 중이면 배포 EXE의 임시 폴더 설치 검사를 생략하며, 프로세스 감지를 대체한 엔진 검사는 계속 실행할 수 있습니다. 실제 인게임 플레이와 UAC 클릭은 별도 확인 항목입니다.
 
 산출물은 `bin/Release/GhostifyOverlay/`, `dist/GhostifyOverlay-Setup-<버전>.exe`, `dist/GhostifyOverlay-<버전>.zip`, `dist/SHA256SUMS.txt`입니다.
+- `Run-KeyPresetTests.ps1`: 실제 프리셋 서비스·저장·어댑터에서 이름과 키 설정 왕복, 모든 배치 조합, 기존 설정 보존, 가져오기 검증, 저장 실패·복구·되돌리기를 검사합니다.
+- `Run-OverlayGroupUiTests.ps1`: 실제 설정창 전체 빌더·콜백을 inert uGUI API에서 실행해 분류 탐색, 스크롤 기억, 프리셋 대화상자, 키 이름, 입력 연동, 편집 복귀를 검사합니다. 생성한 JSON 배치는 `Render-SettingsPreview.ps1 -InputDirectory <검사 폴더>`로 참고 이미지를 만들 수 있습니다. Unity 렌더링 캡처는 아닙니다.

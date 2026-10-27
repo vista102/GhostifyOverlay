@@ -39,7 +39,11 @@ namespace DonQuixoteOverlay
         }
         internal static bool IsSettingsWindowOpen => Enabled && SettingsWindow.Instance != null && SettingsWindow.Instance.Visible;
         internal static void Save() => Saves.Save();
-        internal static void RequestSave() => Saves.Request(Time.unscaledTime);
+        internal static void RequestSave()
+        {
+            Saves.Request(Time.unscaledTime);
+            RuntimeStatus.Set("settings.pending", "설정", "저장 대기 중");
+        }
         internal static bool SaveFromUi() => Saves.TrySave(Time.unscaledTime);
         internal static void Log(string message) { if (Entry != null) Entry.Logger.Log("[GhostifyOverlay] " + message); }
     }

@@ -75,13 +75,13 @@ namespace GhostifySetup {
             Check(config.SelectSingleNode("/Param/ModParams/Mod[@Id='Other']").OuterXml == "<Mod Id=\"Other\" Enabled=\"true\"><Hotkey>keep me</Hotkey></Mod>" && config.SelectSingleNode("/Param/LastSelectedMod").InnerText == "Other", "other mods and general UMM settings are preserved");
             Check(File.ReadAllBytes(Path.Combine(install.Backup, "Params.xml")).SequenceEqual(oldConfig), "original UMM config is backed up byte for byte");
             string data = Path.Combine(Target(fresh), "UserData"); Directory.CreateDirectory(data);
-            foreach (string file in new[] { "settings.json", "layout.json", "keyviewer.json", "keyviewer-counts.json" }) {
+            foreach (string file in new[] { "settings.json", "layout.json", "keyviewer.json", "keyviewer-counts.json", "keyviewer-presets.json" }) {
                 File.WriteAllText(Path.Combine(data, file), "USER-" + file + "-saved colors and position"); File.WriteAllText(Path.Combine(data, file + ".bak"), "BACKUP-" + file);
             }
             var userSnapshot = Snapshot(data);
             Check(engine.Inspect(fresh).IsUpdate, "existing Ghostify installation is recognized as an update");
             var update = engine.Install(fresh);
-            Check(update.Success && Same(userSnapshot, data), "update preserves all eight user files byte for byte");
+            Check(update.Success && Same(userSnapshot, data), "update preserves all ten settings, preset and backup files byte for byte");
             Check(Same(userSnapshot, Path.Combine(update.Backup, "previous-mod", "UserData")), "update backup includes existing user data");
             Check(File.Exists(Path.Combine(update.Backup, "installation.json")), "successful install writes a recovery receipt");
             var modSnapshot = Snapshot(Target(fresh)); byte[] paramsSnapshot = File.ReadAllBytes(Config(fresh));

@@ -19,6 +19,7 @@ namespace DonQuixoteOverlay.KeyViewerContents
             _repository = new GhostifyOverlay.Infrastructure.Persistence.JsonSettingsRepository<KeyViewerSetting>(
                 Path.Combine(directory, "keyviewer.json"), JsonFileStore.Storage, Deserialize, () => new KeyViewerSetting(), Main.Log);
             Settings = _repository.Load();
+            KeyPresetStore.Initialize();
         }
         internal static KeyViewerSetting Deserialize(string json)
         {

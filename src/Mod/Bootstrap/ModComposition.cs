@@ -14,7 +14,8 @@ namespace DonQuixoteOverlay
             new DelegateSaveParticipant(() => SettingsStore.Save(Main.Settings)),
             new DelegateSaveParticipant(LayoutStore.Save),
             new DelegateSaveParticipant(KeyViewerStore.Save),
-            new DelegateSaveParticipant(() => KeyCountData.Instance.Flush(KeyViewer.CurrentTicks, true))
+            new DelegateSaveParticipant(() => KeyCountData.Instance.Flush(KeyViewer.CurrentTicks, true)),
+            new DelegateSaveParticipant(() => RuntimeStatus.Clear("settings.pending"))
         }, LayoutEditorController.CancelActive, error => Main.Log(error.ToString()));
     }
 }

@@ -53,5 +53,5 @@ Check (($taskHeight-$taskThumb)/2 -eq $taskInset) 'circular thumb has equal vert
 Check ($taskTravel+$taskThumb/2 -eq $taskWidth/2-$taskInset) 'thumb stays inside track at both toggle positions'
 $taskSource=[IO.File]::ReadAllText((Join-Path $taskProject 'src/Mod/Presentation/Settings/SettingsWindow.cs'))
 Check ($taskSource -notmatch 'Numeric\("위치 [XY]"|Numeric\("전체 배율') 'settings window has no remaining placement numeric controls'
-Check ($taskSource -match 'LayoutEditorController>\(\)\.Begin\(6\)') 'keyviewer page opens editing with keyviewer selected'
+Check ($null -ne (T 'LayoutEditorController').GetMethod('BeginFromSettings',$taskFlags)) 'screen editing supports return to its originating settings category'
 'Layout editor assertions passed: '+$taskPassed

@@ -2,6 +2,7 @@
 
 - [코드 구조와 의존성](architecture/ARCHITECTURE.md)
 - [빌드·테스트 방법](development/BUILD_AND_TEST.md)
+- [0.5.0 설정 UX·키 배치 프리셋 검증](validation/UX_PRESETS_0.5.0_VALIDATION.md)
 - [0.4.14 곡 정보 UI·행간·채터링 검증](validation/FEATURES_0.4.14_VALIDATION.md)
 - [0.4.13 기본 설정 반영 검증](validation/FACTORY_DEFAULTS_0.4.13_VALIDATION.md)
 - [0.4.12 UMM 0.32.5 호환성 검증](validation/UMM_0.32.5_0.4.12_VALIDATION.md)

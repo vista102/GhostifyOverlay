@@ -8,6 +8,7 @@ src/
     Bootstrap/             UMM 진입점과 서비스 조립
     Application/           생명주기, 저장 순서·예약, 데이터 조회 계약
     Domain/Configuration/  기존 설정·레이아웃 데이터와 정규화
+    Domain/Presets/        키 배치 프리셋·이름·목록 데이터와 검증
     Features/
       Attempts/            어템 집계와 세션
       Overlay/             오버레이 표시·텍스트 캐시·배치
@@ -58,3 +59,9 @@ docs/                      개발·계획·조사·검증 기록
 설정 DTO는 기존 Unity 색상과 JSON converter 특성을 유지합니다. `Domain` 폴더가 런타임과 완전히 독립된 별도 어셈블리라는 뜻은 아닙니다. Application 계약·정책은 런타임 UI와 분리되어 있습니다.
 
 게임 안의 UI는 독립형 uGUI/TMP이며 Alt+D로 엽니다. 설치 UI는 Windows Forms입니다. 외부 라이브러리 고지와 글꼴 자산은 기존 배포 경로를 유지합니다.
+
+## 0.5.0 설정 UX와 프리셋
+
+설정창은 두 탭의 분류 탐색과 상세 스크롤을 `SettingsWindow.Navigation`에서 관리합니다. 키 배치, 레인, 색상, 입력과 프리셋의 uGUI 구성은 각 partial 파일로 나눕니다. 화면 편집의 복귀 콜백은 사용자 저장·취소 때만 실행하며 장면 변경·비활성화에서는 실행하지 않습니다.
+
+`KeyPresetService`는 `ISettingsRepository<KeyPresetLibrary>`에 의존해 이름·복제·덮어쓰기·삭제·적용 전 백업·되돌리기를 관리합니다. 데이터와 배열을 복사하고 저장에 성공한 뒤 상태를 교체합니다. Unity, Harmony, UI에 의존하지 않습니다. `KeyPresetStore`가 기존 설정에서 선택한 손·발 배치만 추출하거나 반영하고, 별도 JSON 목록·파일 공유·이전 저장 복구를 연결합니다. 기존 설정 및 카운터 파일과 프리셋 파일은 분리합니다.

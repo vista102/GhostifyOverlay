@@ -31,7 +31,6 @@ namespace DonQuixoteOverlay
         private readonly List<GameObject> _pages = new List<GameObject>();
         private readonly List<string> _pageNames = new List<string>();
         private readonly List<Button> _tabs = new List<Button>();
-        private readonly List<float> _scrollPositions = new List<float>();
         private int _tabIndex;
         private int _keyViewerCapture = -1, _keyViewerCaptureGroup;
         private void Awake()
@@ -109,8 +108,10 @@ namespace DonQuixoteOverlay
             }
             else
             {
+                CloseDialog();
                 ClosePalette();
                 StopCapture();
+                FlushViewerGeometry();
                 Cursor.visible = _cursorVisible;
                 Cursor.lockState = _cursorLock;
                 Main.SaveFromUi();
@@ -125,15 +126,19 @@ namespace DonQuixoteOverlay
         {
             if (!Visible)
                 return;
+            if (_geometryDirty && Time.unscaledTime >= _geometryAt)
+                FlushViewerGeometry();
             if (_statusRevision != RuntimeStatus.Revision)
             {
                 _statusRevision = RuntimeStatus.Revision;
-                _status.text = RuntimeStatus.ErrorCount > 0 ? RuntimeStatus.Details() : RuntimeStatus.Summary;
+                _status.text = RuntimeStatus.Summary;
             }
 
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                if (_palette != null)
+                if (_dialog != null)
+                    CloseDialog();
+                else if (_palette != null)
                     ClosePalette();
                 else if (_capturing)
                     StopCapture();
@@ -142,7 +147,12 @@ namespace DonQuixoteOverlay
                 return;
             }
 
-            if (_palette != null)
+            if (Time.unscaledTime >= _nextLiveRefresh)
+            {
+                _nextLiveRefresh = Time.unscaledTime + .25f;
+                foreach (var refresh in _liveRefresh) refresh();
+            }
+            if (_palette != null || _dialog != null)
                 return;
             if (!_capturing || Time.frameCount <= _captureFrame + 1)
                 return;
@@ -200,49 +210,19 @@ namespace DonQuixoteOverlay
 
         private void Build()
         {
-            _canvas = new GameObject("DonQuixoteOverlay.Settings", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            _canvas = new GameObject("GhostifyOverlay.Settings", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             _canvas.transform.SetParent(transform, false);
-            Canvas canvas = _canvas.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = 10000;
-            canvas.pixelPerfect = true;
-            CanvasScaler scaler = _canvas.GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920, 1080);
-            scaler.matchWidthOrHeight = .5f;
-            GameObject panel = DarkNeonUi.Rect("Window", _canvas.transform, new Vector2(.5f, .5f), new Vector2(.5f, .5f));
-            _panel = panel.GetComponent<RectTransform>();
-            _panel.sizeDelta = new Vector2(960, 720);
+            var canvas = _canvas.GetComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay; canvas.sortingOrder = 10000; canvas.pixelPerfect = true;
+            var scaler = _canvas.GetComponent<CanvasScaler>(); scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; scaler.referenceResolution = new Vector2(1920, 1080); scaler.matchWidthOrHeight = .5f;
+            var panel = DarkNeonUi.Rect("Window", _canvas.transform, new Vector2(.5f, .5f), new Vector2(.5f, .5f));
+            _panel = panel.GetComponent<RectTransform>(); _panel.sizeDelta = new Vector2(960, 720);
             DarkNeonUi.ControlSurface(panel, DQColors.Window, DQRadii.Window, true);
             DarkNeonUi.Text("Ghostify Overlay", panel.transform, new Vector2(.035f, .91f), new Vector2(.85f, .98f), 28, DQColors.Text, TextAlignmentOptions.Left, true);
             DarkNeonUi.CloseButton(panel.transform, () => SetVisible(false));
-            _status = DarkNeonUi.Text("", panel.transform, new Vector2(.03f, .01f), new Vector2(.97f, .05f), 13, DQColors.TextSecondary, TextAlignmentOptions.Left, false);
-            GameObject scrollRoot = DarkNeonUi.Rect("Scroll", panel.transform, new Vector2(.03f, .06f), new Vector2(.97f, .84f));
-            ScrollRect scroll = _scroll = scrollRoot.AddComponent<ScrollRect>();
-            scroll.horizontal = false;
-            // Wheel steps should move a useful amount through the settings rows.
-            scroll.scrollSensitivity = 80f;
-            GameObject viewport = DarkNeonUi.Rect("Viewport", scrollRoot.transform, Vector2.zero, Vector2.one);
-            viewport.AddComponent<RectMask2D>();
-            scroll.viewport = viewport.GetComponent<RectTransform>();
-            // A raycast surface lets mouse wheel scrolling work between controls.
-            viewport.AddComponent<Image>().color = new Color(0, 0, 0, .001f);
-            NewPage("오버레이");
-            BuildOverlayGroups();
-            BuildOverlayTypography();
-            BuildOverlayColors();
-            NewPage("키뷰어");
-            BuildKeyViewerPage();
-            for (int i = 0; i < _pages.Count; i++)
-            {
-                int tab = i;
-                float x = .03f + i * .94f / _pages.Count, width = .94f / _pages.Count;
-                _tabs.Add(DarkNeonUi.Button(_pageNames[i], panel.transform, new Vector2(x, .855f), new Vector2(x + width - .008f, .905f), UiButtonKind.Secondary, () => SelectPage(tab)));
-            }
-
-            SelectPage(0);
-            foreach (Action refresh in _refresh)
-                refresh();
+            _status = DarkNeonUi.Text("", panel.transform, new Vector2(.03f, .01f), new Vector2(.73f, .05f), 13, DQColors.TextSecondary, TextAlignmentOptions.Left, false);
+            DarkNeonUi.Button("상태 자세히", panel.transform, new Vector2(.77f, .01f), new Vector2(.97f, .055f), UiButtonKind.Ghost, () => ShowMessage("시스템 상태", RuntimeStatus.Details()));
+            BuildNavigation();
+            foreach (Action refresh in _refresh) refresh();
         }
 
         private GameObject Row(float height)
@@ -250,177 +230,6 @@ namespace DonQuixoteOverlay
             GameObject row = DarkNeonUi.Rect("Row", _page.transform, Vector2.zero, Vector2.one);
             row.AddComponent<LayoutElement>().preferredHeight = height;
             return row;
-        }
-
-        private void NewPage(string name)
-        {
-            _page = DarkNeonUi.Rect(name, _scroll.viewport, new Vector2(0, 1), new Vector2(1, 1));
-            RectTransform content = _page.GetComponent<RectTransform>();
-            content.pivot = new Vector2(.5f, 1);
-            var layout = _page.AddComponent<VerticalLayoutGroup>();
-            layout.spacing = 8;
-            layout.childControlHeight = true;
-            layout.childForceExpandHeight = false;
-            _page.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            _pages.Add(_page);
-            _pageNames.Add(name);
-            _scrollPositions.Add(1);
-        }
-
-        private void SelectPage(int index)
-        {
-            if (_scroll.content != null)
-                _scrollPositions[_tabIndex] = _scroll.verticalNormalizedPosition;
-            ClosePalette();
-            StopCapture();
-            _tabIndex = index;
-            for (int i = 0; i < _pages.Count; i++)
-            {
-                _pages[i].SetActive(i == index);
-                DarkNeonUi.SetButtonState(_tabs[i], i == index ? UiButtonKind.Tab : UiButtonKind.Secondary);
-            }
-
-            _scroll.content = _pages[index].GetComponent<RectTransform>();
-            _scroll.StopMovement();
-            Canvas.ForceUpdateCanvases();
-            _scroll.verticalNormalizedPosition = _scrollPositions[index];
-        }
-
-        private void BuildKeyViewerPage()
-        {
-            Heading("키뷰어");
-            Toggle("키뷰어 표시", () => KeyViewerStore.Settings.Enabled, v =>
-            {
-                KeyViewerStore.Settings.Enabled = v;
-                ChangedKeyViewer();
-            });
-            Toggle("플레이 중에만 표시", () => KeyViewerStore.Settings.ViewerOnlyGameplay, v => KeyViewerStore.Settings.ViewerOnlyGameplay = v);
-            Label("맵 플레이에 진입하면 표시합니다. 에디터에서는 재생 중에 표시합니다.", 40);
-            Toggle("게임 입력 키 자동 연동", () => KeyViewerStore.Settings.SyncNativeInputKeys, v =>
-            {
-                KeyViewerStore.Settings.SyncNativeInputKeys = v;
-                NativeInputSync.Request();
-            });
-            Label("손·발 키를 게임의 ‘특정 키만 입력으로 간주’에 반영합니다.\n고스트 키는 제외합니다. 연동을 끄면 게임에서 직접 변경할 수 있습니다.", 64).textWrappingMode = TextWrappingModes.Normal;
-            ValueButton(() => "손 배치: " + HandSize() + "키", () =>
-            {
-                KeyViewerStore.Settings.KeyViewerStyle = NextStyle(KeyViewerStore.Settings.KeyViewerStyle);
-                ChangedKeyViewer();
-            });
-            ValueButton(() => "발 배치: " + FootSize() + "키", () =>
-            {
-                KeyViewerStore.Settings.FootKeyViewerStyle = NextStyle(KeyViewerStore.Settings.FootKeyViewerStyle);
-                ChangedKeyViewer();
-            });
-            Button("키뷰어 위치·크기 편집", () =>
-            {
-                SetVisible(false);
-                Main.Root.GetComponent<LayoutEditorController>().Begin(6);
-            });
-            Numeric("키 간격 · 0~30 (기본 3)", () => KeyViewerStore.Settings.KeyGap, v =>
-            {
-                KeyViewerStore.Settings.KeyGap = v;
-                ChangedKeyViewer();
-            });
-            BuildChatterSettings();
-            Heading("레인");
-            Toggle("레인 표시", () => KeyViewerStore.Settings.useRain, v =>
-            {
-                KeyViewerStore.Settings.useRain = v;
-                ChangedKeyViewer();
-            });
-            Toggle("고스트 레인 표시", () => KeyViewerStore.Settings.useGhostRain, v =>
-            {
-                KeyViewerStore.Settings.useGhostRain = v;
-                ChangedKeyViewer();
-            });
-            Numeric("레인 속도 · 10~500", () => KeyViewerStore.Settings.rainSpeed, v =>
-            {
-                KeyViewerStore.Settings.rainSpeed = v;
-                ChangedKeyViewer();
-            });
-            Numeric("레인 높이 · 20~800", () => KeyViewerStore.Settings.rainHeight, v =>
-            {
-                KeyViewerStore.Settings.rainHeight = v;
-                ChangedKeyViewer();
-            });
-            BuildKeyLayoutEditor();
-            Label("KPS는 최근 1초 입력이며 위 오버레이의 이론 KPS와 별개입니다.", 40).textWrappingMode = TextWrappingModes.Normal;
-            Heading("키 색상");
-            string[] colorFields =
-            {
-                "Background",
-                "BackgroundClicked",
-                "Outline",
-                "OutlineClicked",
-                "Text",
-                "TextClicked",
-                "RainColor",
-                "RainColor2",
-                "GhostRainColor"
-            };
-            string[] colorNames =
-            {
-                "기본 키 배경",
-                "누른 키 배경",
-                "기본 테두리",
-                "누른 테두리",
-                "기본 글자",
-                "누른 키 글자",
-                "상단 레인",
-                "하단 레인",
-                "고스트 레인"
-            };
-            for (int i = 0; i < colorFields.Length; i++)
-            {
-                FieldInfo field = typeof(KeyViewerSetting).GetField(colorFields[i]);
-                ColorRow(colorNames[i], () => (Color)field.GetValue(KeyViewerStore.Settings), c =>
-                {
-                    field.SetValue(KeyViewerStore.Settings, c);
-                    KeyViewer.Instance?.RefreshColors();
-                    RefreshKeyEditor();
-                });
-            }
-
-            Button("키 색상 기본값으로 복원", () =>
-            {
-                var defaults = new KeyViewerSetting();
-                foreach (string name in colorFields)
-                {
-                    var field = typeof(KeyViewerSetting).GetField(name);
-                    field.SetValue(KeyViewerStore.Settings, field.GetValue(defaults));
-                }
-
-                ChangedKeyViewer();
-            });
-            CounterColors("KPS 색상", () => KeyViewerStore.Settings.KpsColors, p => KeyViewerStore.Settings.KpsColors = p);
-            CounterColors("Total 색상", () => KeyViewerStore.Settings.TotalColors, p => KeyViewerStore.Settings.TotalColors = p);
-            bool confirm = false;
-            Button reset = null;
-            reset = Button("누적 키 횟수 초기화", () =>
-            {
-                if (!confirm)
-                {
-                    confirm = true;
-                    reset.GetComponentInChildren<TMP_Text>().text = "한 번 더 누르면 키 횟수 초기화";
-                    return;
-                }
-
-                confirm = false;
-                KeyCountData.Instance.Count = new long[KeyViewer.FootOutIndex];
-                KeyCountData.Instance.TotalCount = 0;
-                KeyCountData.Instance.Save();
-                ChangedKeyViewer();
-                reset.GetComponentInChildren<TMP_Text>().text = "누적 키 횟수 초기화";
-            });
-            _refresh.Add(() =>
-            {
-                if (!Visible)
-                {
-                    confirm = false;
-                    reset.GetComponentInChildren<TMP_Text>().text = "누적 키 횟수 초기화";
-                }
-            });
         }
 
         private static int HandSize() => KeyViewer.GetKeyCode().Length;
@@ -529,7 +338,10 @@ namespace DonQuixoteOverlay
 
         private TMP_Text Label(string text, float height)
         {
-            return DarkNeonUi.Text(text, Row(height).transform, Vector2.zero, Vector2.one, 17, DQColors.Text, TextAlignmentOptions.Left, false);
+            var label = DarkNeonUi.Text(text, Row(height).transform, Vector2.zero, Vector2.one, 16, DQColors.Text, TextAlignmentOptions.Left, false);
+            label.textWrappingMode = TextWrappingModes.Normal;
+            label.overflowMode = TextOverflowModes.Overflow;
+            return label;
         }
 
         private void Heading(string title)

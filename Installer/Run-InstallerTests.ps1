@@ -43,7 +43,7 @@ if($process.ExitCode -ne 0 -or !$result.Success){throw ('Shipping EXE install fa
 'PASS shipping EXE installs its embedded payload into a Unicode game fixture'
 $data=Join-Path $game 'Mods\Ghostify Overlay\UserData'
 New-Item -ItemType Directory -Path $data | Out-Null
-foreach($name in @('settings.json','layout.json','keyviewer.json','keyviewer-counts.json')){
+foreach($name in @('settings.json','layout.json','keyviewer.json','keyviewer-counts.json','keyviewer-presets.json')){
     [IO.File]::WriteAllText((Join-Path $data $name),('saved user settings '+$name))
     [IO.File]::WriteAllText((Join-Path $data ($name+'.bak')),('saved user backup '+$name))
 }
@@ -56,7 +56,7 @@ foreach($file in $before){
     if((Get-FileHash -LiteralPath (Join-Path $data $file.Name)).Hash -ne $file.Hash){throw 'Shipping EXE changed user settings'}
     if((Get-FileHash -LiteralPath (Join-Path $result.Backup ('previous-mod\UserData\'+$file.Name))).Hash -ne $file.Hash){throw 'Shipping EXE backup is incomplete'}
 }
-'PASS shipping EXE updates and backs up all eight user files without changing them'
+'PASS shipping EXE updates and backs up all ten settings and preset files without changing them'
 $target=Join-Path $game 'Mods\Ghostify Overlay'
 $legacy=Join-Path $game 'Mods\DonQuixoteOverlay'
 $fixtureBoundary=[IO.Path]::GetFullPath($root).TrimEnd('\')+'\'
@@ -68,7 +68,7 @@ $process=Start-Process -FilePath $exe -ArgumentList ('--install "'+$game+'" "'+$
 $result=Get-Content -LiteralPath $migrationReport -Raw -Encoding UTF8|ConvertFrom-Json
 if($process.ExitCode -ne 0 -or !$result.Success -or (Test-Path -LiteralPath $legacy) -or !(Test-Path -LiteralPath $target)){throw 'Shipping EXE legacy folder migration failed'}
 foreach($file in $before){if((Get-FileHash -LiteralPath (Join-Path $data $file.Name)).Hash -ne $file.Hash){throw 'Shipping EXE migration changed user settings'}}
-'PASS shipping EXE migrates the legacy folder and retains all eight user files'
+'PASS shipping EXE migrates the legacy folder and retains all ten settings and preset files'
 $failureReport=Join-Path $root 'EXE-invalid-result.json'
 $process=Start-Process -FilePath $exe -ArgumentList ('--install "'+$root+'" "'+$failureReport+'" "'+$backup+'"') -WindowStyle Hidden -PassThru -Wait
 $result=Get-Content -LiteralPath $failureReport -Raw -Encoding UTF8 | ConvertFrom-Json

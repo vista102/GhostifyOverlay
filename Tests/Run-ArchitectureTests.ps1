@@ -6,6 +6,7 @@ $json=Join-Path $managed 'Newtonsoft.Json.dll'
 $fixture=Join-Path $project ('Backups\ArchitectureTests-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $fixture -Force|Out-Null
 $sources=@(Get-ChildItem -LiteralPath (Join-Path $project 'src/Mod/Application') -Filter *.cs -Recurse -File|ForEach-Object FullName)
+$sources+=@(Get-ChildItem -LiteralPath (Join-Path $project 'src/Mod/Domain/Presets') -Filter *.cs -File|ForEach-Object FullName)
 $sources+=@('IJsonStorage','AtomicJsonStorage','JsonSettingsRepository')|ForEach-Object{Join-Path $project ('src/Mod/Infrastructure/Persistence/'+$_+'.cs')}
 $sources+=Join-Path $PSScriptRoot 'ArchitectureServiceTests.cs'
 $compiler='C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\Roslyn\csc.exe'

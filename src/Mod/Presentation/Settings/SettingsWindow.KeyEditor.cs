@@ -20,9 +20,7 @@ namespace DonQuixoteOverlay
         private float _previewGap = float.NaN;
         private void BuildKeyLayoutEditor()
         {
-            Heading("키 배치 편집");
-            Label("아래 키를 선택하면 오른쪽에서 입력 키·표시 이름·고스트 키를 변경할 수 있습니다.", 44).textWrappingMode = TextWrappingModes.Normal;
-            _keyEditorRoot = Row(340).transform;
+            _keyEditorRoot = Row(280).transform;
             DarkNeonUi.ControlSurface(_keyEditorRoot.gameObject, DQColors.Window, DQRadii.Card, true);
             _keyDetail = DarkNeonUi.Rect("Selected key", _keyEditorRoot, new Vector2(.63f, .04f), new Vector2(.98f, .96f));
             _keyDetailTitle = DarkNeonUi.Text("키를 선택하세요", _keyDetail.transform, new Vector2(0, .86f), Vector2.one, 20, DQColors.Text, TextAlignmentOptions.Left, false);
@@ -45,7 +43,7 @@ namespace DonQuixoteOverlay
             _ghostBind = DarkNeonUi.Button("고스트 키 변경", _ghostDetail.transform, Vector2.zero, new Vector2(.77f, .50f), UiButtonKind.Secondary, () => CaptureSelected(true));
             DarkNeonUi.Button("해제", _ghostDetail.transform, new Vector2(.80f, 0), new Vector2(1, .50f), UiButtonKind.Ghost, () => ClearSelected(true));
             _refresh.Add(RefreshKeyEditor);
-            Label("등록 중 Esc 취소 · Enter/NumEnter 및 좌우 보조키 구분 · 고스트 키는 입력 횟수에서 제외", 46).textWrappingMode = TextWrappingModes.Normal;
+            Label("키 선택 → 오른쪽에서 편집 · 등록 중 Esc 취소\nEnter/NumEnter · 좌우 보조키 구분 · 고스트 키는 입력 횟수에서 제외", 32).fontSize = 13;
         }
 
         private bool SelectedExists() => _selectedKey >= 0 && (_selectedKey < 20 ? _selectedKey < HandSize() : _selectedKey - 20 < FootSize());
@@ -89,7 +87,7 @@ namespace DonQuixoteOverlay
                 float extent = 1;
                 foreach (var slot in slots)
                     extent = Math.Max(extent, slot.X + slot.Width);
-                scale = Math.Min(scale, 480f / extent);
+                scale = Math.Min(scale, 380f / extent);
                 foreach (var slot in slots)
                 {
                     int selected = slot.Index;

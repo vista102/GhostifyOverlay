@@ -42,12 +42,14 @@ namespace DonQuixoteOverlay
         private bool _scaling;
         private GameObject _hintCanvas;
         private TMP_Text _hint;
+        private Action _returnToSettings;
         internal static bool IsActive { get; private set; }
+        internal int SelectedIndex => _part;
 
         internal static void CancelActive()
         {
             if (Main.Root != null)
-                Main.Root.GetComponent<LayoutEditorController>()?.Cancel();
+                Main.Root.GetComponent<LayoutEditorController>()?.Cancel(false);
         }
 
         private void OnEnable()
@@ -58,17 +60,17 @@ namespace DonQuixoteOverlay
         private void OnDisable()
         {
             SceneManager.activeSceneChanged -= OnSceneChanged;
-            Cancel();
+            Cancel(false);
         }
 
         private void OnDestroy()
         {
-            Cancel();
+            Cancel(false);
         }
 
         private void OnSceneChanged(Scene a, Scene b)
         {
-            Cancel();
+            Cancel(false);
         }
 
         public void Begin(int part = 0)
@@ -86,6 +88,12 @@ namespace DonQuixoteOverlay
             IsActive = true;
             _hintCanvas.SetActive(true);
             RefreshHint();
+        }
+
+        internal void BeginFromSettings(int part, Action returnToSettings)
+        {
+            Begin(part);
+            _returnToSettings = returnToSettings;
         }
 
         private void Update()
@@ -180,7 +188,7 @@ namespace DonQuixoteOverlay
             }
         }
 
-        private void End()
+        private void End(bool returnToSettings = true)
         {
             IsActive = false;
             _before = null;
@@ -188,15 +196,18 @@ namespace DonQuixoteOverlay
             _vertical.Reset();
             if (_hintCanvas != null)
                 _hintCanvas.SetActive(false);
+            var callback = _returnToSettings;
+            _returnToSettings = null;
+            if (returnToSettings) callback?.Invoke();
         }
 
-        private void Cancel()
+        private void Cancel(bool returnToSettings = true)
         {
             if (_before == null)
                 return;
             _before.Restore(LayoutStore.Current, KeyViewerStore.Settings);
             KeyViewer.Instance?.ApplyPosition();
-            End();
+            End(returnToSettings);
         }
 
         private void EnsureHint()
@@ -205,6 +216,7 @@ namespace DonQuixoteOverlay
                 return;
             _hintCanvas = new GameObject("GhostifyOverlay.LayoutHint", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler));
             _hintCanvas.transform.SetParent(transform, false);
+            _hintCanvas.AddComponent<LayoutSelectionFrame>().Owner = this;
             var canvas = _hintCanvas.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.sortingOrder = 10001;
