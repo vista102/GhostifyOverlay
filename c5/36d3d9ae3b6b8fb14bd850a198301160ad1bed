@@ -1,0 +1,53 @@
+Tests/Run-AttemptTrackerTests.ps1
+  s_da0fc42e2dcc83::t_6afef1664f4e49 11-12
+src/Mod/Integration/Adofai/Metadata/AdofaiLevelIdentity.cs
+  s_da0fc42e2dcc83::t_6afef1664f4e49 1-68
+Licenses/JipperResourcePack-source.json
+  s_da0fc42e2dcc83::t_6afef1664f4e49 4-6,21
+docs/development/BUILD_AND_TEST.md
+  s_da0fc42e2dcc83::t_6afef1664f4e49 32
+src/Mod/Features/Attempts/AttemptTracker.cs
+  s_da0fc42e2dcc83::t_6afef1664f4e49 4,54,63,97-103,105,118,124,178,180,185,188-189,193-198,213,218,222,225,242,249,252,262,264-269
+src/Mod/Application/Attempts/AttemptRecordMigration.cs
+  s_da0fc42e2dcc83::t_6afef1664f4e49 1-20
+GameCompatibility.json
+  s_da0fc42e2dcc83::t_6afef1664f4e49 4,7
+src/Mod/Application/Attempts/LevelFingerprint.cs
+  s_da0fc42e2dcc83::t_6afef1664f4e49 1-60
+Installer/README.md
+  s_da0fc42e2dcc83::t_6afef1664f4e49 3
+Info.json
+  s_da0fc42e2dcc83::t_6afef1664f4e49 5
+THIRD-PARTY-NOTICES.md
+  s_da0fc42e2dcc83::t_6afef1664f4e49 5,12
+  s_da0fc42e2dcc83::t_a7c94d7df7309c 13
+README.md
+  s_da0fc42e2dcc83::t_6afef1664f4e49 12,14,47
+  s_da0fc42e2dcc83::t_2b28e05af1c872 48
+Tests/AttemptTrackerHarness.cs
+  s_da0fc42e2dcc83::t_6afef1664f4e49 14-20,22,32,34,36,40,84-85,88,90,95
+Tests/Run-StandaloneAlphaTests.ps1
+  s_da0fc42e2dcc83::t_6afef1664f4e49 22
+docs/README.md
+  s_da0fc42e2dcc83::t_6afef1664f4e49 5
+Tests/LevelHashHarness.cs
+  s_da0fc42e2dcc83::t_6afef1664f4e49 1-96
+docs/validation/ATTEMPT_HASH_0.5.1_VALIDATION.md
+  s_da0fc42e2dcc83::t_6afef1664f4e49 1-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c536d3d9ae3b6b8fb14bd850a198301160ad1bed",
+  "prompts": {},
+  "sessions": {
+    "s_da0fc42e2dcc83": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-attempt-level-hash-0.5.1",
+        "model": "unknown"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
