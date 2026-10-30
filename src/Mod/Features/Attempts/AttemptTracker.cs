@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using UnityEngine;
+using GhostifyOverlay.Application.Attempts;
 
 namespace DonQuixoteOverlay
 {
@@ -50,8 +51,7 @@ namespace DonQuixoteOverlay
             get
             {
                 EnsureStore();
-                int value;
-                return Main.Settings.Overlay.FullAttempts.TryGetValue(_levelKey, out value) ? value : 0;
+                return GetByKey(Main.Settings.Overlay.FullAttempts, _levelKey);
             }
         }
 
@@ -60,8 +60,7 @@ namespace DonQuixoteOverlay
             get
             {
                 EnsureStore();
-                int value;
-                return Main.Settings.Overlay.FullProgressAttempts.TryGetValue(_levelKey, out value) ? value : 0;
+                return GetByKey(Main.Settings.Overlay.FullProgressAttempts, _levelKey);
             }
         }
 
@@ -95,8 +94,15 @@ namespace DonQuixoteOverlay
         {
             if (controller == null || !controller.gameworld || Main.Settings == null)
                 return;
-            string key = CurrentLevelKey(controller);
+            string key = AdofaiLevelIdentity.Current(true);
+            if (string.IsNullOrEmpty(key))
+            {
+                PrepareRun(controller, startFloor);
+                RuntimeStatus.Set("attempts.run", "시도 횟수", "레벨 해시 준비 대기 중");
+                return;
+            }
             ObserveLevel(key);
+            PromoteLegacyRecords();
             _startedMidMap = IsProgressStart(startFloor, controller.startedFromCheckpoint);
             _startProgress = _startedMidMap ? OverlayController.FloorProgress(startFloor) : 0f;
             if (!IsEligible(controller))
@@ -109,13 +115,13 @@ namespace DonQuixoteOverlay
             {
                 Increment(SessionAttempts, _levelKey, 1);
                 EnsureStore();
-                Main.Settings.Overlay.FullAttempts[_levelKey] = FullAttempts + 1;
+                Main.Settings.Overlay.FullAttempts[_levelKey] = NextValue(FullAttempts);
             }
             else
             {
                 Increment(SessionProgressAttempts, _levelKey, 1);
                 EnsureStore();
-                Main.Settings.Overlay.FullProgressAttempts[_levelKey] = FullProgressAttempts + 1;
+                Main.Settings.Overlay.FullProgressAttempts[_levelKey] = NextValue(FullProgressAttempts);
             }
 
             Main.Save();
@@ -169,21 +175,27 @@ namespace DonQuixoteOverlay
             return startFloor > 1 || startedFromCheckpoint;
         }
 
-        public static int GetSessionAttempts(string filePath, bool progress)
+        public static int GetSessionAttempts(string levelKey, bool progress)
         {
-            string key = PathKey(filePath);
-            return GetByKey(progress ? SessionProgressAttempts : SessionAttempts, key);
+            return GetByKey(progress ? SessionProgressAttempts : SessionAttempts, levelKey);
         }
 
         internal static void ObserveLevel(string key)
         {
+            if (string.IsNullOrEmpty(key)) return;
             if (string.Equals(_levelKey, key, StringComparison.OrdinalIgnoreCase))
                 return;
-            EndSession();
-            _levelKey = key ?? string.Empty;
+            ClearSession();
+            _levelKey = key;
         }
 
         internal static void EndSession()
+        {
+            ClearSession();
+            AdofaiLevelIdentity.Reset();
+        }
+
+        private static void ClearSession()
         {
             _pendingController = null;
             SessionAttempts.Clear();
@@ -198,21 +210,19 @@ namespace DonQuixoteOverlay
             if (controller == null)
                 return; // Native restart can briefly have no controller.
             if (controller.gameworld)
-                ObserveLevel(CurrentLevelKey(controller));
+                ObserveLevel(AdofaiLevelIdentity.Current(false));
             else if (!ADOBase.isLevelEditor)
                 EndSession();
         }
 
-        public static int GetStoredAttempts(string filePath, bool progress)
+        public static int GetStoredAttempts(string levelKey, bool progress)
         {
             EnsureStore();
-            string key = PathKey(filePath);
-            int value;
             System.Collections.Generic.Dictionary<string, int> store = progress ? Main.Settings.Overlay.FullProgressAttempts : Main.Settings.Overlay.FullAttempts;
-            return store.TryGetValue(key, out value) ? value : 0;
+            return GetByKey(store, levelKey);
         }
 
-        public static string PathKey(string filePath)
+        private static string LegacyPathKey(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))
                 return string.Empty;
@@ -229,20 +239,17 @@ namespace DonQuixoteOverlay
         private static int GetByKey(System.Collections.Generic.Dictionary<string, int> values, string key)
         {
             int value;
-            return !string.IsNullOrEmpty(key) && values.TryGetValue(key, out value) ? value : 0;
+            return !string.IsNullOrEmpty(key) && values.TryGetValue(key, out value) ? Math.Max(0, value) : 0;
         }
 
         private static void Increment(System.Collections.Generic.Dictionary<string, int> values, string key, int amount)
         {
             if (string.IsNullOrEmpty(key))
                 return;
-            values[key] = Math.Max(0, GetByKey(values, key) + amount);
+            values[key] = (int)Math.Min(int.MaxValue, Math.Max(0L, (long)GetByKey(values, key) + amount));
         }
 
-        private static string LevelPathFromKey(string key)
-        {
-            return key != null && key.StartsWith("path:", StringComparison.OrdinalIgnoreCase) ? key.Substring(5) : string.Empty;
-        }
+        private static int NextValue(int value) => value >= int.MaxValue ? int.MaxValue : Math.Max(0, value) + 1;
 
         private static void EnsureStore()
         {
@@ -250,29 +257,16 @@ namespace DonQuixoteOverlay
                 Main.Settings.Overlay.FullAttempts = new System.Collections.Generic.Dictionary<string, int>();
             if (Main.Settings.Overlay.FullProgressAttempts == null)
                 Main.Settings.Overlay.FullProgressAttempts = new System.Collections.Generic.Dictionary<string, int>();
-            if (string.IsNullOrEmpty(_levelKey))
-                _levelKey = "unknown-level";
         }
 
-        private static string CurrentLevelKey(scrController controller)
+        private static void PromoteLegacyRecords()
         {
-            try
-            {
-                if (scnGame.instance != null && !string.IsNullOrWhiteSpace(scnGame.instance.levelPath))
-                    return PathKey(scnGame.instance.levelPath);
-                if (!string.IsNullOrWhiteSpace(scrController.currentWorldString))
-                    return "world:" + scrController.currentWorldString;
-                if (!string.IsNullOrWhiteSpace(controller.levelName))
-                    return "name:" + controller.levelName;
-                AudioSource source = ADOBase.conductor == null ? null : ADOBase.conductor.song;
-                if (source != null && source.clip != null)
-                    return "song:" + source.clip.name;
-            }
-            catch
-            {
-            }
-
-            return "unknown-level";
+            EnsureStore();
+            string legacy = ADOBase.isOfficialLevel ? "world:" + scrController.currentWorldString :
+                scnGame.instance == null ? null : LegacyPathKey(scnGame.instance.levelPath);
+            bool changed = AttemptRecordMigration.Promote(Main.Settings.Overlay.FullAttempts, legacy, _levelKey);
+            changed |= AttemptRecordMigration.Promote(Main.Settings.Overlay.FullProgressAttempts, legacy, _levelKey);
+            if (changed) Main.RequestSave();
         }
     }
 }

@@ -11,9 +11,15 @@ public sealed class scrController {
     public string levelName="fixture";
     public static string currentWorldString;
 }
-public sealed class scnGame { public static scnGame instance=new scnGame();public string levelPath="fixture-map.adofai"; }
+public sealed class scnGame { public static scnGame instance=new scnGame();public string levelPath="fixture-map.adofai";public object levelData=new object();public List<ADOFAI.LevelEvent> events=new List<ADOFAI.LevelEvent>(); }
+public sealed class scrLevelMaker {public bool isOldLevel;public string leveldata;public float[] floorAngles=new float[]{0,180,0};}
+public enum SpeedType {Bpm,Multiplier}
+namespace ADOFAI {
+    public enum LevelEventType {SetSpeed,Twirl,Hold,MultiPlanet,Pause,AutoPlayTiles,ScaleMargin,Multitap,KillPlayer,SetText,MoveCamera}
+    public sealed class LevelEvent {public int floor;public LevelEventType eventType;public readonly Dictionary<string,object> Values=new Dictionary<string,object>();public static int Reads;public object this[string key]{get{Reads++;return Values[key];}set{Values[key]=value;}}}
+}
 public sealed class scrConductor { public UnityEngine.AudioSource song; }
-public static class ADOBase { public static bool isLevelEditor;public static scrConductor conductor; }
+public static class ADOBase { public static bool isLevelEditor,isOfficialLevel;public static string currentLevel;public static scrConductor conductor;public static scrLevelMaker lm=new scrLevelMaker();public static scnGame customLevel=>scnGame.instance; }
 public static class RDC { public static bool auto; }
 namespace DonQuixoteOverlay {
     public sealed class OverlaySettings {
@@ -23,15 +29,15 @@ namespace DonQuixoteOverlay {
     internal static class Main {
         internal static DonQuixoteSettings Settings=new DonQuixoteSettings();internal static int Saves;
         internal static readonly List<string> Logs=new List<string>();
-        internal static void Save(){Saves++;}internal static void Log(string text){Logs.Add(text);}
+        internal static int Requests;internal static void RequestSave(){Requests++;}internal static void Save(){Saves++;}internal static void Log(string text){Logs.Add(text);}
     }
-    internal static class RuntimeStatus { internal static string Last;internal static void Set(string key,string label,string text){Last=text;} }
+    internal static class RuntimeStatus { internal static string Last;internal static int Failures;internal static void Clear(string key){}internal static void Failure(string key,string label,Exception error){Failures++;}internal static void Set(string key,string label,string text){Last=text;} }
     internal static class OverlayController { internal static float FloorProgress(int floor)=>floor/100f; }
-    public static class AttemptTrackerHarness {
+    public static partial class AttemptTrackerHarness {
         private static readonly List<string> Results=new List<string>();
         private static void Check(bool condition,string text){if(!condition)throw new Exception("FAIL "+text);Results.Add("PASS "+text);}
         private static void Next(scrController controller){UnityEngine.Time.frameCount++;AttemptTracker.Tick(controller);}
-        private static void Fresh(){AttemptTracker.EndSession();Main.Settings=new DonQuixoteSettings();Main.Saves=0;Main.Logs.Clear();RDC.auto=false;ADOBase.isLevelEditor=true;UnityEngine.Time.frameCount=0;scnGame.instance.levelPath="fixture-map.adofai";}
+        private static void Fresh(){AttemptTracker.EndSession();Main.Settings=new DonQuixoteSettings();Main.Saves=0;Main.Requests=0;Main.Logs.Clear();RDC.auto=false;ADOBase.isLevelEditor=true;ADOBase.isOfficialLevel=false;ADOBase.currentLevel=null;ADOBase.lm=new scrLevelMaker();UnityEngine.Time.frameCount=0;scnGame.instance=new scnGame();RuntimeStatus.Failures=0;}
         public static string[] Run(){
             Results.Clear();Fresh();var c=new scrController{freeroamInvulnerability=true};
             AttemptTracker.PrepareRun(c,0);AttemptTracker.Tick(c);
@@ -75,16 +81,18 @@ namespace DonQuixoteOverlay {
             int full=AttemptTracker.FullAttempts,fullPractice=AttemptTracker.FullProgressAttempts;
             AttemptTracker.EndSession();
             Check(AttemptTracker.Attempts==0 && AttemptTracker.ProgressAttempts==0,"leaving the map clears both session counters");
-            Check(AttemptTracker.GetStoredAttempts(scnGame.instance.levelPath,false)==full && AttemptTracker.GetStoredAttempts(scnGame.instance.levelPath,true)==fullPractice,"leaving the map retains both stored full counters");
+            string hash=AdofaiLevelIdentity.Current(false);
+            Check(AttemptTracker.GetStoredAttempts(hash,false)==full && AttemptTracker.GetStoredAttempts(hash,true)==fullPractice,"leaving the map retains both stored full counters by hash");
             c.noFail=false;c.startedFromCheckpoint=false;AttemptTracker.PrepareRun(c,0);AttemptTracker.EndSession();Next(c);
             Check(AttemptTracker.Attempts==0,"leaving before pending setup finishes cannot create an attempt");
-            scnGame.instance.levelPath="other-fixture.adofai";AttemptTracker.PrepareRun(c,0);Next(c);
+            scnGame.instance.levelPath="other-fixture.adofai";ADOBase.lm.floorAngles=new float[]{0,90,180};AttemptTracker.PrepareRun(c,0);Next(c);
             Check(AttemptTracker.Attempts==1 && AttemptTracker.FullAttempts==1,"new map starts with independent session and persistent counts");
-            scnGame.instance.levelPath="fixture-map.adofai";AttemptTracker.PrepareRun(c,0);Next(c);
+            scnGame.instance.levelPath="fixture-map.adofai";ADOBase.lm.floorAngles=new float[]{0,180,0};AttemptTracker.PrepareRun(c,0);Next(c);
             Check(AttemptTracker.Attempts==1 && AttemptTracker.FullAttempts==full+1,"reopening a map resets its session while retaining history");
             c.gameworld=false;AttemptTracker.PrepareRun(c,0);Next(c);
             Check(AttemptTracker.Attempts==1,"pending setup does not count while gameworld is false");
             c.gameworld=true;Next(c);Check(AttemptTracker.Attempts==2,"gameworld becoming ready lets the prepared attempt complete");
+            HashTests();
             return Results.ToArray();
         }
     }

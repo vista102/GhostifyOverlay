@@ -19,7 +19,7 @@ $taskCalls=[LifecycleTests].GetMethod('Calls',$taskFlags).Invoke($null,@($taskTo
 Check (@($taskCalls|Where-Object {$_.Name -eq 'SetVisible'}).Count -eq 1) 'Alt+D toggles the original independent settings window'
 Check ($null -eq $taskMod.GetType('DonQuixoteOverlay.AttemptTracker',$true).GetMethod('ValidateCurrentRun',$taskFlags)) '0.4.9 counted-attempt preservation remains in place'
 $taskCompatibility=Get-Content -LiteralPath (Join-Path $taskProject 'GameCompatibility.json') -Raw|ConvertFrom-Json
-Check ($taskCompatibility.SteamBuild -eq '26044349' -and $taskCompatibility.AssemblySha256 -eq (Get-FileHash -LiteralPath (Join-Path $taskManaged 'Assembly-CSharp.dll')).Hash) 'compatibility manifest matches the updated installed alpha bytes'
+Check ($taskCompatibility.SteamBuild -eq '26311090' -and $taskCompatibility.AssemblySha256 -eq (Get-FileHash -LiteralPath (Join-Path $taskManaged 'Assembly-CSharp.dll')).Hash) 'compatibility manifest matches the updated installed alpha bytes'
 'Standalone alpha SDK assertions passed: '+$taskPassed
 $taskFixture=Join-Path $taskProject ('Backups\Feedback-0.4.10\Input-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $taskFixture -Force|Out-Null

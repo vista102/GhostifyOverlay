@@ -1,6 +1,9 @@
 {
   "repository": "https://github.com/Jongye0l/JipperResourcePack",
   "commit": "ac6d6410571ee7d585aedce7f5085de34f615af2",
+  "references": {
+    "OverlayContents/PlayCount.cs": "c1f43f9ec5c83aef2e550871b1c39310e4277cb059c09354259765b7fd7f8e5e"
+  },
   "files": {
     "KeyViewer.cs": "57741f77d0fcf01d8b907c5579e155678c0ccc1214836d3705f15aa3f2910fec",
     "KeyViewer.Update.cs": "359d6b592f0b4a7be3923bc704581f912a86af6b09ca46c41fee3d28b3093449",

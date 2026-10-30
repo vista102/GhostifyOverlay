@@ -29,3 +29,4 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File Tests\Run-AllTests.ps1 -
 산출물은 `bin/Release/GhostifyOverlay/`, `dist/GhostifyOverlay-Setup-<버전>.exe`, `dist/GhostifyOverlay-<버전>.zip`, `dist/SHA256SUMS.txt`입니다.
 - `Run-KeyPresetTests.ps1`: 실제 프리셋 서비스·저장·어댑터에서 이름과 키 설정 왕복, 모든 배치 조합, 기존 설정 보존, 가져오기 검증, 저장 실패·복구·되돌리기를 검사합니다.
 - `Run-OverlayGroupUiTests.ps1`: 실제 설정창 전체 빌더·콜백을 inert uGUI API에서 실행해 분류 탐색, 스크롤 기억, 프리셋 대화상자, 키 이름, 입력 연동, 편집 복귀를 검사합니다. 생성한 JSON 배치는 `Render-SettingsPreview.ps1 -InputDirectory <검사 폴더>`로 참고 이미지를 만들 수 있습니다. Unity 렌더링 캡처는 아닙니다.
+- `Run-AttemptTrackerTests.ps1`: production 어템·플레이 데이터 해시·게임 API 어댑터에서 파일 이동/수정 구분, 주요 이벤트, 공식·구형 맵, 기존 경로 기록 이전, 캐시·로딩·오류 복구와 기존 집계 규칙을 검사합니다.

@@ -9,9 +9,9 @@
 
 ## 설치
 
-**지원 환경:** Windows 10/11, 얼불춤 3.4.0 alpha(build 26044349), Unity Mod Manager 0.32.5 이상, .NET Framework 4.8.
+**지원 환경:** Windows 10/11, 얼불춤 3.4.0 alpha(build 26311090), Unity Mod Manager 0.32.5 이상, .NET Framework 4.8.
 
-1. 설치 파일 `GhostifyOverlay-Setup-0.5.0.exe`를 준비합니다.
+1. 설치 파일 `GhostifyOverlay-Setup-0.5.1.exe`를 준비합니다.
 2. 게임을 종료한 뒤 EXE를 실행하고, 게임 폴더를 확인해 **설치하기 / 업데이트**를 누릅니다.
 3. 게임을 실행하고 Unity Mod Manager에서 **Ghostify Overlay**를 활성화합니다.
 
@@ -43,6 +43,8 @@
 16키의 KPS / Total은 항상 표시됩니다. 레인 색상은 **상단 레인**과 **하단 레인**에서 지정합니다.
 
 시도 횟수는 판 시작 시 자동플레이·맵 전체 무적 여부로 집계합니다. 시작 후 모드를 바꿔도 이미 집계한 횟수는 유지합니다. 자유 이동 구간 무적 옵션은 일반 시도 집계를 막지 않습니다. Attempt / Prac Attempt는 맵을 나가면 초기화하고 Full 누적은 유지합니다.
+
+레벨은 파일 경로 대신 타일 데이터와 주요 플레이 이벤트의 해시로 구분합니다. 같은 맵은 파일을 옮기거나 이름을 바꿔도 Full 기록을 공유하며, 같은 경로의 타일·주요 이벤트가 바뀌면 별도로 집계합니다. 기존 경로 기록은 해당 경로의 맵을 열 때 해시 기록으로 이전합니다. 확인할 수 없는 이전 경로의 기록도 삭제하지 않습니다.
 
 [출처·라이선스](THIRD-PARTY-NOTICES.md) · [AI 생성 코드 기록](AI_ATTRIBUTION.md)
 

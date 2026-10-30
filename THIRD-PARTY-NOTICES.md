@@ -2,12 +2,14 @@
 
 | 구성 요소 | 사용 범위 | 저작권·라이선스 전문 |
 |---|---|---|
-| [JipperResourcePack](https://github.com/Jongye0l/JipperResourcePack) — Jongyeol | 수정한 키뷰어 코드 일부 | [BSD-3-Clause](Licenses/JipperResourcePack-BSD-3-Clause.txt) |
+| [JipperResourcePack](https://github.com/Jongye0l/JipperResourcePack) — Jongyeol | 수정한 키뷰어 코드 일부, 어템의 레벨 해시 판별 기준 참고 | [BSD-3-Clause](Licenses/JipperResourcePack-BSD-3-Clause.txt) |
 | [ADOFAI Tweaks](https://github.com/PizzaLovers007/AdofaiTweaks) — PizzaLovers007 | 기본 곡 정보 UI 숨김 동작 참고·연동 | [MIT](Licenses/AdofaiTweaks-MIT.txt) |
 | Gmarket Sans Light / Medium | UI·오버레이·설치 프로그램 글꼴 | [동봉된 OFL](Assets/GmarketSans-OFL.txt) |
 | Noto Sans KR | 한글 등 누락 글리프 보완 | [SIL OFL 1.1](Assets/NotoSansKR-OFL.txt) |
 
 키뷰어 기준 커밋은 `ac6d6410571ee7d585aedce7f5085de34f615af2`이며 [원본 파일 기록](Licenses/JipperResourcePack-source.json)을 제공합니다. Noto Sans KR의 변환·출처는 [폰트 기록](Assets/NotoSansKR-source.json)에 있습니다.
+
+레벨 판별은 같은 커밋의 `OverlayContents/PlayCount.cs`에서 타일·주요 플레이 이벤트만 해시하는 기준을 참고했습니다. Ghostify는 별도의 버전이 지정된 직렬화와 SHA256을 사용하며, 원본 `Plays.dat` 형식이나 JALib 의존성을 포함하지 않습니다.
 
 위 문서의 저작권·라이선스 조건·면책 전문은 소스와 EXE·ZIP 배포물에 함께 포함합니다.
 
