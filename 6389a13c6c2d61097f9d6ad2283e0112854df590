@@ -1,0 +1,19 @@
+README.md
+  s_f36d01ef0434f4::t_9e9572040a67b0 9-16,26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6389a13c6c2d61097f9d6ad2283e0112854df590",
+  "prompts": {},
+  "sessions": {
+    "s_f36d01ef0434f4": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-readme-downloads-0.5.1",
+        "model": "unknown"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
