@@ -1,0 +1,48 @@
+Tests/Run-KeyViewerTests.ps1
+  s_f6a519c0426059::t_ab4aaf15396266 72-75
+Tests/Run-FeedbackV6Tests.ps1
+  s_f6a519c0426059::t_ab4aaf15396266 25
+src/Mod/Features/KeyViewer/Layout/KeyViewerGeometry.cs
+  s_f6a519c0426059::t_ab4aaf15396266 15-25
+src/Mod/Infrastructure/Persistence/KeyPresetStore.cs
+  s_f6a519c0426059::t_ab4aaf15396266 19,38,62
+Tests/KeyViewerTests.cs
+  s_f6a519c0426059::t_ab4aaf15396266 113-125
+src/Mod/Presentation/Settings/SettingsWindow.KeyViewer.cs
+  s_f6a519c0426059::t_ab4aaf15396266 65
+docs/validation/KEYVIEWER_4_8_0.5.1.md
+  s_f6a519c0426059::t_ab4aaf15396266 1-16
+Tests/Run-FeedbackV2Tests.ps1
+  s_f6a519c0426059::t_ab4aaf15396266 36,69,75
+src/Mod/Features/KeyViewer/Layout/KeyviewerStyle.cs
+  s_f6a519c0426059::t_ab4aaf15396266 8-10
+README.md
+  s_f6a519c0426059::t_ab4aaf15396266 30
+Tests/KeyPresetTests.cs
+  s_f6a519c0426059::t_ab4aaf15396266 42,69,78-87
+  s_f6a519c0426059::t_6cd67b50a6871e 88
+src/Mod/Features/KeyViewer/Configuration/KeyViewerSetting.cs
+  s_f6a519c0426059::t_ab4aaf15396266 9-14
+Tests/Run-FeedbackV4Tests.ps1
+  s_f6a519c0426059::t_ab4aaf15396266 74
+src/Mod/Domain/Presets/KeyBindingPreset.cs
+  s_f6a519c0426059::t_ab4aaf15396266 24
+src/Mod/Features/KeyViewer/Presentation/KeyViewer.cs
+  s_f6a519c0426059::t_ab4aaf15396266 226-227,234-235,249-250
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a2885ead7f59bcdb167f7871e02f59df06a651d2",
+  "prompts": {},
+  "sessions": {
+    "s_f6a519c0426059": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-keyviewer-4-8-0.5.1",
+        "model": "unknown"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
