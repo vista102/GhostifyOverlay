@@ -1,0 +1,29 @@
+Installer/Build-Setup.ps1
+  s_9292367f195140::t_1f1a96516e1e72 14
+THIRD-PARTY-NOTICES.md
+  s_9292367f195140::t_1f1a96516e1e72 15
+docs/validation/FEATURES_0.4.14_VALIDATION.md
+  s_9292367f195140::t_1f1a96516e1e72 18
+src/Installer/Application/InstallerEngine.cs
+  s_9292367f195140::t_1f1a96516e1e72 44
+Installer/Verify-Shipping.ps1
+  s_9292367f195140::t_1f1a96516e1e72 20
+Tests/Installer/InstallerTests.cs
+  s_9292367f195140::t_1f1a96516e1e72 63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b9f7d14020f639e143aa8aafad0a7bdbb2544e1e",
+  "prompts": {},
+  "sessions": {
+    "s_9292367f195140": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-license-cleanup-0.5.1",
+        "model": "unknown"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
