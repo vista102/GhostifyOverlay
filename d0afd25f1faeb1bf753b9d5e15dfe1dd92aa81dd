@@ -1,0 +1,91 @@
+LICENSE.md
+  s_9ecfe499b32f77::t_667610f7d2d688 1-23
+Tests/Run-DistributionNoticeTests.ps1
+  s_9ecfe499b32f77::t_667610f7d2d688 1-30
+Installer/Verify-Shipping.ps1
+  s_9ecfe499b32f77::t_667610f7d2d688 20
+src/Mod/Features/KeyViewer/Configuration/KeyViewerCounterPalette.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 1-2
+Tests/Installer/InstallerTests.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 63
+src/Mod/Features/KeyViewer/Configuration/KeyViewerSetting.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 1-2
+Installer/README.md
+  s_9ecfe499b32f77::t_667610f7d2d688 19
+THIRD-PARTY-NOTICES.md
+  s_9ecfe499b32f77::t_667610f7d2d688 16-27
+Installer/Verify-Notices.ps1
+  s_9ecfe499b32f77::t_667610f7d2d688 23-44
+src/Mod/Features/KeyViewer/Layout/KeyViewerSlot.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 1-2
+src/Mod/Features/KeyViewer/Presentation/KeyViewer.Layout.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 1-2
+src/Mod/Features/KeyViewer/Layout/KeyviewerStyle.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 1-2
+src/Mod/Features/KeyViewer/Presentation/KeyViewer.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 1-2
+src/Mod/Features/KeyViewer/Rain/RainPool.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 1-2
+GhostifyOverlay.csproj
+  s_9ecfe499b32f77::t_667610f7d2d688 101
+Installer/Verify-DistributionNotices.ps1
+  s_9ecfe499b32f77::t_667610f7d2d688 1-39
+src/Mod/Features/KeyViewer/Layout/KeyViewerGeometry.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 1-2
+src/Mod/Features/KeyViewer/Input/KeyTransitionState.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 1-2
+docs/validation/LICENSE_DISTRIBUTION_0.5.1.md
+  s_9ecfe499b32f77::t_667610f7d2d688 1-20
+Tests/Run-RepositoryTests.ps1
+  s_9ecfe499b32f77::t_667610f7d2d688 12,14
+src/Mod/Features/KeyViewer/Configuration/KeyViewerColors.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 1-2
+src/Mod/Features/KeyViewer/Input/KeyEventClock.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 1-2
+src/Mod/Features/KeyViewer/Input/KeyViewer.Input.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 1-2
+src/Mod/Features/KeyViewer/Presentation/Key.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 1-2
+Installer/Build-Setup.ps1
+  s_9ecfe499b32f77::t_667610f7d2d688 14,90-91
+src/Mod/Features/KeyViewer/Rain/RawRain.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 1-2
+Licenses/JipperResourcePack-source.json
+  s_9ecfe499b32f77::t_667610f7d2d688 1-45
+src/Mod/Features/KeyViewer/Rain/Rain.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 1-2
+src/Mod/Features/KeyViewer/Rain/RainManager.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 1-2
+Previews/Render-ControlPreview.ps1
+  s_9ecfe499b32f77::t_667610f7d2d688 77
+README.md
+  s_9ecfe499b32f77::t_667610f7d2d688 49
+src/Mod/Infrastructure/Persistence/KeyCountData.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 1-2
+src/Mod/Features/KeyViewer/Layout/FootKeyviewerStyle.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 1-2
+src/Mod/Features/KeyViewer/Input/KeyKpsWindow.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 1-2
+src/Mod/Integration/Adofai/Input/RawGhostInputPatch.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 1-2
+src/Installer/Application/InstallerEngine.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 44
+src/Mod/Integration/Adofai/Input/AsyncInputHook.cs
+  s_9ecfe499b32f77::t_667610f7d2d688 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d0afd25f1faeb1bf753b9d5e15dfe1dd92aa81dd",
+  "prompts": {},
+  "sessions": {
+    "s_9ecfe499b32f77": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-bsd-distribution-0.5.1",
+        "model": "unknown"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
