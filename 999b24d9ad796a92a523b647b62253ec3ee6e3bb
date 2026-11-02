@@ -1,0 +1,66 @@
+src/Mod/Features/Attempts/AttemptTracker.cs
+  s_825c86015ccdc8::t_a2740557645fca 71,91,106,117-118,203-242,246
+README.md
+  s_825c86015ccdc8::t_a2740557645fca 11,13,26,33,49,79,101-110,113-115
+  s_825c86015ccdc8::t_71f836d8aae469 116
+src/Mod/Domain/Configuration/SettingsNormalization.cs
+  s_825c86015ccdc8::t_a2740557645fca 28-33
+src/Mod/Features/Overlay/OverlayController.Text.cs
+  s_825c86015ccdc8::t_a2740557645fca 109,114-117,122
+src/Mod/Features/Overlay/OverlayGroups.cs
+  s_825c86015ccdc8::t_a2740557645fca 14
+src/Mod/Presentation/Settings/SettingsWindow.Navigation.cs
+  s_825c86015ccdc8::t_a2740557645fca 35
+Tests/Run-OverlayGroupUiTests.ps1
+  s_825c86015ccdc8::t_a2740557645fca 7
+src/Mod/Domain/Configuration/CustomOverlayText.cs
+  s_825c86015ccdc8::t_a2740557645fca 1-29
+src/Mod/Presentation/Settings/SettingsWindow.CustomText.cs
+  s_825c86015ccdc8::t_a2740557645fca 1-46
+src/Mod/Features/Overlay/OverlayController.CustomText.cs
+  s_825c86015ccdc8::t_a2740557645fca 1-40
+docs/validation/OVERLAY_0.5.2.md
+  s_825c86015ccdc8::t_a2740557645fca 1-16
+Tests/Run-NewOverlayTests.ps1
+  s_825c86015ccdc8::t_a2740557645fca 1-40
+src/Mod/Bootstrap/OverlayRuntime.cs
+  s_825c86015ccdc8::t_a2740557645fca 19,40,51
+src/Mod/Domain/Configuration/LayoutData.cs
+  s_825c86015ccdc8::t_a2740557645fca 12-42
+Tests/SettingsUxHarness.cs
+  s_825c86015ccdc8::t_a2740557645fca 64,115,117,142-150
+src/Mod/Domain/Configuration/DonQuixoteSettings.cs
+  s_825c86015ccdc8::t_a2740557645fca 25
+src/Mod/Domain/Configuration/OverlaySettings.cs
+  s_825c86015ccdc8::t_a2740557645fca 12-45
+src/Mod/Features/Overlay/OverlayController.cs
+  s_825c86015ccdc8::t_a2740557645fca 141,181,192
+Tests/Data/FactoryDefaults.json
+  s_825c86015ccdc8::t_a2740557645fca 1-306
+Tests/AttemptTrackerHarness.cs
+  s_825c86015ccdc8::t_a2740557645fca 9-11,13-15,32,102-117
+Info.json
+  s_825c86015ccdc8::t_a2740557645fca 5
+src/Mod/Domain/Configuration/ChatterSettings.cs
+  s_825c86015ccdc8::t_a2740557645fca 7-12
+Tests/KeyPresetTests.cs
+  s_825c86015ccdc8::t_a2740557645fca 37
+src/Mod/Features/KeyViewer/Configuration/KeyViewerSetting.cs
+  s_825c86015ccdc8::t_a2740557645fca 10-60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "999b24d9ad796a92a523b647b62253ec3ee6e3bb",
+  "prompts": {},
+  "sessions": {
+    "s_825c86015ccdc8": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-overlay-best-custom-0.5.2",
+        "model": "unknown"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
