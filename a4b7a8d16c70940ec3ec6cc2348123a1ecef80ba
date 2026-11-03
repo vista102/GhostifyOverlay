@@ -1,0 +1,39 @@
+Info.json
+  s_f8d17adaa768bc::t_14293854044c46 5
+src/Mod/Features/Attempts/AttemptTracker.cs
+  s_f8d17adaa768bc::t_14293854044c46 119,212,221-226
+Tests/Render-SettingsPreview.ps1
+  s_f8d17adaa768bc::t_14293854044c46 6
+README.md
+  s_f8d17adaa768bc::t_14293854044c46 11,13,26,105-110,112
+Tests/SettingsUxHarness.cs
+  s_f8d17adaa768bc::t_14293854044c46 46,63,85,145-167
+src/Mod/Features/LayoutEditing/LayoutSelectionFrame.cs
+  s_f8d17adaa768bc::t_14293854044c46 28-29
+docs/validation/OVERLAY_0.5.3.md
+  s_f8d17adaa768bc::t_14293854044c46 1-22
+src/Mod/Features/Overlay/OverlayController.CustomText.cs
+  s_f8d17adaa768bc::t_14293854044c46 33
+Tests/AttemptTrackerHarness.cs
+  s_f8d17adaa768bc::t_14293854044c46 9,116,118-127
+src/Mod/Features/LayoutEditing/LayoutEditorController.cs
+  s_f8d17adaa768bc::t_14293854044c46 48-76,142-148,171,195-198,218-221,239-240,289-292
+src/Mod/Presentation/Settings/SettingsWindow.CustomText.cs
+  s_f8d17adaa768bc::t_14293854044c46 2,5,10-12,17-22,24-44,46-65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a4b7a8d16c70940ec3ec6cc2348123a1ecef80ba",
+  "prompts": {},
+  "sessions": {
+    "s_f8d17adaa768bc": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-restart-inline-custom-0.5.3",
+        "model": "unknown"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
