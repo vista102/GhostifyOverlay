@@ -1,0 +1,36 @@
+Tests/AttemptTrackerHarness.cs
+  s_7765eded9bec2c::t_f79a36c39dce1b 40,129-154
+Info.json
+  s_7765eded9bec2c::t_f79a36c39dce1b 5
+src/Mod/Features/Attempts/AttemptTracker.Reset.cs
+  s_7765eded9bec2c::t_f79a36c39dce1b 1-69
+Tests/Run-AttemptTrackerTests.ps1
+  s_7765eded9bec2c::t_f79a36c39dce1b 12
+src/Mod/Features/Attempts/AttemptTracker.cs
+  s_7765eded9bec2c::t_f79a36c39dce1b 8
+Tests/SettingsUxHarness.cs
+  s_7765eded9bec2c::t_f79a36c39dce1b 88,140,144-153
+src/Mod/Presentation/Settings/SettingsWindow.Overlay.cs
+  s_7765eded9bec2c::t_f79a36c39dce1b 18,25-42
+docs/validation/OVERLAY_0.5.4.md
+  s_7765eded9bec2c::t_f79a36c39dce1b 1-15
+README.md
+  s_7765eded9bec2c::t_f79a36c39dce1b 11,13,26,120-127
+  s_7765eded9bec2c::t_b9c7f83994e602 128
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "305c5642fc41168023a07764fb92d70b40d4d4f4",
+  "prompts": {},
+  "sessions": {
+    "s_7765eded9bec2c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-current-map-reset-0.5.4",
+        "model": "unknown"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
