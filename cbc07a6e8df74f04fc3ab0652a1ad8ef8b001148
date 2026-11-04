@@ -1,0 +1,23 @@
+Info.json
+  s_ff60f3345996f2::t_4850b138231ed8 5
+README.md
+  s_ff60f3345996f2::t_4850b138231ed8 11,13,26
+docs/validation/ORBITRENDER_0.5.5.md
+  s_ff60f3345996f2::t_4850b138231ed8 1-11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cbc07a6e8df74f04fc3ab0652a1ad8ef8b001148",
+  "prompts": {},
+  "sessions": {
+    "s_ff60f3345996f2": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-orbitrender-release-0.5.5",
+        "model": "unknown"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
