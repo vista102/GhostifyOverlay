@@ -9,7 +9,7 @@ namespace DonQuixoteOverlay
         internal static string CaptureRecordKey() => ResolveRecordKey(true);
         private static string ResolveRecordKey(bool refresh)
         {
-            if (_renderContext != null) return null;
+            if (_replayContext != null) return null;
             var controller = scrController.instance;
             if (controller == null || (!controller.gameworld && !ADOBase.isLevelEditor)) return null;
             return AdofaiLevelIdentity.Current(refresh);

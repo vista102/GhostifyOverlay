@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using GhostifyOverlay.Integration.OrbitRender;
+using GhostifyOverlay.Integration.TUFReplay;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -25,7 +25,7 @@ namespace DonQuixoteOverlay.KeyViewerContents
         public Key[] Keys;
         public Key Kps, Total;
         public static Stopwatch Stopwatch = Stopwatch.StartNew();
-        public static long CurrentTicks => OrbitRenderBridge.TryGetReplayTicks(out long ticks) ? ticks : Stopwatch.Elapsed.Ticks;
+        public static long CurrentTicks => ReplayApiBridge.TryGetReplayTicks(out long ticks) ? ticks : Stopwatch.Elapsed.Ticks;
 
         private bool _built, _visible, _focused = true;
         private float _builtY;
@@ -64,12 +64,12 @@ namespace DonQuixoteOverlay.KeyViewerContents
         private void OnApplicationFocus(bool focus)
         {
             _focused = focus;
-            if (!OrbitRenderBridge.IsReplayActive) ResetTransient(true);
+            if (!ReplayApiBridge.IsReplayActive) ResetTransient(true);
         }
 
         private void SceneChanged(Scene previous, Scene current)
         {
-            if (!OrbitRenderBridge.IsReplayActive) ResetTransient(true);
+            if (!ReplayApiBridge.IsReplayActive) ResetTransient(true);
         }
         internal void Rebuild()
         {
@@ -117,11 +117,11 @@ namespace DonQuixoteOverlay.KeyViewerContents
             Updater.enabled = false;
             _pressTimes = new();
             RebuildKeyBinding();
-            if (!OrbitRenderBridge.IsReplayActive) StartEventListener();
+            if (!ReplayApiBridge.IsReplayActive) StartEventListener();
             _built = true;
             _visible = true;
             ResetTransient(true);
-            if (OrbitRenderBridge.IsReplayActive) SetReplayInput(true);
+            if (ReplayApiBridge.IsReplayActive) SetReplayInput(true, ReplayApiBridge.RecordedKeyCounts);
             RefreshColors();
             RuntimeStatus.Set("keyviewer", "키뷰어", "활성");
         }
@@ -157,7 +157,7 @@ namespace DonQuixoteOverlay.KeyViewerContents
         {
             if (!_built)
                 return;
-            if (OrbitRenderBridge.IsReplayActive)
+            if (ReplayApiBridge.IsReplayActive)
             {
                 RefreshReplayFrame();
                 return;

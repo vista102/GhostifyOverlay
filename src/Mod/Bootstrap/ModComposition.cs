@@ -11,7 +11,7 @@ namespace DonQuixoteOverlay
         internal static ModLifecycle CreateLifecycle() => new ModLifecycle(new UnityModRuntime(), new HarmonyPatchService(),
             error => Main.Log(error.ToString()), enabled => {
                 Main.Enabled = enabled;
-                if (enabled) GhostifyOverlay.Integration.OrbitRender.OrbitRenderBridge.Tick();
+                if (enabled) GhostifyOverlay.Integration.TUFReplay.ReplayApiBridge.Tick();
             });
         internal static SaveCoordinator CreateSaveCoordinator() => new SaveCoordinator(new ISaveParticipant[] {
             new DelegateSaveParticipant(() => SettingsStore.Save(Main.Settings)),

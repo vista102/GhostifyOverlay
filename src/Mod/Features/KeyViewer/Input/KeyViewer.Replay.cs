@@ -1,5 +1,6 @@
 using System;
-using GhostifyOverlay.Integration.OrbitRender;
+using GhostifyOverlay.Application.Replays;
+using GhostifyOverlay.Integration.TUFReplay;
 using SkyHook;
 using UnityEngine;
 
@@ -7,19 +8,28 @@ namespace DonQuixoteOverlay.KeyViewerContents
 {
     public partial class KeyViewer
     {
-        // A render may display increasing counts, but must never mutate the saved counters.
+        // A replay may display increasing counts, but must never mutate saved counters.
         private KeyCountData _replayCounts;
         private KeyCountData CurrentCounts => _replayCounts ?? KeyCountData.Instance;
 
-        internal void SetReplayInput(bool replay)
+        internal static KeyCountRunState CaptureRunState() => new KeyCountRunState
+        {
+            Counts = (long[])KeyCountData.Instance.Count.Clone(),
+            TotalCount = KeyCountData.Instance.TotalCount
+        };
+
+        internal void SetReplayInput(bool replay, KeyCountRunState recorded = null)
         {
             if (replay)
             {
                 if (_replayCounts == null)
                 {
                     _replayCounts = new KeyCountData();
-                    Array.Copy(KeyCountData.Instance.Count, _replayCounts.Count, _replayCounts.Count.Length);
-                    _replayCounts.TotalCount = KeyCountData.Instance.TotalCount;
+                    long[] counts = recorded?.Counts ?? KeyCountData.Instance.Count;
+                    Array.Copy(counts, _replayCounts.Count, Math.Min(counts.Length, _replayCounts.Count.Length));
+                    for (int i = 0; i < _replayCounts.Count.Length; i++)
+                        _replayCounts.Count[i] = Math.Max(0, _replayCounts.Count[i]);
+                    _replayCounts.TotalCount = Math.Max(0, recorded?.TotalCount ?? KeyCountData.Instance.TotalCount);
                 }
                 if (_listening) StopEventListener();
                 ResetTransient(false);
@@ -40,19 +50,25 @@ namespace DonQuixoteOverlay.KeyViewerContents
             }
         }
 
-        // OverlayApi callbacks run on Unity's main thread. Bypass live event routing,
-        // including its ghost-only split, so each recorded transition is applied once.
-        internal void ApplyReplayKey(KeyCode code, bool pressed, long ticks)
+        // Match the live label and native maps, without the live ghost-only split.
+        // The native identity is supplied by the recording, never inferred from a
+        // Unity key (which would lose native-only keys and keypad distinctions).
+        internal void ApplyReplayKey(KeyCode code, int? nativeKey, bool pressed, long ticks)
         {
-            if (!OrbitRenderBridge.IsReplayActive || !_built || _replayCounts == null) return;
-            WorkUnity(code, pressed, ticks);
-            KeyLabel label = SkyHookKeyMapper.UnityKeyToSkyHookKey(code);
-            if (label != KeyLabel.Unknown)
+            if (!ReplayApiBridge.IsReplayActive || !_built || _replayCounts == null || _keyBinding == null) return;
+            // Values above this boundary are Ghostify's stored native bindings,
+            // not symbolic Unity keys. Only nativeKey may address those slots.
+            if ((int)code > 0 && (int)code < 0x1000)
             {
-                ushort native = NativeInputSync.NativeKey(code);
-                if (native != ushort.MaxValue && _keyBinding.NativeMap.TryGetValue(native, out var indexes))
+                KeyLabel label = SkyHookKeyMapper.UnityKeyToSkyHookKey(code);
+                if (label == KeyLabel.Unknown)
+                    WorkUnity(code, pressed, ticks);
+                else if (_keyBinding.LabelMap.TryGetValue(label, out var indexes))
                     Work(indexes, pressed, ticks, false, false);
             }
+            if (nativeKey is >= 0 and <= ushort.MaxValue &&
+                _keyBinding.NativeMap.TryGetValue((ushort)nativeKey.Value, out var nativeIndexes))
+                Work(nativeIndexes, pressed, ticks, false, false);
         }
 
         internal void RefreshReplayFrame()

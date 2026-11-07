@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
+using GhostifyOverlay.Application.Replays;
 // Execute the production tracker without invoking Unity native methods.
 namespace UnityEngine {
-    public static class Time { public static int frameCount; }
+    public static class Time { public static int frameCount, captureFramerate; }
     public sealed class AudioClip { public string name; }
     public sealed class AudioSource { public AudioClip clip; }
 }
@@ -44,7 +45,7 @@ namespace DonQuixoteOverlay {
         private static readonly List<string> Results=new List<string>();
         private static void Check(bool condition,string text){if(!condition)throw new Exception("FAIL "+text);Results.Add("PASS "+text);}
         private static void Next(scrController controller){UnityEngine.Time.frameCount++;AttemptTracker.Tick(controller);}
-        private static void Fresh(){AttemptTracker.EndRenderSession();AttemptTracker.EndSession();Main.Settings=new DonQuixoteSettings();Main.Saves=0;Main.Requests=0;Main.Logs.Clear();RDC.auto=false;ADOBase.isLevelEditor=true;ADOBase.isOfficialLevel=false;ADOBase.currentLevel=null;ADOBase.lm=new scrLevelMaker();UnityEngine.Time.frameCount=0;scnGame.instance=new scnGame();RuntimeStatus.Failures=0;}
+        private static void Fresh(){AttemptTracker.EndReplaySession();AttemptTracker.EndSession();Main.Settings=new DonQuixoteSettings();Main.Saves=0;Main.Requests=0;Main.Logs.Clear();RDC.auto=false;ADOBase.isLevelEditor=true;ADOBase.isOfficialLevel=false;ADOBase.currentLevel=null;ADOBase.lm=new scrLevelMaker();UnityEngine.Time.frameCount=0;scnGame.instance=new scnGame();RuntimeStatus.Failures=0;}
         public static string[] Run(){
             Results.Clear();Fresh();var c=new scrController{freeroamInvulnerability=true};
             AttemptTracker.PrepareRun(c,0);AttemptTracker.Tick(c);
@@ -153,7 +154,81 @@ namespace DonQuixoteOverlay {
             ADOBase.lm.floorAngles=oldAngles;c.gameworld=false;failed=false;try{AttemptTracker.ResetCurrentMap(resetKey,false);}catch(InvalidOperationException){failed=true;}
             Check(failed&&AttemptTracker.CurrentRecordKey==null,"map reset is rejected outside a loaded game or editor map");
             RenderProtectionTests();
+            RunStateTests();
             return Results.ToArray();
+        }
+
+        private static void RunStateTests()
+        {
+            Fresh();
+            var controller = new scrController();
+            scrController.instance = controller;
+            AttemptTracker.PrepareRun(controller, 0);
+            Check(AttemptTracker.CaptureRunState().Attempts == 0, "capture does not force pending hashing or persistence before the next frame");
+            Next(controller);
+            controller.stateMachine.State = States.Countdown;
+            int saves = Main.Saves, requests = Main.Requests;
+            var recorded = AttemptTracker.CaptureRunState();
+            Check(recorded.Attempts == 1 && recorded.FullAttempts == 1 && Main.Saves == saves && Main.Requests == requests,
+                "countdown capture includes the run increment and performs no saves");
+            controller.startedFromCheckpoint = true;
+            AttemptTracker.PrepareRun(controller, 22);
+            Next(controller);
+            recorded = AttemptTracker.CaptureRunState();
+            Check(recorded.ProgressAttempts == 1 && recorded.FullProgressAttempts == 1 && recorded.StartedMidMap && recorded.StartProgress == .22f,
+                "checkpoint capture includes practice counters and the displayed start progress");
+            recorded.Attempts = 12; recorded.ProgressAttempts = 34;
+            recorded.FullAttempts = 56; recorded.FullProgressAttempts = 78; recorded.BestProgress = .9f;
+            AttemptTracker.BeginReplaySession(recorded);
+            recorded.FullAttempts = 999;
+            Check(AttemptTracker.Attempts == 12 && AttemptTracker.ProgressAttempts == 34 && AttemptTracker.FullAttempts == 56 && AttemptTracker.FullProgressAttempts == 78,
+                "replay reads all four historical counters from an owned copy");
+            Check(!AttemptTracker.CountsAttempts(true, false, false, false), "in-game replays are ineligible even without captureFramerate");
+            saves = Main.Saves; requests = Main.Requests;
+            AttemptTracker.PrepareRun(controller, 0); Next(controller);
+            controller.currFloor.seqID = 100; controller.stateMachine.State = States.Won; Next(controller);
+            AttemptTracker.FlushBest(); AttemptTracker.EndSession();
+            Check(AttemptTracker.BestProgress == .9f && AttemptTracker.StartedMidMap && AttemptTracker.StartProgress == .22f && AttemptTracker.FullAttempts == 56,
+                "replay scene, start and completion callbacks cannot replace the saved display state");
+            Check(Main.Saves == saves && Main.Requests == requests, "replay attempt and best values never enter settings persistence");
+            AttemptTracker.EndReplaySession();
+            Check(AttemptTracker.Attempts == 1 && AttemptTracker.ProgressAttempts == 1 && AttemptTracker.FullAttempts == 1 && AttemptTracker.FullProgressAttempts == 1,
+                "replay exit restores live full and practice counters");
+            string key = AdofaiLevelIdentity.Current(false);
+            Main.Settings.Overlay.BestProgress[key] = float.PositiveInfinity;
+            Check(AttemptTracker.CaptureRunState().BestProgress == 0, "run state never exposes non-finite progress to the serializer");
+            Main.Settings.Overlay.BestProgress[key] = .4f;
+            AttemptTracker.BeginReplaySession(null);
+            Check(AttemptTracker.FullAttempts == 1 && AttemptTracker.BestProgress == .4f, "older runs without state show current values");
+            AttemptTracker.EndReplaySession();
+
+            UnityEngine.Time.captureFramerate = 60;
+            saves = Main.Saves; requests = Main.Requests;
+            Check(!AttemptTracker.CountsAttempts(true, false, false, false), "offline renders are ineligible without any replay provider");
+            controller.startedFromCheckpoint = false;
+            controller.stateMachine.State = States.PlayerControl;
+            AttemptTracker.PrepareRun(controller, 0); Next(controller);
+            controller.currFloor.seqID = 100; controller.stateMachine.State = States.Won; Next(controller);
+            AttemptTracker.FlushBest();
+            Check(AttemptTracker.FullAttempts == 1 && AttemptTracker.BestProgress == .4f && Main.Saves == saves && Main.Requests == requests,
+                "offline rendering cannot count attempts, promote legacy records or write a best");
+            UnityEngine.Time.captureFramerate = 0;
+            controller.currFloor.seqID = 20; controller.stateMachine.State = States.PlayerControl;
+            AttemptTracker.BeginRun(controller, 0); Next(controller);
+            Check(AttemptTracker.FullAttempts == 2, "normal runs count again after offline rendering ends");
+            UnityEngine.Time.captureFramerate = 60;
+            controller.currFloor.seqID = 100; controller.stateMachine.State = States.Won;
+            AttemptTracker.FlushBest();
+            UnityEngine.Time.captureFramerate = 0;
+            AttemptTracker.FlushBest();
+            Check(AttemptTracker.BestProgress == .4f, "turning capture on mid-run discards the live candidate instead of saving rendered progress later");
+            UnityEngine.Time.captureFramerate = 60;
+            AttemptTracker.PrepareRun(controller, 0);
+            UnityEngine.Time.captureFramerate = 0;
+            saves = Main.Saves; requests = Main.Requests;
+            Next(controller);
+            Check(AttemptTracker.FullAttempts == 2 && Main.Saves == saves && Main.Requests == requests,
+                "a queued offline start stays excluded if capture ends before the next Update");
         }
 
         private static void RenderProtectionTests()
@@ -168,7 +243,7 @@ namespace DonQuixoteOverlay {
             float[] liveAngles = ADOBase.lm.floorAngles;
             string livePath = scnGame.instance.levelPath;
 
-            AttemptTracker.BeginRenderSession();
+            AttemptTracker.BeginReplaySession();
             Check(Main.Settings.Overlay.BestProgress[liveKey] == .37f,
                 "render entry preserves the already-observed legitimate live best");
             int saves = Main.Saves, requests = Main.Requests;
@@ -185,7 +260,7 @@ namespace DonQuixoteOverlay {
             Next(controller);
             Check(AttemptTracker.Attempts == 0 && AttemptTracker.FullAttempts == 7 && AttemptTracker.BestProgress == .6f,
                 "render HUD reads the target map without counting a full-start attempt");
-            AttemptTracker.BeginRenderSession();
+            AttemptTracker.BeginReplaySession();
             controller.currFloor.seqID = 100;
             controller.stateMachine.State = States.Won;
             Next(controller);
@@ -212,8 +287,8 @@ namespace DonQuixoteOverlay {
             ADOBase.lm.floorAngles = liveAngles;
             scnGame.instance.levelPath = livePath;
             controller.startedFromCheckpoint = false;
-            AttemptTracker.EndRenderSession();
-            AttemptTracker.EndRenderSession();
+            AttemptTracker.EndReplaySession();
+            AttemptTracker.EndReplaySession();
             Check(AttemptTracker.Attempts == 1 && AttemptTracker.FullAttempts == 1 &&
                 AttemptTracker.BestProgress == .37f && !AttemptTracker.StartedMidMap,
                 "render end restores live session context even after duplicate begin/end callbacks");
@@ -234,14 +309,14 @@ namespace DonQuixoteOverlay {
             controller = new scrController();
             scrController.instance = controller;
             AttemptTracker.PrepareRun(controller, 0);
-            AttemptTracker.BeginRenderSession();
-            AttemptTracker.EndRenderSession();
+            AttemptTracker.BeginReplaySession();
+            AttemptTracker.EndReplaySession();
             Next(controller);
             Check(AttemptTracker.Attempts == 0 && Main.Saves == 0,
                 "render entry discards an unfinished pre-render run callback");
-            AttemptTracker.BeginRenderSession();
+            AttemptTracker.BeginReplaySession();
             AttemptTracker.PrepareRun(controller, 0);
-            AttemptTracker.EndRenderSession();
+            AttemptTracker.EndReplaySession();
             Next(controller);
             Check(AttemptTracker.Attempts == 0 && Main.Saves == 0 && Main.Requests == 0,
                 "render cancellation discards queued render callbacks before live ticks resume");

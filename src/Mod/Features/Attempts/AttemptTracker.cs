@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using UnityEngine;
 using GhostifyOverlay.Application.Attempts;
+using GhostifyOverlay.Application.Replays;
 
 namespace DonQuixoteOverlay
 {
@@ -14,42 +15,48 @@ namespace DonQuixoteOverlay
         private static float _startProgress;
         private static scrController _pendingController;
         private static int _pendingFloor, _pendingFrame;
-        private static RenderContext _renderContext;
+        private static bool _pendingOfflineRender;
+        private static ReplayContext _replayContext;
+        private static AttemptRunState _recorded;
 
-        // Rendering may load another level and trigger all the ordinary run/scene
+        // Replays may load another level and trigger all the ordinary run/scene
         // callbacks. Keep its display context separate from live session history.
-        internal static void BeginRenderSession()
+        internal static void BeginReplaySession(AttemptRunState recorded = null)
         {
-            if (_renderContext != null) return;
+            if (_replayContext != null) return;
             FlushBest();
-            _renderContext = new RenderContext(_levelKey, _startedMidMap, _startProgress);
+            _replayContext = new ReplayContext(_levelKey, _startedMidMap, _startProgress);
+            // Own the snapshot: neither game callbacks nor a caller can change it.
+            _recorded = recorded == null ? null : CopyState(recorded);
             DiscardRun();
         }
 
-        internal static void EndRenderSession()
+        internal static void EndReplaySession()
         {
-            if (_renderContext == null) return;
+            if (_replayContext == null) return;
             DiscardRun();
-            _levelKey = _renderContext.LevelKey;
-            _startedMidMap = _renderContext.StartedMidMap;
-            _startProgress = _renderContext.StartProgress;
-            _renderContext = null;
+            _levelKey = _replayContext.LevelKey;
+            _startedMidMap = _replayContext.StartedMidMap;
+            _startProgress = _replayContext.StartProgress;
+            _replayContext = null;
+            _recorded = null;
             AdofaiLevelIdentity.Reset();
         }
 
         private static void DiscardRun()
         {
             _pendingController = null;
+            _pendingOfflineRender = false;
             _bestRunActive = _bestRunArmed = false;
             _bestRunProgress = 0f;
         }
 
-        private sealed class RenderContext
+        private sealed class ReplayContext
         {
             internal readonly string LevelKey;
             internal readonly bool StartedMidMap;
             internal readonly float StartProgress;
-            internal RenderContext(string levelKey, bool startedMidMap, float startProgress)
+            internal ReplayContext(string levelKey, bool startedMidMap, float startProgress)
             {
                 LevelKey = levelKey;
                 StartedMidMap = startedMidMap;
@@ -60,7 +67,7 @@ namespace DonQuixoteOverlay
         {
             get
             {
-                return GetByKey(SessionAttempts, _levelKey);
+                return _recorded?.Attempts ?? GetByKey(SessionAttempts, _levelKey);
             }
         }
 
@@ -68,7 +75,7 @@ namespace DonQuixoteOverlay
         {
             get
             {
-                return GetByKey(SessionProgressAttempts, _levelKey);
+                return _recorded?.ProgressAttempts ?? GetByKey(SessionProgressAttempts, _levelKey);
             }
         }
 
@@ -76,7 +83,7 @@ namespace DonQuixoteOverlay
         {
             get
             {
-                return _startedMidMap;
+                return _recorded?.StartedMidMap ?? _startedMidMap;
             }
         }
 
@@ -84,7 +91,7 @@ namespace DonQuixoteOverlay
         {
             get
             {
-                return _startProgress;
+                return _recorded?.StartProgress ?? _startProgress;
             }
         }
 
@@ -93,7 +100,7 @@ namespace DonQuixoteOverlay
             get
             {
                 EnsureStore();
-                return GetByKey(Main.Settings.Overlay.FullAttempts, _levelKey);
+                return _recorded?.FullAttempts ?? GetByKey(Main.Settings.Overlay.FullAttempts, _levelKey);
             }
         }
 
@@ -102,7 +109,7 @@ namespace DonQuixoteOverlay
             get
             {
                 EnsureStore();
-                return GetByKey(Main.Settings.Overlay.FullProgressAttempts, _levelKey);
+                return _recorded?.FullProgressAttempts ?? GetByKey(Main.Settings.Overlay.FullProgressAttempts, _levelKey);
             }
         }
 
@@ -114,6 +121,7 @@ namespace DonQuixoteOverlay
             _pendingController = controller;
             _pendingFloor = startFloor;
             _pendingFrame = Time.frameCount;
+            _pendingOfflineRender = Time.captureFramerate > 0;
         }
 
         internal static void Tick(scrController controller)
@@ -126,8 +134,10 @@ namespace DonQuixoteOverlay
                 if (!controller.gameworld || Time.frameCount <= _pendingFrame)
                     return;
                 int floor = _pendingFloor;
+                bool offlineRender = _pendingOfflineRender;
                 _pendingController = null;
-                BeginRun(controller, floor);
+                _pendingOfflineRender = false;
+                BeginRun(controller, floor, offlineRender);
             }
 
             ObserveBest(controller);
@@ -135,6 +145,9 @@ namespace DonQuixoteOverlay
         }
 
         public static void BeginRun(scrController controller, int startFloor)
+            => BeginRun(controller, startFloor, Time.captureFramerate > 0);
+
+        private static void BeginRun(scrController controller, int startFloor, bool offlineRender)
         {
             if (controller == null || !controller.gameworld || Main.Settings == null)
                 return;
@@ -142,6 +155,7 @@ namespace DonQuixoteOverlay
             if (string.IsNullOrEmpty(key))
             {
                 PrepareRun(controller, startFloor);
+                _pendingOfflineRender |= offlineRender;
                 RuntimeStatus.Set("attempts.run", "시도 횟수", "레벨 해시 준비 대기 중");
                 return;
             }
@@ -149,7 +163,7 @@ namespace DonQuixoteOverlay
             ObserveLevel(key);
             _startedMidMap = IsProgressStart(startFloor, controller.startedFromCheckpoint);
             _startProgress = _startedMidMap ? OverlayController.FloorProgress(startFloor) : 0f;
-            if (_renderContext != null)
+            if (_replayContext != null || offlineRender || Time.captureFramerate > 0)
                 return;
             PromoteLegacyRecords();
             if (!IsEligible(controller))
@@ -197,7 +211,7 @@ namespace DonQuixoteOverlay
 
         internal static bool CountsAttempts(bool gameworld, bool auto, bool noFail, bool infiniteMargin)
         {
-            return gameworld && !auto && !noFail && !infiniteMargin;
+            return gameworld && !auto && !noFail && !infiniteMargin && _replayContext == null && Time.captureFramerate <= 0;
         }
 
         private static string EligibilityReason(scrController controller)
@@ -248,6 +262,7 @@ namespace DonQuixoteOverlay
         internal static float BestProgress
         {
             get {
+                if (_recorded != null) return _recorded.BestProgress;
                 if (Main.Settings == null) return 0;
                 float stored; Main.Settings.Overlay.BestProgress.TryGetValue(_levelKey, out stored);
                 return Math.Max(stored, _bestRunActive ? _bestRunProgress : 0);
@@ -257,7 +272,7 @@ namespace DonQuixoteOverlay
         private static float _bestRunProgress;
         private static void ObserveBest(scrController controller)
         {
-            if (_renderContext != null) return;
+            if (_replayContext != null) return;
             if (!_bestRunActive) return;
             if (!controller.gameworld) { FinishBest(); return; }
             if (!IsEligible(controller)) { _bestRunActive = false; return; }
@@ -278,14 +293,15 @@ namespace DonQuixoteOverlay
         private static float FloorBest(int floor) => OverlayController.FloorProgress(floor);
         internal static void FlushBest()
         {
-            if (_renderContext != null) return;
+            if (_replayContext != null) return;
             var controller = scrController.instance;
             if (controller != null && controller.gameworld && !IsEligible(controller)) _bestRunActive = false;
             FinishBest();
         }
         private static void FinishBest()
         {
-            if (_renderContext != null) return;
+            if (_replayContext != null) return;
+            if (Time.captureFramerate > 0) { _bestRunActive = _bestRunArmed = false; return; }
             if (!_bestRunActive) return;
             _bestRunActive = false;
             if (Main.Settings != null && !string.IsNullOrEmpty(_levelKey)) {
@@ -298,7 +314,7 @@ namespace DonQuixoteOverlay
         {
             _pendingController = null;
             FinishBest();
-            if (_renderContext == null)
+            if (_replayContext == null)
             {
                 SessionAttempts.Clear();
                 SessionProgressAttempts.Clear();
@@ -353,6 +369,33 @@ namespace DonQuixoteOverlay
         }
 
         private static int NextValue(int value) => value >= int.MaxValue ? int.MaxValue : Math.Max(0, value) + 1;
+
+        // Start_Rewind queues BeginRun for the next Update. The music coroutine
+        // enters Countdown/Checkpoint after that Update, so capture includes this
+        // run's increment. Never force pending work here (it can hash/save files).
+        internal static AttemptRunState CaptureRunState() => new AttemptRunState
+        {
+            Attempts = Attempts,
+            ProgressAttempts = ProgressAttempts,
+            FullAttempts = FullAttempts,
+            FullProgressAttempts = FullProgressAttempts,
+            StartedMidMap = StartedMidMap,
+            StartProgress = FiniteProgress(StartProgress),
+            BestProgress = FiniteProgress(BestProgress)
+        };
+
+        private static AttemptRunState CopyState(AttemptRunState value) => new AttemptRunState
+        {
+            Attempts = Math.Max(0, value.Attempts),
+            ProgressAttempts = Math.Max(0, value.ProgressAttempts),
+            FullAttempts = Math.Max(0, value.FullAttempts),
+            FullProgressAttempts = Math.Max(0, value.FullProgressAttempts),
+            StartedMidMap = value.StartedMidMap,
+            StartProgress = FiniteProgress(value.StartProgress),
+            BestProgress = FiniteProgress(value.BestProgress)
+        };
+
+        private static float FiniteProgress(float value) => float.IsNaN(value) || float.IsInfinity(value) ? 0f : Math.Max(0f, Math.Min(1f, value));
 
         private static void EnsureStore()
         {

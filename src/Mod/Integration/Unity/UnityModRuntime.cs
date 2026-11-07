@@ -25,7 +25,7 @@ namespace GhostifyOverlay.Integration.Unity
         {
             Exception failure = null;
             Action[] cleanup = {
-                GhostifyOverlay.Integration.OrbitRender.OrbitRenderBridge.Shutdown,
+                GhostifyOverlay.Integration.TUFReplay.ReplayApiBridge.Shutdown,
                 LayoutEditorController.CancelActive, ChatterRuntime.Reset, AsyncInputHook.Reset, NativeJudgmentColors.RestoreAll,
                 DestroyRoot, DarkNeonUi.DisposeAssets, FontAssetProvider.Dispose, OverlayController.ResetRun,
                 () => { if (Main.Settings != null) Main.Save(); }, AttemptTracker.EndSession

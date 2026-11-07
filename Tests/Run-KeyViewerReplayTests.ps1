@@ -4,7 +4,7 @@ $project=Split-Path $PSScriptRoot
 $managed=Join-Path $GameDir 'A Dance of Fire and Ice_Data\Managed'
 $work=Join-Path ([IO.Path]::GetTempPath()) ('Ghostify-KeyViewerReplay-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $work -Force|Out-Null
-$sources=@('src/Mod/Features/KeyViewer/Input/KeyViewer.Input.cs','src/Mod/Features/KeyViewer/Input/KeyViewer.Replay.cs','src/Mod/Features/KeyViewer/Input/KeyTransitionState.cs','src/Mod/Features/KeyViewer/Input/KeyEventClock.cs','src/Mod/Features/KeyViewer/Input/KeyKpsWindow.cs','src/Mod/Features/KeyViewer/Rain/RawRain.cs','src/Mod/Infrastructure/Persistence/KeyCountData.cs','Tests/KeyViewerReplayHarness.cs')|ForEach-Object{Join-Path $project $_}
+$sources=@('src/Mod/Application/Replays/ReplayRunState.cs','src/Mod/Features/KeyViewer/Input/KeyViewer.Input.cs','src/Mod/Features/KeyViewer/Input/KeyViewer.Replay.cs','src/Mod/Features/KeyViewer/Input/KeyTransitionState.cs','src/Mod/Features/KeyViewer/Input/KeyEventClock.cs','src/Mod/Features/KeyViewer/Input/KeyKpsWindow.cs','src/Mod/Features/KeyViewer/Rain/RawRain.cs','src/Mod/Infrastructure/Persistence/KeyCountData.cs','Tests/KeyViewerReplayHarness.cs')|ForEach-Object{Join-Path $project $_}
 $compiler='C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\Roslyn\csc.exe'
 $harness=Join-Path $work 'KeyViewerReplayTests.dll'
 $json=Join-Path $managed 'Newtonsoft.Json.dll'

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using GhostifyOverlay.Integration.OrbitRender;
+using GhostifyOverlay.Integration.TUFReplay;
 using SkyHook;
 using UnityEngine;
 
@@ -84,7 +84,7 @@ namespace DonQuixoteOverlay.KeyViewerContents
 
         private void StartEventListener()
         {
-            if (_listening || OrbitRenderBridge.IsReplayActive) return;
+            if (_listening || ReplayApiBridge.IsReplayActive) return;
             _physicalHeld.Clear();
             _labelHeld.Clear();
             Interlocked.Increment(ref _generation);
@@ -176,7 +176,7 @@ namespace DonQuixoteOverlay.KeyViewerContents
                 Keys[i].UpdateRequestKey(false);
             }
 
-            if (!resynchronize || OrbitRenderBridge.IsReplayActive)
+            if (!resynchronize || ReplayApiBridge.IsReplayActive)
                 return;
             Sync(GetKeyCode(), 0);
             Sync(GetFootKeyCode(), HandOutIndex);
@@ -205,7 +205,7 @@ namespace DonQuixoteOverlay.KeyViewerContents
 
         internal void BeginGameplayRun()
         {
-            if (!_built || OrbitRenderBridge.IsReplayActive)
+            if (!_built || ReplayApiBridge.IsReplayActive)
                 return;
             Interlocked.Increment(ref _generation);
             ResetTransient(false);
@@ -262,7 +262,7 @@ namespace DonQuixoteOverlay.KeyViewerContents
 
         private void PumpInput()
         {
-            if (OrbitRenderBridge.IsReplayActive) return;
+            if (ReplayApiBridge.IsReplayActive) return;
             bool hook = AsyncInputHook.IsRunning;
             if (hook != _hookWasActive)
             {

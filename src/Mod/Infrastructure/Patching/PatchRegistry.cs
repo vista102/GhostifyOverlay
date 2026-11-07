@@ -25,6 +25,7 @@ namespace DonQuixoteOverlay
         {
             return new[]
             {
+                new PatchGroup("replayApi", "TUFReplay 연동", false, new[] { typeof(GhostifyOverlay.Integration.TUFReplay.ReplayApiModLoadedPatch) }),
                 new PatchGroup("inputUi", "설정 UI 입력 보호", true, new[] { typeof(MenuBlockKeyboardPatch), typeof(MenuBlockAsyncKeyboardPatch), typeof(MenuBlockGetStatePatch), typeof(MenuBlockWentDownPatch), typeof(MenuBlockIsDownPatch), typeof(MenuBlockWentUpPatch), typeof(MenuBlockGetMainPatch), typeof(MenuBlockGetStateKeysPatch) }),
                 new PatchGroup("statistics", "콤보·시도 횟수", false, new[] { typeof(NativeComboHitPatch), typeof(NativeTrackerResetPatch), typeof(NativeComboRevertPatch), typeof(OverlayBeginRunPatch), typeof(AttemptLeaveMapPatch), typeof(AttemptOpenMapPatch), typeof(AttemptOpenWorldPatch) }),
                 new PatchGroup("judgmentColors", "세부 판정 색상", false, new[] { typeof(NativeJudgmentColorPatch), typeof(NativeJudgmentColorResetPatch) }),
