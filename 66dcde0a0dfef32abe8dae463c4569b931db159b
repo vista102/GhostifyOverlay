@@ -1,0 +1,21 @@
+Info.json
+  s_79370097c45599::t_76fbd1bce90703 5
+README.md
+  s_79370097c45599::t_76fbd1bce90703 11,13,26,116,118,120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "66dcde0a0dfef32abe8dae463c4569b931db159b",
+  "prompts": {},
+  "sessions": {
+    "s_79370097c45599": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "ghostify-release-0.5.6",
+        "model": "unknown"
+      },
+      "human_author": "vista102 <309137750+vista102@users.noreply.github.com>"
+    }
+  }
+}
