@@ -41,6 +41,7 @@ namespace DonQuixoteOverlay
         private readonly int[] _lastJudgmentCounts = new int[9];
         private readonly string[] _judgmentColors = new string[9];
         private readonly Vector3[] _meterCorners = new Vector3[4];
+        private RectTransform _meterSource, _meterCanvas;
         private bool _overlayActive;
         private bool _textsVisible = true;
         private bool _judgmentColorsReady;
@@ -202,8 +203,8 @@ namespace DonQuixoteOverlay
             SetScaleIfChanged(_xPerfectAboveMeter.rectTransform, Vector3.one * SafeSectionScale(layout.DetailedPerfectScale));
             SetScaleIfChanged(_comboText.rectTransform, Vector3.one * SafeSectionScale(layout.ComboScale));
             SetPositionIfChanged(_songInfo.rectTransform, new Vector2(layout.SongInfoX, -36f + layout.SongInfoY));
-            float canvasScale = _canvas == null || _canvas.scaleFactor <= .01f ? 1f : _canvas.scaleFactor;
-            float songWidth = Math.Max(200f, Screen.width / canvasScale - 32f) / SafeSectionScale(layout.SongInfoScale);
+            // The canvas width, not Screen.width: a render captures at the video size.
+            float songWidth = Math.Max(200f, _contentRoot.rect.width - 32f) / SafeSectionScale(layout.SongInfoScale);
             if (_songMeasuredText != _songInfo.text || _songMeasuredWidth != songWidth)
             {
                 _songMeasuredText = _songInfo.text;
@@ -237,12 +238,25 @@ namespace DonQuixoteOverlay
             try
             {
                 RectTransform meter = controller == null || controller.errorMeter == null ? null : controller.errorMeter.wrapperRectTransform;
-                if (meter != null)
+                if (meter != _meterSource)
                 {
-                    meter.GetWorldCorners(_meterCorners);
-                    Vector2 topCenter = (RectTransformUtility.WorldToScreenPoint(null, _meterCorners[1]) + RectTransformUtility.WorldToScreenPoint(null, _meterCorners[2])) * .5f;
-                    float scale = _canvas == null || _canvas.scaleFactor <= .01f ? 1f : _canvas.scaleFactor;
-                    return new Vector2((topCenter.x - Screen.width * .5f) / scale, topCenter.y / scale + 6f);
+                    // A render swaps in its own recorded meter on a camera-captured canvas.
+                    _meterSource = meter;
+                    Canvas canvas = meter == null ? null : meter.GetComponentInParent<Canvas>(true);
+                    _meterCanvas = canvas == null ? null : canvas.rootCanvas.transform as RectTransform;
+                }
+
+                if (meter != null && _meterCanvas != null && _contentRoot != null)
+                {
+                    Rect source = _meterCanvas.rect;
+                    if (source.width > 0f && source.height > 0f)
+                    {
+                        // Canvas-local units are valid in overlay and camera modes alike;
+                        // screen pixels and Screen.width are not during a capture.
+                        meter.GetWorldCorners(_meterCorners);
+                        Vector3 topCenter = _meterCanvas.InverseTransformPoint((_meterCorners[1] + _meterCorners[2]) * .5f);
+                        return OverlayPlacement.MeterAnchor(topCenter, source, _contentRoot.rect);
+                    }
                 }
             }
             catch
