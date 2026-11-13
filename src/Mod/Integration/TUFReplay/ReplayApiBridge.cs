@@ -14,7 +14,7 @@ namespace GhostifyOverlay.Integration.TUFReplay
     // this boundary and no assembly reference is required to run without it.
     internal static class ReplayApiBridge
     {
-        internal const int RequiredApiVersion = 1;
+        internal const int RequiredApiVersion = 2;
         private const string ProviderId = "GhostifyOverlay";
         private static readonly Provider Callbacks = new Provider();
         private static Func<string, object, bool> _register;
@@ -81,7 +81,7 @@ namespace GhostifyOverlay.Integration.TUFReplay
                     _observingSession = true;
                     // No callback stream is available for this session. Isolate
                     // counters and suspend live input until the next real session.
-                    BeginSession(null, _rendering());
+                    BeginSession(_rendering());
                     return;
                 }
                 if (_registered && _isRegistered(ProviderId)) return;
@@ -167,13 +167,15 @@ namespace GhostifyOverlay.Integration.TUFReplay
             }
         }
 
-        private static void BeginSession(ReplayRunState recorded, bool render)
+        // A mode switch only. The run's saved state follows through OnReplayState;
+        // until then the features show current values, as for a run without one.
+        private static void BeginSession(bool render)
         {
             if (_replayActive) return;
-            AttemptTracker.BeginReplaySession(recorded?.Attempts);
+            AttemptTracker.BeginReplaySession();
             IsRendering = render;
             _replayActive = true;
-            RecordedKeyCounts = recorded?.Keys;
+            RecordedKeyCounts = null;
             Interlocked.Exchange(ref _replayTicks, 0);
             try
             {
@@ -181,13 +183,24 @@ namespace GhostifyOverlay.Integration.TUFReplay
                 if (SettingsWindow.Instance != null && SettingsWindow.Instance.Visible) SettingsWindow.Instance.Toggle();
                 ChatterRuntime.RenderSuspended = true;
                 ChatterRuntime.Reset();
-                KeyViewer.Instance?.SetReplayInput(true, RecordedKeyCounts);
+                KeyViewer.Instance?.SetReplayInput(true);
             }
             catch
             {
                 EndSession();
                 throw;
             }
+        }
+
+        // The start value (null when the run has none), right after OnReplayBegin and
+        // again after a timeline seek, which starts the run over. Each replaces the
+        // last one, so no counter is applied twice.
+        private static void SetRunState(ReplayRunState state)
+        {
+            if (!_replayActive || _observingSession) return;
+            AttemptTracker.SetReplayState(state?.Attempts);
+            RecordedKeyCounts = state?.Keys;
+            KeyViewer.Instance?.SetReplayState(RecordedKeyCounts);
         }
 
         private sealed class Provider
@@ -210,7 +223,10 @@ namespace GhostifyOverlay.Integration.TUFReplay
                 if (canvas != null) yield return canvas;
             }
 
-            public void OnReplayBegin(ReplayRunState recorded, bool render) => BeginSession(recorded, render);
+            public void OnReplayBegin(bool render) => BeginSession(render);
+
+            // Replay clock time is owned by OnReplayClock; the value alone matters.
+            public void OnReplayState(ReplayRunState state, long ticks) => SetRunState(state);
 
             public void OnReplayEnd() => EndSession();
 

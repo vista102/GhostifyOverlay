@@ -30,7 +30,7 @@ public static class ReplayApiBridgeHarness
         long ticks;
         Check(!ReplayApiBridge.IsRendering && !ReplayApiBridge.TryGetReplayTicks(out ticks), "missing TUFReplay leaves normal input and time available");
 
-        LoadOptionalApi("UnrelatedMod").GetField("ApiVersion").SetValue(null, 1);
+        LoadOptionalApi("UnrelatedMod").GetField("ApiVersion").SetValue(null, 2);
         ReplayApiBridge.OnModLoaded();
         Check(ReplayTestApi.RegisterCalls == 0, "a matching type name outside the TUFReplay assembly is ignored");
 
@@ -40,6 +40,10 @@ public static class ReplayApiBridgeHarness
         ReplayApiBridge.Tick();
         Check(ReplayTestApi.RegisterCalls == 0, "an incompatible optional API is ignored");
         api.GetField("ApiVersion").SetValue(null, 1);
+        ReplayApiBridge.Shutdown();
+        ReplayApiBridge.Tick();
+        Check(ReplayTestApi.RegisterCalls == 0, "a ReplayApi v1 TUFReplay, which passes saved state to OnReplayBegin, is ignored");
+        api.GetField("ApiVersion").SetValue(null, 2);
         ReplayTestApi.Replaying = true;
         ReplayTestApi.Rendering = true;
         ReplayApiBridge.Shutdown();
@@ -68,9 +72,11 @@ public static class ReplayApiBridgeHarness
         Check(ReplayTestApi.RegisterCalls == 1, "failed registration is throttled instead of retried each frame");
         ReplayTestApi.RejectRegistration = false;
         ReplayApiBridge.OnModLoaded();
-        Check(ReplayTestApi.RegisterCalls == 2 && Provider != null && ReplayTestApi.LastId == "GhostifyOverlay", "a mod-load notification retries immediately with ReplayApi v1");
-        Check(ReplayTestApi.ReplayKey != null && ReplayTestApi.Capture != null && ReplayTestApi.Begin != null && ReplayTestApi.Clock != null && ReplayTestApi.End != null && ReplayTestApi.Canvases != null && ReplayTestApi.BeforeCapture != null && Provider.GetType().GetMethod("OnRenderSessionBegin") == null,
+        Check(ReplayTestApi.RegisterCalls == 2 && Provider != null && ReplayTestApi.LastId == "GhostifyOverlay", "a mod-load notification retries immediately with ReplayApi v2");
+        Check(ReplayTestApi.ReplayKey != null && ReplayTestApi.Capture != null && ReplayTestApi.Begin != null && ReplayTestApi.State != null && ReplayTestApi.Clock != null && ReplayTestApi.End != null && ReplayTestApi.Canvases != null && ReplayTestApi.BeforeCapture != null && Provider.GetType().GetMethod("OnRenderSessionBegin") == null,
             "all ReplayApi methods bind to exact typed delegates without the old OverlayApi contract");
+        Check(Provider.GetType().GetMethods().Where(method => method.Name == "OnReplayBegin").All(method => method.GetParameters().Length == 1 && method.GetParameters()[0].ParameterType == typeof(bool)),
+            "OnReplayBegin is only the v2 mode switch, with no saved-state overload that v2 rejects");
         ReplayApiBridge.Tick();
         Check(ReplayTestApi.RegisterCalls == 2, "an already registered provider is not duplicated");
 
@@ -78,8 +84,11 @@ public static class ReplayApiBridgeHarness
         var recorded = ReplayTestApi.Capture();
         Check(recorded.Attempts.FullAttempts == 23 && recorded.Keys.TotalCount == 456,
             "CaptureRunState combines feature snapshots under one stable provider id");
+        int states = AttemptTracker.States;
         Begin(false);
         Check(!ReplayApiBridge.IsRendering && ReplayApiBridge.IsReplayActive && AttemptTracker.Rendering && KeyViewer.Instance.Replay, "in-game replays protect attempts and suspend live input too");
+        Check(AttemptTracker.States == states + 1 && KeyViewer.Instance.States == 1 && AttemptTracker.Recorded == null && KeyViewer.Instance.Recorded == null && ReplayApiBridge.RecordedKeyCounts == null,
+            "a null start value falls back to current attempts and key counts as before");
         Check(!SettingsWindow.Instance.Visible && !LayoutEditorController.Active && ChatterRuntime.RenderSuspended, "replay preparation closes control UI and suspends chatter filtering");
         Check(Canvases().Length == 0, "in-game playback does not provide render canvases");
         Invoke("OnReplayClock", 10000000L);
@@ -90,14 +99,30 @@ public static class ReplayApiBridgeHarness
 
         SetupPresentation();
         ReplayTestApi.Replaying = ReplayTestApi.Rendering = true;
-        ReplayTestApi.Begin(recorded, true);
-        Check(ReferenceEquals(AttemptTracker.Recorded, recorded.Attempts) && ReferenceEquals(KeyViewer.Instance.Recorded, recorded.Keys),
-            "saved attempts and key counts reach their feature boundaries at replay begin");
-        Check(ReplayApiBridge.IsReplayActive && KeyViewer.Instance.Replay, "replay session switches the viewer to recorded input");
+        states = AttemptTracker.States;
+        ReplayTestApi.Begin(true);
+        Check(ReplayApiBridge.IsReplayActive && KeyViewer.Instance.Replay && AttemptTracker.Rendering && !KeyViewer.Instance.BeganWithState,
+            "replay begin switches modes and the viewer to recorded input");
+        Check(AttemptTracker.States == states && KeyViewer.Instance.States == 0 && AttemptTracker.Recorded == null && KeyViewer.Instance.Recorded == null && ReplayApiBridge.RecordedKeyCounts == null,
+            "replay begin reads no saved state before OnReplayState hands over the start value");
+        ReplayTestApi.State(recorded, 0L);
+        Check(ReferenceEquals(AttemptTracker.Recorded, recorded.Attempts) && ReferenceEquals(KeyViewer.Instance.Recorded, recorded.Keys)
+            && ReferenceEquals(ReplayApiBridge.RecordedKeyCounts, recorded.Keys),
+            "the start value brings saved attempts and key counts to their feature boundaries");
+        Check(ReplayApiBridge.TryGetReplayTicks(out ticks) && ticks == 0, "the start value leaves the presentation clock to OnReplayClock");
         Check(Canvases().SequenceEqual(new[] { OverlayController.Instance.CaptureCanvas, KeyViewer.Instance.KeyViewerObject.Canvas }), "replay capture provides both existing canvases");
         int begins = AttemptTracker.Begins;
-        Invoke("OnReplayBegin", null, true);
-        Check(AttemptTracker.Begins == begins, "duplicate session begin does not replace the owned snapshot");
+        Invoke("OnReplayBegin", true);
+        Check(AttemptTracker.Begins == begins && ReferenceEquals(AttemptTracker.Recorded, recorded.Attempts) && ReferenceEquals(KeyViewer.Instance.Recorded, recorded.Keys),
+            "duplicate session begin keeps the value already handed over");
+        var later = new ReplayRunState { Attempts = new AttemptRunState { Attempts = 5 }, Keys = new KeyCountRunState { TotalCount = 789 } };
+        ReplayTestApi.State(later, 15000000L);
+        Check(ReferenceEquals(AttemptTracker.Recorded, later.Attempts) && ReferenceEquals(KeyViewer.Instance.Recorded, later.Keys)
+            && AttemptTracker.Begins == begins && AttemptTracker.States == states + 2 && KeyViewer.Instance.States == 2,
+            "a value handed over again replaces the saved state once without restarting the session");
+        ReplayTestApi.State(recorded, 15000000L);
+        Check(ReferenceEquals(AttemptTracker.Recorded, recorded.Attempts) && ReferenceEquals(ReplayApiBridge.RecordedKeyCounts, recorded.Keys),
+            "a seek hands the start value over again as a replacement");
         Invoke("OnReplayClock", 20000000L);
         Check(ReplayApiBridge.TryGetReplayTicks(out ticks) && ticks == 20000000L, "presentation clock uses supplied TimeSpan ticks");
         Invoke("OnReplayClock", 0L);
@@ -133,11 +158,20 @@ public static class ReplayApiBridgeHarness
         int inputs = KeyViewer.Instance.Inputs.Count;
         ReplayTestApi.DispatchReplayKey(KeyCode.A, 65, true, 42L);
         Check(KeyViewer.Instance.Inputs.Count == inputs, "late replay input cannot reach live mode");
+        states = AttemptTracker.States;
+        int viewerStates = KeyViewer.Instance.States;
+        ReplayTestApi.State(recorded, 42L);
+        Check(AttemptTracker.States == states && KeyViewer.Instance.States == viewerStates && ReplayApiBridge.RecordedKeyCounts == null,
+            "a late start value cannot replace live attempts or key counts");
 
         KeyViewer.Instance.FailBegin = true;
         ExpectFailure(() => Begin(true));
         Check(!ReplayApiBridge.IsRendering && !ReplayApiBridge.IsReplayActive && !AttemptTracker.Rendering
             && !ChatterRuntime.RenderSuspended, "a viewer preparation failure restores attempts, input and chatter ownership");
+        states = AttemptTracker.States;
+        ReplayTestApi.State(recorded, 0L);
+        Check(AttemptTracker.States == states && !ReplayApiBridge.IsReplayActive && ReplayApiBridge.RecordedKeyCounts == null,
+            "the start value after a failed begin cannot revive the session");
         KeyViewer.Instance.FailBegin = false;
         Begin(true);
         KeyViewer.Instance.FailEnd = true;
@@ -174,6 +208,10 @@ public static class ReplayApiBridgeHarness
         ReplayApiBridge.Tick();
         Check(ReplayApiBridge.IsReplayActive && !ReplayApiBridge.IsRendering && KeyViewer.Instance.Replay,
             "enabling midway through an in-game replay also isolates live input and counts");
+        states = AttemptTracker.States;
+        ReplayTestApi.State(recorded, 30000000L);
+        Check(AttemptTracker.States == states && AttemptTracker.Recorded == null && ReplayApiBridge.RecordedKeyCounts == null,
+            "an observed session ignores the start value and keeps current values like a run without state");
         ReplayTestApi.Replaying = false;
         ReplayApiBridge.Tick();
         Check(!ReplayApiBridge.IsReplayActive && !KeyViewer.Instance.Replay && Provider != null,
@@ -189,11 +227,13 @@ public static class ReplayApiBridgeHarness
         SettingsWindow.Instance = new SettingsWindow { Visible = true };
         LayoutEditorController.Active = true;
     }
+    // ReplayApi v2 sends the run's start value right after the mode switch.
     private static void Begin(bool replay)
     {
         ReplayTestApi.Replaying = true;
         ReplayTestApi.Rendering = replay;
-        Invoke("OnReplayBegin", null, replay);
+        Invoke("OnReplayBegin", replay);
+        Invoke("OnReplayState", null, 0L);
     }
     private static void End()
     {
@@ -251,7 +291,8 @@ public static class ReplayTestApi
     public static string LastId;
     public static bool Rendering, Replaying, RejectRegistration, ThrowUnregister;
     internal static Func<ReplayRunState> Capture;
-    internal static Action<ReplayRunState, bool> Begin;
+    internal static Action<bool> Begin;
+    internal static Action<ReplayRunState, long> State;
     internal static Action<long> Clock;
     internal static Action End, BeforeCapture;
     internal static Func<IEnumerable<Canvas>> Canvases;
@@ -262,12 +303,19 @@ public static class ReplayTestApi
     {
         RegisterCalls++;
         if (RejectRegistration) return false;
+        // ReplayApi v2 rejects a begin that takes state, and hands the start value back
+        // through OnReplayState typed like the capture.
+        foreach (var begin in provider.GetType().GetMethods().Where(method => method.Name == "OnReplayBegin"))
+            if (begin.GetParameters().Length > 1 || begin.GetParameters().Any(parameter => parameter.ParameterType != typeof(bool))) return false;
+        var replayState = provider.GetType().GetMethod("OnReplayState");
+        if (replayState == null || replayState.GetParameters()[0].ParameterType != provider.GetType().GetMethod("CaptureRunState").ReturnType) return false;
         var typedInput = provider.GetType().GetMethod("OnReplayKey", BindingFlags.Public | BindingFlags.Instance,
             null, new[] { typeof(KeyCode), typeof(int?), typeof(bool), typeof(long) }, null);
         ReplayKey = (Action<KeyCode, int?, bool, long>)Delegate.CreateDelegate(
             typeof(Action<KeyCode, int?, bool, long>), provider, typedInput);
         Capture = Bind<Func<ReplayRunState>>(provider, "CaptureRunState");
-        Begin = Bind<Action<ReplayRunState, bool>>(provider, "OnReplayBegin");
+        Begin = Bind<Action<bool>>(provider, "OnReplayBegin");
+        State = Bind<Action<ReplayRunState, long>>(provider, "OnReplayState");
         Clock = Bind<Action<long>>(provider, "OnReplayClock");
         End = Bind<Action>(provider, "OnReplayEnd");
         Canvases = Bind<Func<IEnumerable<Canvas>>>(provider, "GetReplayCanvases");
@@ -310,11 +358,12 @@ namespace DonQuixoteOverlay
     internal static class AttemptTracker
     {
         internal static bool Rendering;
-        internal static int Begins, Ends;
+        internal static int Begins, Ends, States;
         internal static AttemptRunState Recorded;
         internal static AttemptRunState CaptureRunState() => new AttemptRunState { FullAttempts = 23 };
-        internal static void BeginReplaySession(AttemptRunState recorded = null) { Recorded = recorded; Rendering = true; Begins++; }
-        internal static void EndReplaySession() { Rendering = false; Ends++; }
+        internal static void BeginReplaySession() { Recorded = null; Rendering = true; Begins++; }
+        internal static void SetReplayState(AttemptRunState recorded) { Recorded = recorded; States++; }
+        internal static void EndReplaySession() { Rendering = false; Recorded = null; Ends++; }
     }
     internal static class ChatterRuntime
     {
@@ -344,14 +393,16 @@ namespace DonQuixoteOverlay.KeyViewerContents
     {
         internal static KeyViewer Instance;
         internal GameObject KeyViewerObject;
-        internal bool Replay, FailBegin, FailEnd, EndSawReplay, EndSawRendering;
-        internal int Refreshes;
+        internal bool Replay, FailBegin, FailEnd, EndSawReplay, EndSawRendering, BeganWithState;
+        internal int Refreshes, States;
         internal KeyCountRunState Recorded;
         internal static KeyCountRunState CaptureRunState() => new KeyCountRunState { Counts = new long[] { 123 }, TotalCount = 456 };
         internal readonly List<InputEdge> Inputs = new List<InputEdge>();
+        internal void SetReplayState(KeyCountRunState recorded) { Recorded = recorded; States++; }
         internal void SetReplayInput(bool replay, KeyCountRunState recorded = null)
         {
-            Recorded = recorded;
+            if (replay) BeganWithState = recorded != null;
+            else Recorded = null;
             Replay = replay;
             if (!replay)
             {

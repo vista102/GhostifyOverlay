@@ -21,14 +21,23 @@ namespace DonQuixoteOverlay
 
         // Replays may load another level and trigger all the ordinary run/scene
         // callbacks. Keep its display context separate from live session history.
-        internal static void BeginReplaySession(AttemptRunState recorded = null)
+        internal static void BeginReplaySession()
         {
             if (_replayContext != null) return;
             FlushBest();
             _replayContext = new ReplayContext(_levelKey, _startedMidMap, _startProgress);
+            // The run's values follow through SetReplayState; until then, as for
+            // a run without saved state, the HUD shows the current values.
+            _recorded = null;
+            DiscardRun();
+        }
+
+        // Replaces, never merges, the displayed run values. Null shows current values.
+        internal static void SetReplayState(AttemptRunState recorded)
+        {
+            if (_replayContext == null) return;
             // Own the snapshot: neither game callbacks nor a caller can change it.
             _recorded = recorded == null ? null : CopyState(recorded);
-            DiscardRun();
         }
 
         internal static void EndReplaySession()

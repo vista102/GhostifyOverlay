@@ -113,7 +113,7 @@ Pitch는 백분율로 표시하며, FPS는 초당 10회 갱신합니다. 판정 
 
 ## TUFReplay 호환
 
-게임 안에서 리플레이 오버레이를 보려면 **TUFReplay 1.2.0 이상**을 활성화한 뒤 저장된 리플레이를 재생합니다. 영상에 오버레이를 넣으려면 **OrbitRender 2.8.0 이상**도 활성화하고 TUFReplay에서 영상 만들기를 실행합니다. [TUFReplay 다운로드](https://github.com/KGH1113/TUFReplay/releases) · [OrbitRender 다운로드](https://github.com/imnyang/OrbitRender/releases)
+게임 안에서 리플레이 오버레이를 보려면 **ReplayApi 2를 지원하는 TUFReplay**를 활성화한 뒤 저장된 리플레이를 재생합니다. ReplayApi 1만 지원하는 이전 TUFReplay에는 연결하지 않습니다. 영상에 오버레이를 넣으려면 **OrbitRender 2.8.0 이상**도 활성화하고 TUFReplay에서 영상 만들기를 실행합니다. [TUFReplay 다운로드](https://github.com/KGH1113/TUFReplay/releases) · [OrbitRender 다운로드](https://github.com/imnyang/OrbitRender/releases)
 
 녹화 당시의 시도 횟수, 시작 지점, 최고 진행도, 키별 누적 횟수를 리플레이와 함께 저장합니다. 재생하면 기록된 키 입력과 레인·KPS가 리플레이 시간에 맞춰 표시됩니다. 오버레이 상태가 저장되기 전에 녹화한 리플레이는 현재 카운터를 기준으로 표시합니다.
 
