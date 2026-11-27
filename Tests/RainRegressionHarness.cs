@@ -59,9 +59,13 @@ namespace UnityEngine {
     public class Transform : Component {
         public readonly List<Transform> Children = new List<Transform>();
         public Transform parent;
-        public Vector3 localScale;
+        public Vector3 localScale,localPosition;
+        // Local Z of the world origin under the parent. Unity 6 measured 972 for a
+        // canvas captured by ADOFAI's default render camera; 0 for a screen overlay.
+        public static float WorldOriginDepth;
         public void SetParent(Transform target,bool worldPositionStays=true) {
             parent?.Children.Remove(this);parent=target;target?.Children.Add(this);
+            if(worldPositionStays && target!=null)localPosition=new Vector3(localPosition.x,localPosition.y,WorldOriginDepth);
         }
         public void SetSiblingIndex(int index) {
             var children=parent.Children;children.Remove(this);
@@ -148,7 +152,24 @@ namespace DonQuixoteOverlay.KeyViewerContents {
             return all;
         }
         public static string[] Run() {
-            Results.Clear();Solid();Layering();Capacity();Reuse();Clipping();return Results.ToArray();
+            Results.Clear();Solid();Layering();Capacity();Reuse();Clipping();Depth();return Results.ToArray();
+        }
+        private static void Depth() {
+            // A bar first created during a replay render must not carry the render
+            // camera's depth back into the screen overlay through the pool.
+            UnityEngine.Transform.WorldOriginDepth=972;
+            try {
+                var manager=Manager();var pool=new RainPool(new UnityEngine.GameObject("captured lane").transform);
+                var key=Lane(pool,1);var raw=Start(manager,key,false,0);
+                var rain=manager.RainList.Single();
+                Check(rain.Transform.localPosition.z==0,"a bar created under a camera-captured canvas stays on the lane plane");
+                raw.Finish(300000);KeyViewer.CurrentTicks=100000000;manager.Tick();
+                UnityEngine.Transform.WorldOriginDepth=0;
+                Start(manager,key,false,100001000);
+                Check(ReferenceEquals(manager.RainList.Single(),rain) && rain.Transform.localPosition.z==0,"the pooled bar reused after the render is still on the lane plane");
+                manager.Clear();
+            }
+            finally { UnityEngine.Transform.WorldOriginDepth=0; }
         }
         private static void Solid() {
             var pool=new RainPool(new UnityEngine.GameObject("solid lane").transform);

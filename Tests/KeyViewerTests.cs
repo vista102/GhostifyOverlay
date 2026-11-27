@@ -22,7 +22,7 @@ public static class KeyViewerTests {
     private static object EnumValue(string name,string value) { return Enum.Parse(T(name),value); }
     public static string[] Run(Assembly assembly) {
         Mod=assembly;Results.Clear();
-        try { Transitions();Core();Clock();Kps();Rows();Rain();Metadata();return Results.ToArray(); }
+        try { Transitions();Core();Clock();Kps();Rows();Rain();Metadata();MeterAnchor();return Results.ToArray(); }
         catch(Exception ex) { throw new Exception(ex.ToString()+"\nLast assertion: "+Results.LastOrDefault(),ex); }
     }
     private static void Transitions() {
@@ -163,5 +163,25 @@ public static class KeyViewerTests {
         int listeners=new[]{game}.Concat(game.GetNestedTypes(All)).SelectMany(t=>t.GetMethods(All|BindingFlags.DeclaredOnly)).Count(m=>m.ReturnType==typeof(void)&&m.GetParameters().Length==1&&m.GetParameters()[0].ParameterType.Name=="SkyHookEvent");
         Check(listeners>0,"game event listener is discoverable without starting native hooks");
         Check(T("KeyViewerSetting").GetField("AutoSetupKeyLimit")==null,"key viewer no longer carries key limiter setup");
+    }
+    // Detailed judgments and Timing Scale sit above the game's hit error meter.
+    private static void MeterAnchor() {
+        MethodInfo anchor=Mod.GetType("DonQuixoteOverlay.OverlayPlacement",true).GetMethod("MeterAnchor",All);
+        Type vector=anchor.GetParameters()[0].ParameterType,rect=anchor.GetParameters()[1].ParameterType;
+        object V(float x,float y) => Activator.CreateInstance(vector,x,y);
+        object R(float x,float y,float w,float h) => Activator.CreateInstance(rect,x,y,w,h);
+        bool At(object point,object meter,object overlay,float x,float y) {
+            object value=anchor.Invoke(null,new[]{point,meter,overlay});
+            return Math.Abs((float)vector.GetField("x").GetValue(value)-x)<.01f && Math.Abs((float)vector.GetField("y").GetValue(value)-y)<.01f;
+        }
+        // 2560x1440 window: the overlay canvas is 1920x1080 units (scale 4/3) and the
+        // meter canvas is pixel sized. Screen points (1280,100) and (1600,300) gave
+        // (0,81) and (240,231) with the previous screen-pixel formula.
+        object screen=R(-1280,-720,2560,1440),overlay=R(-960,-540,1920,1080);
+        Check(At(V(0,-620),screen,overlay,0,81) && At(V(320,-420),screen,overlay,240,231),"meter anchor keeps the existing screen-overlay placement");
+        // A render captures the recorded meter at the video size. Its canvas units
+        // differ from the overlay's, but the same spot in the video gives the same anchor.
+        Check(At(V(0,-480),R(-960,-540,1920,1080),overlay,0,66) && At(V(0,-960),R(-1920,-1080,3840,2160),overlay,0,66),
+            "meter anchor follows the meter's place in the video, not the window or canvas units");
     }
 }
