@@ -179,10 +179,27 @@ namespace DonQuixoteOverlay {
                 "checkpoint capture includes practice counters and the displayed start progress");
             recorded.Attempts = 12; recorded.ProgressAttempts = 34;
             recorded.FullAttempts = 56; recorded.FullProgressAttempts = 78; recorded.BestProgress = .9f;
-            AttemptTracker.BeginReplaySession(recorded);
+            AttemptTracker.SetReplayState(recorded);
+            Check(AttemptTracker.Attempts == 1 && AttemptTracker.FullAttempts == 1,
+                "saved run values outside a replay cannot replace live counters");
+            AttemptTracker.BeginReplaySession();
+            Check(AttemptTracker.Attempts == 1 && AttemptTracker.FullProgressAttempts == 1 && AttemptTracker.StartProgress == .22f,
+                "replay begin shows current values until the run's start value arrives");
+            AttemptTracker.SetReplayState(recorded);
             recorded.FullAttempts = 999;
             Check(AttemptTracker.Attempts == 12 && AttemptTracker.ProgressAttempts == 34 && AttemptTracker.FullAttempts == 56 && AttemptTracker.FullProgressAttempts == 78,
                 "replay reads all four historical counters from an owned copy");
+            AttemptTracker.BeginReplaySession();
+            Check(AttemptTracker.FullAttempts == 56, "a duplicate replay begin keeps the value already handed over");
+            AttemptTracker.SetReplayState(new AttemptRunState { Attempts = 3, FullAttempts = 4, StartProgress = float.NaN, BestProgress = 2f });
+            Check(AttemptTracker.Attempts == 3 && AttemptTracker.FullAttempts == 4 && AttemptTracker.ProgressAttempts == 0 && !AttemptTracker.StartedMidMap
+                && AttemptTracker.StartProgress == 0 && AttemptTracker.BestProgress == 1,
+                "a later value replaces every displayed run value instead of merging, with progress kept finite");
+            AttemptTracker.SetReplayState(null);
+            Check(AttemptTracker.Attempts == 1 && AttemptTracker.FullAttempts == 1 && AttemptTracker.StartProgress == .22f,
+                "a null value shows current values like a run without saved state");
+            recorded.FullAttempts = 56;
+            AttemptTracker.SetReplayState(recorded);
             Check(!AttemptTracker.CountsAttempts(true, false, false, false), "in-game replays are ineligible even without captureFramerate");
             saves = Main.Saves; requests = Main.Requests;
             AttemptTracker.PrepareRun(controller, 0); Next(controller);
@@ -198,7 +215,8 @@ namespace DonQuixoteOverlay {
             Main.Settings.Overlay.BestProgress[key] = float.PositiveInfinity;
             Check(AttemptTracker.CaptureRunState().BestProgress == 0, "run state never exposes non-finite progress to the serializer");
             Main.Settings.Overlay.BestProgress[key] = .4f;
-            AttemptTracker.BeginReplaySession(null);
+            AttemptTracker.BeginReplaySession();
+            AttemptTracker.SetReplayState(null);
             Check(AttemptTracker.FullAttempts == 1 && AttemptTracker.BestProgress == .4f, "older runs without state show current values");
             AttemptTracker.EndReplaySession();
 

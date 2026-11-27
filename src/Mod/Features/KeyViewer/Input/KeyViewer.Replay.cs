@@ -25,11 +25,7 @@ namespace DonQuixoteOverlay.KeyViewerContents
                 if (_replayCounts == null)
                 {
                     _replayCounts = new KeyCountData();
-                    long[] counts = recorded?.Counts ?? KeyCountData.Instance.Count;
-                    Array.Copy(counts, _replayCounts.Count, Math.Min(counts.Length, _replayCounts.Count.Length));
-                    for (int i = 0; i < _replayCounts.Count.Length; i++)
-                        _replayCounts.Count[i] = Math.Max(0, _replayCounts.Count[i]);
-                    _replayCounts.TotalCount = Math.Max(0, recorded?.TotalCount ?? KeyCountData.Instance.TotalCount);
+                    CopyReplayCounts(recorded);
                 }
                 if (_listening) StopEventListener();
                 ResetTransient(false);
@@ -48,6 +44,28 @@ namespace DonQuixoteOverlay.KeyViewerContents
                 UpdateCounters();
                 if (Main.Enabled && Settings.Enabled && !_listening) StartEventListener();
             }
+        }
+
+        // The run's saved counts arrive after replay input began. Replace the
+        // base instead of adding to it, so a repeated value never counts presses
+        // twice; held keys and rain stay. Null copies the current counts again.
+        internal void SetReplayState(KeyCountRunState recorded)
+        {
+            if (_replayCounts == null) return;
+            CopyReplayCounts(recorded);
+            if (_built) UpdateCounters();
+        }
+
+        private void CopyReplayCounts(KeyCountRunState recorded)
+        {
+            long[] counts = recorded?.Counts ?? KeyCountData.Instance.Count;
+            long[] owned = _replayCounts.Count;
+            // A shorter value must not keep slots from the value it replaces.
+            Array.Clear(owned, 0, owned.Length);
+            Array.Copy(counts, owned, Math.Min(counts.Length, owned.Length));
+            for (int i = 0; i < owned.Length; i++)
+                owned[i] = Math.Max(0, owned[i]);
+            _replayCounts.TotalCount = Math.Max(0, recorded?.TotalCount ?? KeyCountData.Instance.TotalCount);
         }
 
         // Match the live label and native maps, without the live ghost-only split.

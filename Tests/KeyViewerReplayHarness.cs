@@ -149,9 +149,14 @@ public static class KeyViewerReplayHarness
             "capture preserves 64-bit counts in a detached array");
         saved.Count[0] = 11; saved.TotalCount = 22;
         var viewer = new KeyViewer(); viewer.InitializeHarness();
+        viewer.SetReplayState(recorded);
+        check(ReferenceEquals(viewer.Counts, saved) && saved.Count[0] == 11 && saved.TotalCount == 22,
+            "a saved value outside replay cannot replace live counters");
         ReplayApiBridge.IsReplayActive = true;
-        viewer.SetReplayInput(true, recorded);
-        check(viewer.Total.Value.text == "4000000000" && viewer.Keys[0].Value.text == "3000000000", "historical counts are visible immediately at replay begin");
+        viewer.SetReplayInput(true);
+        check(viewer.Total.Value.text == "22" && viewer.Keys[0].Value.text == "11", "replay begin shows a copy of current counts until the start value arrives");
+        viewer.SetReplayState(recorded);
+        check(viewer.Total.Value.text == "4000000000" && viewer.Keys[0].Value.text == "3000000000", "historical counts are visible as soon as the start value arrives");
         viewer.ApplyReplayKey(KeyCode.A, null, false, 0);
         check(viewer.Counts.TotalCount == 4000000000L && !viewer.Held(0), "a seek release without a previous press is harmless");
         viewer.ApplyReplayKey(KeyCode.A, null, true, 10);
@@ -163,12 +168,31 @@ public static class KeyViewerReplayHarness
             "replay keys mutate neither the recorded snapshot nor the live save object");
         viewer.SetReplayInput(true, recorded);
         check(viewer.Counts.TotalCount == 4000000002L, "a viewer rebuild does not reset already replayed counts");
+        viewer.ApplyReplayKey(KeyCode.A, null, true, 35);
+        var replayed = viewer.Counts;
+        viewer.SetReplayState(recorded);
+        check(ReferenceEquals(viewer.Counts, replayed) && viewer.Counts.TotalCount == 4000000000L && viewer.Counts.Count[0] == 3000000000L
+            && viewer.Total.Value.text == "4000000000" && viewer.Held(0),
+            "a repeated value replaces the replay base in place instead of adding to it, keeping held keys");
+        viewer.ApplyReplayKey(KeyCode.A, null, false, 40);
+        viewer.ApplyReplayKey(KeyCode.A, null, true, 50);
+        check(viewer.Counts.TotalCount == 4000000001L && viewer.Counts.Count[0] == 3000000001L,
+            "presses after a replacement count once from the new base");
+        viewer.SetReplayState(new KeyCountRunState { Counts = new long[] { -1, 123 }, TotalCount = -1 });
+        check(viewer.Counts.Count[0] == 0 && viewer.Counts.Count[1] == 123 && viewer.Counts.Count[2] == 0 && viewer.Counts.TotalCount == 0,
+            "short or negative historical count arrays are normalized into safe owned slots");
+        viewer.SetReplayState(new KeyCountRunState { Counts = new long[] { 9 }, TotalCount = 9 });
+        check(viewer.Counts.Count[0] == 9 && viewer.Counts.Count[1] == 0 && viewer.Counts.TotalCount == 9 && viewer.Keys[1].Value.text == "0",
+            "a shorter replacing value clears slots the previous value set");
+        viewer.SetReplayState(null);
+        check(viewer.Counts.Count[0] == 11 && viewer.Counts.Count[1] == 0 && viewer.Counts.TotalCount == 22 && !ReferenceEquals(viewer.Counts, saved),
+            "a null value copies current counts like a recording without key state");
         ReplayApiBridge.IsReplayActive = false; viewer.SetReplayInput(false);
         check(viewer.Total.Value.text == "22" && viewer.Keys[0].Value.text == "11", "historical playback restores the current live display");
         ReplayApiBridge.IsReplayActive = true;
         viewer.SetReplayInput(true, new KeyCountRunState { Counts = new long[] { -1, 123 }, TotalCount = -1 });
         check(viewer.Counts.Count[0] == 0 && viewer.Counts.Count[1] == 123 && viewer.Counts.Count[2] == 0 && viewer.Counts.TotalCount == 0,
-            "short or negative historical count arrays are normalized into safe owned slots");
+            "a viewer built during replay normalizes the handed-over counts into owned slots");
         ReplayApiBridge.IsReplayActive = false; viewer.SetReplayInput(false);
         ReplayApiBridge.IsReplayActive = true; viewer.SetReplayInput(true, null);
         check(viewer.Counts.Count[0] == 11 && viewer.Counts.TotalCount == 22, "older recordings without key state copy current values");
